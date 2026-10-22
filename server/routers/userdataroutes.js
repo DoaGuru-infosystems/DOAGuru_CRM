@@ -4,7 +4,6 @@ const router = express.Router();
 const upload = require("../controllers/fileUploadController");
 const {
   generalUpload,
-  blogUpload,
   uploadRegistryDoc,
 } = require("../config/multerConfig");
 
@@ -232,17 +231,6 @@ const {
   addUnitsBulk,
 } = require("../controllers/ControllerTen");
 
-const {
-  registerLandingAdmin,
-  landingAdminlogin,
-  sendOtpForlandAdmin,
-  createBlog,
-  getAllBlogs,
-  getBlogsById,
-  deleteBlogsById,
-  updateBlog,
-  getOnlyPublishedBlogs,
-} = require("../controllers/LandingController");
 
 const {
   createBooking,
@@ -1008,16 +996,6 @@ router.put(
 const excelUpload = multer({ dest: "uploads/" });
 router.post("/bulk-upload-leads", excelUpload.single("file"), bulkUploadLeads);
 
-// landing page admin route
-router.post("/registerLandingAdmin", registerLandingAdmin);
-router.post("/landingAdminlogin", landingAdminlogin);
-router.post("/sendOtpForlandAdmin", sendOtpForlandAdmin);
-router.post("/createBlog", blogUpload.single("feature_image"), createBlog);
-router.get("/getAllBlogs", getAllBlogs);
-router.get("/getBlogsById/:bid", getBlogsById);
-router.delete("/deleteBlogsById/:bid", deleteBlogsById);
-router.put("/updateBlog/:bid", blogUpload.single("feature_image"), updateBlog);
-router.get("/getOnlyPublishedBlogs", getOnlyPublishedBlogs);
 router.put("/updateLeadAssignment/:leadId", updateLeadAssignment);
 router.post("/addUnitsBulk", excelUpload.single("file"), addUnitsBulk);
 

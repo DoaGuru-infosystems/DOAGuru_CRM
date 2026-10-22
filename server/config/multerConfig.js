@@ -18,38 +18,6 @@ const generalUpload = multer({
   },
 });
 
-const blogStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "/blog_image"));
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const base = path
-      .basename(file.originalname, ext)
-      .replace(/[^a-z0-9]/gi, "_")
-      .toLowerCase();
-    cb(null, `${Date.now()}_${base}${ext}`);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  const allowedMime = "image/webp";
-  const allowedExt = ".webp";
-  const ext = path.extname(file.originalname).toLowerCase();
-
-  if (file.mimetype === allowedMime && ext === allowedExt) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only .webp images are allowed!"), false);
-  }
-};
-
-const blogUpload = multer({
-  storage: blogStorage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
-
 const registryStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.resolve(__dirname, "../registry_documents"));
@@ -75,4 +43,4 @@ const uploadRegistryDoc = multer({
   registryFileFilter,
 }).single("registry_document_url");
 
-module.exports = { generalUpload, blogUpload, uploadRegistryDoc };
+module.exports = { generalUpload, uploadRegistryDoc };

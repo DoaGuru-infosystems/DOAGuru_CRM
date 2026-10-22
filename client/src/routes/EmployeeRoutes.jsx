@@ -38,7 +38,6 @@ import EmployeeManagement from "../adiComponent/EmployManagementContent";
 import EmployeeSingle from "../adiComponent/EmployeSingleContent";
 import SingleOrganization from "../adiComponent/SingleOrganizaton";
 import Reporting from "../adiComponent/Reporting";
-import Landingpage from "../pages/Landingpage";
 import EmployeeLogin from "../components/EmployeeModule/EmployeeLogin";
 import EmployeeQuotationData from "../components/EmployeeModule/EmployeeDataExport/EmployeeQuotationData";
 import MainQuotation from "../components/EmployeeModule/QuotationEmployee&Invoice/MainQuotationPage";
