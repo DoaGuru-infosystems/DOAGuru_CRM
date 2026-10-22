@@ -1,0 +1,211 @@
+import React, { useRef, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+const RemarkCreationPopup = ({
+  isOpen,
+  onClose,
+  fetchRemark,
+  fetchLeads,
+  fetchMetaLeads,
+  leads,
+}) => {
+  const superadminuser = useSelector((state) => state.auth.user);
+  const token = superadminuser.token;
+  const modalRef = useRef();
+  const { type, id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [remark, setRemark] = useState({
+    remark_lead_id: leads[0]?.lead_id || leads[0]?.leadgen_id,
+    remark_project_id: leads[0]?.project_id || leads[0]?.meta_project_id,
+    remark_employeeId: leads[0]?.staff_id || leads[0]?.meta_assignedTo,
+    remark_status: "",
+    answer_remark: "",
+    remark_date: "",
+    lead_status: "Remark created",
+    leadType: type,
+  });
+
+  useEffect(() => {
+    setRemark({
+      ...remark,
+      remark_lead_id: leads[0]?.lead_id || leads[0]?.leadgen_id,
+      remark_project_id: leads[0]?.project_id || leads[0]?.meta_project_id,
+      remark_employeeId: leads[0]?.staff_id || leads[0]?.meta_assignedTo,
+    });
+  }, [leads]);
+
+  const handleInputChangeRemark = (e) => {
+    const { name, value } = e.target;
+    setRemark((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const saveRemark = async (e) => {
+    e.preventDefault();
+    if (!remark.remark_status) {
+      toast.error("Please select a remark status.");
+      return;
+    }
+
+    if (!remark.remark_date) {
+      toast.error("Please select a date.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `https://crm-generalize.siarasystems.com/api/remarks`,
+        remark,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Remark created and lead updated successfully");
+
+      fetchRemark();
+      fetchLeads();
+      fetchMetaLeads();
+      setLoading(false);
+      onClose();
+    } catch (error) {
+      console.error("Request failed:", error);
+      setLoading(false);
+      toast.error("Failed to create remark and update lead.");
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    const handleEscape = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            ref={modalRef}
+            className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4"
+            initial={{ scale: 0.9, opacity: 0, y: -30 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 30 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Title */}
+            <h2 className="text-2xl font-bold mb-4 text-center text-cyan-700">
+              Add Remark
+            </h2>
+
+            {/* Form */}
+            <form onSubmit={saveRemark} className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Answer Remark
+                </label>
+                <input
+                  type="text"
+                  name="answer_remark"
+                  value={remark.answer_remark}
+                  onChange={handleInputChangeRemark}
+                  placeholder="Answer remark"
+                  className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+
+              {/* Remark Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Remark Status
+                </label>
+                <select
+                  name="remark_status"
+                  placeholder=""
+                  value={remark.remark_status}
+                  onChange={handleInputChangeRemark}
+                  className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-cyan-500"
+                >
+                  <option value="">--select--</option>
+                  <option value="Fresh-Lead">Fresh Lead</option>
+                  <option value="Contacted">Contacted</option>
+                  <option value="Interested">Interested</option>
+                  <option value="Site Visit Scheduled">
+                    Site Visit Scheduled
+                  </option>
+                  <option value="Site Visited">Site Visited</option>
+                  <option value="In Discussion">In Discussion</option>
+                  <option value="Converted">Converted</option>
+                  <option value="Not Interested">Not Interested</option>
+                  <option value="Invalid Lead">Invalid Lead</option>
+                  <option value="Lost">Lost</option>
+                </select>
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Remark Date
+                </label>
+                <input
+                  type="date"
+                  name="remark_date"
+                  value={remark.remark_date}
+                  onChange={handleInputChangeRemark}
+                  className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
+                  onClick={onClose}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 rounded text-white ${loading ? "bg-gray-600" : "bg-cyan-600 hover:bg-cyan-700"
+                    }`}
+                >
+                  {loading ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default RemarkCreationPopup;

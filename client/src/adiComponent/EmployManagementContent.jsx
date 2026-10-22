@@ -1,0 +1,246 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { BsPencilSquare, BsTrash, BsPlusCircle } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import ReactPaginate from "react-paginate";
+import { useSelector } from "react-redux";
+import SuperAddEditEmployeePopup from "./Super-Admin/SuperAdminProject/SuperAddEditEmployeePopup";
+
+const EmployeeManagementContent = () => {
+  const [employees, setEmployees] = useState([]);
+  const superadminuser = useSelector((state) => state.auth.user);
+  const userId = superadminuser.id;
+  const token = superadminuser.token;
+  const [newEmployee, setNewEmployee] = useState({
+    name: "",
+    email: "",
+    password: "",
+    position: "",
+    phone: "",
+    user_id: userId,
+  });
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 7;
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/getEmployeeByOrg/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEmployees(data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+
+  const filterEmp = employees?.filter((item) => {
+    return item?.staff_role === "employee";
+  });
+
+  const handleKeyPress = (e) => {
+    if (e.target.name === "phone") {
+      if (
+        !/[0-9]/.test(e.key) &&
+        !["Backspace", "ArrowLeft", "ArrowRight"].includes(e.key)
+      ) {
+        e.preventDefault();
+      }
+    }
+  };
+
+  const handleEditEmployee = (data) => {
+    setEditingIndex(data);
+    setShowForm(true);
+  };
+
+  const handleDeleteEmployee = async (employeeId) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this employee?"
+    );
+    if (isConfirmed) {
+      try {
+        await axios.delete(
+          `https://crm-generalize.siarasystems.com/api/deleteEmployee/${employeeId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        fetchEmployees();
+      } catch (error) {
+        console.error("Error deleting employee:", error);
+      }
+    }
+  };
+
+  const handleEmployeeClick = (employeeId) => {
+    navigate(`/employee-single/${employeeId}`);
+  };
+
+  const pageCount = Math.ceil(filterEmp.length / itemsPerPage);
+
+  // Pagination logic
+  const indexOfLastLead = (currentPage + 1) * itemsPerPage;
+  const indexOfFirstLead = indexOfLastLead - itemsPerPage;
+  const currentemployee = filterEmp.slice(indexOfFirstLead, indexOfLastLead);
+
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected);
+  };
+
+  console.log(employees);
+
+  return (
+    <>
+      <div className="flex sm:mt-20 mt-16">
+        <div className="w-full min-h-screen bg-[#F9FAFF] p-2">
+          <div className=" container px-3">
+            <h2 className="text-2xl text-center mt-[2rem] font-medium">
+              Employee Management
+            </h2>
+            <div className="mx-auto h-[3px] w-16 bg-cyan-600 my-3"></div>
+          </div>
+
+          <div className=" container flex flex-col min-h-screen lg:flex-row">
+            <main className="flex-1 p-4 lg:p-8">
+              <div className="flex flex-col-reverse items-start justify-between mb-8 lg:flex-row lg:items-center">
+                <button
+                  onClick={() => {
+                    setShowForm(true);
+                    setEditingIndex(null);
+                  }}
+                  className="flex items-center px-4 py-2 font-medium text-white transition duration-200 bg-cyan-500 rounded-lg shadow-lg hover:bg-cyan-600"
+                >
+                  <BsPlusCircle className="mr-2 font-medium" /> Add Employee
+                </button>
+              </div>
+
+              <div className="overflow-x-auto rounded-lg shadow-md">
+                <table className="min-w-full bg-white">
+                  <thead>
+                    <tr className="text-sm font-semibold text-left text-gray-600 uppercase bg-gray-200">
+                      <th className="px-4 py-3 sm:px-6">Name</th>
+                      <th className="px-4 py-3 sm:px-6">Email</th>
+                      <th className="px-4 py-3 sm:px-6">Role</th>
+                      <th className="px-4 py-3 sm:px-6">Phone</th>
+                      <th className="px-4 py-3 sm:px-6">Status</th>
+                      <th className="px-4 py-3 sm:px-6">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentemployee.length > 0 ? (
+                      currentemployee
+                        .filter((employee) => employee && employee.staff_name)
+                        .map((employee, index) => (
+                          <tr
+                            key={employee.staff_id}
+                            className="border-b border-gray-200 cursor-pointer hover:text-cyan-600"
+                            onClick={() =>
+                              handleEmployeeClick(employee.staff_id)
+                            }
+                          >
+                            <td className="px-4 py-4 sm:px-6">
+                              {employee.staff_name}
+                            </td>
+                            <td className="px-4 py-4 sm:px-6">
+                              {employee.staff_email}
+                            </td>
+                            <td className="px-4 py-4 sm:px-6">
+                              {employee.staff_role}
+                            </td>
+                            <td className="px-4 py-4 sm:px-6">
+                              {employee.staff_phone}
+                            </td>
+                            <td className="px-4 py-4 sm:px-6 capitalize">
+                              {employee.staff_status}
+                            </td>
+                            <td className="px-4 py-4 sm:px-6">
+                              <div className="flex space-x-2 sm:space-x-4">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditEmployee(employee);
+                                  }}
+                                  className="text-cyan-500 transition duration-200 hover:text-cyan-600"
+                                >
+                                  <BsPencilSquare size={20} />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteEmployee(employee.staff_id);
+                                  }}
+                                  className="text-red-500 transition duration-200 hover:text-red-600"
+                                >
+                                  <BsTrash size={20} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="py-4 text-center">
+                          No employees found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-2 mb-2 flex justify-center">
+                <ReactPaginate
+                  previousLabel={"Previous"}
+                  nextLabel={"Next"}
+                  breakLabel={"..."}
+                  pageCount={pageCount}
+                  forcePage={currentPage}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={3}
+                  onPageChange={handlePageClick}
+                  containerClassName={"pagination"}
+                  activeClassName={"active"}
+                  pageClassName={"page-item"}
+                  pageLinkClassName={"page-link"}
+                  previousClassName={"page-item"}
+                  nextClassName={"page-item"}
+                  previousLinkClassName={"page-link"}
+                  nextLinkClassName={"page-link"}
+                  breakClassName={"page-item"}
+                  breakLinkClassName={"page-link"}
+                />
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+      <SuperAddEditEmployeePopup
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+        editingIndex={editingIndex}
+        setEditingIndex={setEditingIndex}
+        fetchEmployees={fetchEmployees}
+      />
+    </>
+  );
+};
+
+export default EmployeeManagementContent;

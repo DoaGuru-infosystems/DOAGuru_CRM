@@ -1,0 +1,216 @@
+import axios from "axios";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import ReactPaginate from "react-paginate";
+
+const SuperAdminVisitContent = () => {
+  const [leads, setLeads] = useState([]);
+  const [filteredLeads, setFilteredLeads] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [leadsPerPage, setLeadsPerPage] = useState(7);
+  const navigate = useNavigate();
+  const superadminuser = useSelector((state) => state.auth.user);
+  const token = superadminuser.token;
+  console.log(superadminuser);
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
+
+  const fetchLeads = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/leads-all-visits/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setLeads(data);
+      setFilteredLeads(data);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+    }
+  };
+
+  console.log(leads);
+
+  useEffect(() => {
+    let filtered = leads;
+    console.log(filtered);
+
+    if (searchTerm) {
+      const trimmedSearchTerm = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter((lead) =>
+        ["name", "employee_name", "visit"].some((key) =>
+          lead[key]?.toLowerCase().trim().includes(trimmedSearchTerm)
+        )
+      );
+    }
+
+    setFilteredLeads(filtered);
+    setCurrentPage(0);
+  }, [searchTerm]);
+
+  // Calculate page data for pagination
+  const pageCount = Math.ceil(filteredLeads.length / leadsPerPage);
+
+  // Pagination logic
+  const indexOfLastLead = (currentPage + 1) * leadsPerPage;
+  const indexOfFirstLead = indexOfLastLead - leadsPerPage;
+  const currentLeads =
+    leadsPerPage === Infinity
+      ? filteredLeads
+      : filteredLeads.slice(indexOfFirstLead, indexOfLastLead);
+
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected);
+    console.log("change current page ", data.selected);
+  };
+  const handleLeadsPerPageChange = (e) => {
+    const value = e.target.value;
+    setLeadsPerPage(value === "All" ? Infinity : parseInt(value, 10));
+    setCurrentPage(0);
+  };
+
+  return (
+    <>
+      <div className="flex mt-20">
+        <div className="w-[90%] sm:w-full min-h-screen bg-[#F9FAFF] p-2">
+          <div>
+            <div className="mt-[2rem]">
+              <button
+                onClick={() => navigate(-1)}
+                className="bg-cyan-600 text-white px-3 py-1 max-sm:hidden rounded-lg hover:bg-cyan-700 transition-colors"
+              >
+                Back
+              </button>
+            </div>
+            <div className="flex flex-col">
+              <div className="flex-grow p-4 sm:ml-0">
+                <center className="text-2xl text-center font-medium">
+                  Total Visits
+                </center>
+                <center className="mx-auto h-[3px] w-16 bg-cyan-600 my-3"></center>
+                <div className="flex justify-between mb-3">
+                  <input
+                    type="text"
+                    placeholder=" Name,Visit Type,Assigned To"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="border rounded-md p-2 w-2/4"
+                  />
+                  <select
+                    onChange={handleLeadsPerPageChange}
+                    className="border rounded-md p-2 w-1/4"
+                  >
+                    <option value={7}>Number of rows: 7</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value="All">All</option>
+                  </select>
+                </div>
+                <div className="overflow-x-auto mt-2">
+                  <table className="min-w-full  border border-gray-300">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-cyan-600 uppercase tracking-wider">
+                          S.no
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-cyan-600 uppercase tracking-wider">
+                          Lead Id
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-cyan-600 uppercase tracking-wider">
+                          Name
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-cyan-600 uppercase tracking-wider">
+                          Assigned To
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-cyan-600 uppercase tracking-wider">
+                          Visit Type
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-cyan-600 uppercase tracking-wider">
+                          Visit Date
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {currentLeads.length > 0 ? (
+                        currentLeads.map((visit, index) => (
+                          <tr key={visit.id}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {leadsPerPage === Infinity
+                                ? index + 1
+                                : index + 1 + currentPage * leadsPerPage}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {visit.lead_id}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {visit.name}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {visit.staff_name}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {visit.visit_type}
+                            </td>
+                            <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                              {visit.visit_date === "pending"
+                                ? "pending"
+                                : moment(visit.visit_date)
+                                  .format("DD MMM YYYY")
+                                  .toUpperCase()}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={11} className="py-4 text-center">
+                            No data found
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-2 mb-2 flex justify-center">
+                  <ReactPaginate
+                    previousLabel={"Previous"}
+                    nextLabel={"Next"}
+                    breakLabel={"..."}
+                    pageCount={pageCount}
+                    forcePage={currentPage}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={3}
+                    onPageChange={handlePageClick}
+                    containerClassName={"pagination"}
+                    activeClassName={"active"}
+                    pageClassName={"page-item"}
+                    pageLinkClassName={"page-link"}
+                    previousClassName={"page-item"}
+                    nextClassName={"page-item"}
+                    previousLinkClassName={"page-link"}
+                    nextLinkClassName={"page-link"}
+                    breakClassName={"page-item"}
+                    breakLinkClassName={"page-link"}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default SuperAdminVisitContent;

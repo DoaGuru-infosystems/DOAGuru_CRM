@@ -1,0 +1,48 @@
+import React, { useState } from "react";
+import Overview from "./Overview2";
+import SuperLeadGraph from "./Super-Admin/SuperLeadGraph";
+import SuperLeadAllVisitChart from "./Super-Admin/SuperLeadAllVisitChart";
+import SuperDealClosedGraph from "./Super-Admin/SuperDealClosedGraph";
+import SuperLeadsToday from "./Super-Admin/SuperLeadsToday";
+
+const SuperDashContent = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  return (
+    <>
+      <div className="flex mt-20">
+        <div className="w-[90%] sm:w-full min-h-screen bg-[#F9FAFF] p-2">
+          <div className="">
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl font-bold text-gray-600 mt-2">
+                Super Admin Dashboard
+              </h2>
+            </div>
+
+            <div className="flex min-h-screen overflow-hidden ">
+              <div className="flex-1 max-w-full">
+                <div>
+                  <Overview />
+                </div>
+                <div className="grid grid-cols-1 gap-1 mx-2 mt-6 md:grid-cols-2 lg:grid-cols-3">
+                  <SuperLeadGraph />
+                  <SuperLeadAllVisitChart />
+                  <SuperDealClosedGraph />
+                </div>
+
+                <SuperLeadsToday />
+                {/* <ToDoList /> */}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default SuperDashContent;

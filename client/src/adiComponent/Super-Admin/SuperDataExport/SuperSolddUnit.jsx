@@ -1,0 +1,365 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import moment from "moment";
+import ReactPaginate from "react-paginate";
+import * as XLSX from "xlsx";
+import { useSelector } from "react-redux";
+
+const SuperSoldnit = () => {
+  const [leads, setLeads] = useState([]);
+  const [filteredLeads, setFilteredLeads] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [employees, setEmployees] = useState([]);
+
+  const leadsPerPage = 7;
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [soldUnits, setSoldUnits] = useState([]);
+  const [selectedColumns, setSelectedColumns] = useState([
+    "lead_id",
+    "project_name",
+    "name",
+    "unit_no",
+    "employee_name",
+    "unit_status",
+    "date",
+  ]);
+  const superadminuser = useSelector((state) => state.auth.user);
+  const token = superadminuser.token;
+  const userId = superadminuser.staff_id;
+
+  useEffect(() => {
+    fetchEmployeeUnitSold();
+    fetchSoldUnits();
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployeeUnitSold = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setLeads(data);
+      setFilteredLeads(data);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+    }
+  };
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/employee-super-admin/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setEmployees(response.data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+
+  const fetchSoldUnits = async () => {
+    try {
+      const response = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/super-admin-unit-sold/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSoldUnits(response.data.data || response.data || []);
+      console.log("Fetched Sold Units:", response.data);
+    } catch (error) {
+      console.error("Error fetching Sold Units:", error);
+    }
+  };
+
+  const fetchEmployeeData = async (employeeId) => {
+    try {
+      const response = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Fetched Employee Data:", response.data);
+      const employeeData = response.data.data || response.data || [];
+      setLeads(employeeData);
+      setFilteredLeads(employeeData);
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedEmployee) {
+      fetchEmployeeData(selectedEmployee);
+    } else {
+      fetchEmployeeUnitSold();
+    }
+    setCurrentPage(0);
+  }, [selectedEmployee]);
+
+  useEffect(() => {
+    let filtered = leads;
+    if (startDate && endDate) {
+      filtered = filtered.filter((lead) => {
+        const soldDate = moment(lead.date, "YYYY-MM-DD");
+        return soldDate.isBetween(startDate, endDate, undefined, "[]");
+      });
+    }
+    if (selectedEmployee) {
+      filtered = filtered.filter(
+        (lead) => lead.employee_name === selectedEmployee
+      );
+    }
+    setFilteredLeads(filtered);
+  }, [startDate, selectedEmployee, endDate, leads]);
+
+  const downloadExcel = () => {
+    const columnMapping = {
+      lead_id: "lead id",
+      project_name: "Project Name",
+      name: "Costumer name",
+      unit_no: "unit Id",
+      employee_name: "Employee Name",
+      unit_status: "Unit Status",
+      date: "Date",
+    };
+
+    const completedLeads = filteredLeads.map((lead) => {
+      const formattedLead = {};
+      selectedColumns.forEach((col) => {
+        const newKey = columnMapping[col] || col;
+        if (
+          ["actual_date", "createdTime", "visit_date", "date"].includes(col)
+        ) {
+          formattedLead[newKey] =
+            lead[col] && moment(lead[col], moment.ISO_8601, true).isValid()
+              ? moment(lead[col]).format("DD MMM YYYY").toUpperCase()
+              : "pending";
+        } else {
+          formattedLead[newKey] = lead[col];
+        }
+      });
+      return formattedLead;
+    });
+
+    if (completedLeads.length === 0) {
+      alert("No data available for the selected date range.");
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(completedLeads);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+
+    const filename = `Lead Report ${startDate ? moment(startDate).format("DD-MM-YYYY") : "Start"
+      } to ${endDate ? moment(endDate).format("DD-MM-YYYY") : "End"}.xlsx`;
+
+    XLSX.writeFile(workbook, filename);
+  };
+
+  // Pagination logic
+  const pageCount = Math.ceil(filteredLeads.length / leadsPerPage);
+  const indexOfLastLead = (currentPage + 1) * leadsPerPage;
+  const indexOfFirstLead = indexOfLastLead - leadsPerPage;
+  const currentLeads = filteredLeads.slice(indexOfFirstLead, indexOfLastLead);
+
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected);
+  };
+
+  const handleEmployeeChange = (e) => {
+    setSelectedEmployee(e.target.value);
+  };
+
+  return (
+    <div className="h-auto md:p-4 mt-14 lg:mt-0 sm:ml-0">
+      <center className="text-2xl text-center mt-8 font-medium">
+        Total Sold Units
+      </center>
+      <center className="mx-auto h-[3px] w-16 bg-[#34495E] my-3"></center>
+      <div className="flex flex-col sm:flex-row gap-4 mb-6 items-end">
+        {/* Start Date */}
+        <div className="flex flex-col w-full sm:w-auto">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            Start Date
+          </label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+
+        {/* Separator "to" */}
+        <div className="flex items-center justify-center text-gray-600 font-medium hidden sm:flex">
+          <span className="px-2">to</span>
+        </div>
+
+        {/* End Date */}
+        <div className="flex flex-col w-full sm:w-auto">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            End Date
+          </label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+
+        {/* Employee Dropdown */}
+        <div className="flex flex-col w-full sm:w-auto">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            Employee
+          </label>
+          <select
+            value={selectedEmployee}
+            onChange={(e) => setSelectedEmployee(e.target.value)}
+            className="border rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          >
+            <option value="">Select Employee</option>
+            {employees.map((employee) => (
+              <option key={employee.id} value={employee.name}>
+                {employee.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Download Button */}
+        <div className="w-full sm:w-auto">
+          <button
+            onClick={downloadExcel}
+            className="bg-cyan-600 hover:bg-cyan-700 text-white font-medium px-6 py-2 rounded-lg shadow-md transition active:scale-95 w-full sm:w-auto"
+          >
+            Download Excel
+          </button>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="mt-4">
+        <div className="border rounded-lg shadow-sm overflow-x-auto">
+          <table className="min-w-[900px] w-full bg-white border">
+            <thead className="sticky top-0 bg-gray-200 z-10">
+              <tr>
+                <th className="px-6 py-3 border-b-2 border-gray-300">S.no</th>
+                <th className="px-6 py-3 border-b-2 border-gray-300">
+                  Lead Id
+                </th>
+                <th className="px-6 py-3 border-b-2 border-gray-300">
+                  Project Name
+                </th>
+                <th className="px-6 py-3 border-b-2 border-gray-300">
+                  Customer Name
+                </th>
+                <th className="px-6 py-3 border-b-2 border-gray-300">
+                  Unit Number
+                </th>
+                <th className="px-6 py-3 border-b-2 border-gray-300">
+                  Employee Name
+                </th>
+                <th className="px-6 py-3 border-b-2 border-gray-300">
+                  Unit Status
+                </th>
+                <th className="px-6 py-3 border-b-2 border-gray-300">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentLeads.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="11"
+                    className="px-6 py-4 border-b border-gray-200 text-center text-gray-500"
+                  >
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+                currentLeads.map((sold, index) => (
+                  <tr
+                    key={sold.id}
+                    className={index % 2 === 0 ? "bg-gray-100" : ""}
+                  >
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {currentPage * leadsPerPage + index + 1}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {sold.lead_id}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {sold.project_name}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {sold.name}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {sold.unit_number}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {sold.staff_name}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {sold.unit_status}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
+                      {sold.unit_updated_at?.split(" ")[0]}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-4 flex justify-center">
+        <ReactPaginate
+          previousLabel={"Previous"}
+          nextLabel={"Next"}
+          breakLabel={"..."}
+          pageCount={pageCount}
+          forcePage={currentPage}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={3}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+          pageClassName={"page-item"}
+          pageLinkClassName={"page-link"}
+          previousClassName={"page-item"}
+          nextClassName={"page-item"}
+          previousLinkClassName={"page-link"}
+          nextLinkClassName={"page-link"}
+          breakClassName={"page-item"}
+          breakLinkClassName={"page-link"}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default SuperSoldnit;

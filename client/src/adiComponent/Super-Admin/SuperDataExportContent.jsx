@@ -1,0 +1,310 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { GiFiles } from "react-icons/gi";
+import { useSelector } from "react-redux";
+import { FaCheckCircle, FaClipboardList } from "react-icons/fa";
+import SuperLeadData from "./SuperDataExport/SuperLeadData";
+import SuperVisitData from "./SuperDataExport/SuperVisitData";
+import SuperCloseData from "./SuperDataExport/SuperCloseDateData";
+import SuperSoldnit from "./SuperDataExport/SuperSolddUnit";
+import SuperMetaLeadData from "./SuperDataExport/SuperMetaLeadData";
+import { FaMeta } from "react-icons/fa6";
+
+const SuperDataExportContent = () => {
+  const [leads, setLeads] = useState([]);
+  const [metaLeads, setMetaLeads] = useState([]);
+  const [visit, setVisit] = useState([]);
+  const [employeesold, setemployeesold] = useState([]);
+  const [employee, setEmployee] = useState([]);
+  const [selectedComponent, setSelectedComponent] = useState("LeadData");
+  const superadminuser = useSelector((state) => state.auth.user);
+  const token = superadminuser.token;
+  const userId = superadminuser.staff_id;
+
+  useEffect(() => {
+    fetchLeads();
+    fetchMetaLeads();
+    fetchEmployee();
+    fetchVisit();
+    employeesoldunit();
+  }, []);
+
+  const fetchLeads = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setLeads(data);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+    }
+  };
+
+  const fetchMetaLeads = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMetaLeads(data);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+    }
+  };
+
+  const fetchEmployee = async () => {
+    try {
+      const response = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/employee-super-admin/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setEmployee(response.data);
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
+
+  const employeesoldunit = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/getAllUnitSoldByOrg/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(data);
+      setemployeesold(data);
+    } catch (error) {
+      console.error("Error fetching quotations:", error);
+    }
+  };
+  const fetchVisit = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://crm-generalize.siarasystems.com/api/leads-all-visits/${superadminuser?.staff_org_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(data);
+      setVisit(data);
+    } catch (error) {
+      console.error("Error fetching quotations:", error);
+    }
+  };
+
+  const closedCount = leads.filter(
+    (lead) => lead.unit_status === "sold"
+  ).length;
+
+  const soldUnits = employeesold.length;
+  return (
+    <>
+      <div className="flex mt-20">
+        <div className="w-[90%] sm:w-full min-h-screen bg-[#F9FAFF] p-2">
+          <div className="container">
+            <h2 className="text-2xl text-center mt-[2rem] font-medium">
+              Data Export
+            </h2>
+            <div className="mx-auto h-[3px] w-16 bg-cyan-600 my-3"></div>
+
+            <div className="flex flex-wrap justify-center sm:justify-around mt-5">
+              {/* Leads Data */}
+              <div className="w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/5 my-2 px-2">
+                <div
+                  className={`shadow-lg rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${selectedComponent === "LeadData"
+                    ? "bg-cyan-600 text-white"
+                    : "bg-white"
+                    }`}
+                  onClick={() => setSelectedComponent("LeadData")}
+                >
+                  <div className="p-4 flex flex-col items-center text-center">
+                    <div
+                      className={`text-3xl ${selectedComponent === "LeadData"
+                        ? "text-white"
+                        : "text-gray-700"
+                        }`}
+                    >
+                      <GiFiles />
+                    </div>
+                    <div className="mt-2">
+                      <h5
+                        className={`text-base sm:text-lg font-semibold ${selectedComponent === "LeadData"
+                          ? "text-white"
+                          : "text-gray-800"
+                          }`}
+                      >
+                        Leads Data
+                      </h5>
+                      <p
+                        className={`${selectedComponent === "LeadData"
+                          ? "text-white"
+                          : "text-gray-600"
+                          }`}
+                      >
+                        {leads?.length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Meta Leads Data */}
+              <div className="w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/5 my-2 px-2">
+                <div
+                  className={`shadow-lg rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${selectedComponent === "metaLeadData"
+                    ? "bg-cyan-600 text-white"
+                    : "bg-white"
+                    }`}
+                  onClick={() => setSelectedComponent("metaLeadData")}
+                >
+                  <div className="p-4 flex flex-col items-center text-center">
+                    <div
+                      className={`text-3xl ${selectedComponent === "metaLeadData"
+                        ? "text-white"
+                        : "text-gray-700"
+                        }`}
+                    >
+                      <FaMeta />
+                    </div>
+                    <div className="mt-2">
+                      <h5
+                        className={`text-base sm:text-lg font-semibold ${selectedComponent === "metaLeadData"
+                          ? "text-white"
+                          : "text-gray-800"
+                          }`}
+                      >
+                        Meta Leads Data
+                      </h5>
+                      <p
+                        className={`${selectedComponent === "metaLeadData"
+                          ? "text-white"
+                          : "text-gray-600"
+                          }`}
+                      >
+                        {metaLeads?.length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visit Data */}
+              <div className="w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/5 my-2 px-2">
+                <div
+                  className={`shadow-lg rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${selectedComponent === "VisitData"
+                    ? "bg-cyan-600 text-white"
+                    : "bg-white"
+                    }`}
+                  onClick={() => setSelectedComponent("VisitData")}
+                >
+                  <div className="p-4 flex flex-col items-center text-center">
+                    <div
+                      className={`text-3xl ${selectedComponent === "VisitData"
+                        ? "text-white"
+                        : "text-gray-700"
+                        }`}
+                    >
+                      <FaClipboardList />
+                    </div>
+                    <div className="mt-2">
+                      <h5
+                        className={`text-base sm:text-lg font-semibold ${selectedComponent === "VisitData"
+                          ? "text-white"
+                          : "text-gray-800"
+                          }`}
+                      >
+                        Site Visits Data
+                      </h5>
+                      <p
+                        className={`${selectedComponent === "VisitData"
+                          ? "text-white"
+                          : "text-gray-600"
+                          }`}
+                      >
+                        {visit?.length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sold Data */}
+              <div className="w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/5 my-2 px-2">
+                <div
+                  className={`shadow-lg rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${selectedComponent === "SoldData"
+                    ? "bg-cyan-600 text-white"
+                    : "bg-white"
+                    }`}
+                  onClick={() => setSelectedComponent("SoldData")}
+                >
+                  <div className="p-4 flex flex-col items-center text-center">
+                    <div
+                      className={`text-3xl ${selectedComponent === "SoldData"
+                        ? "text-white"
+                        : "text-gray-700"
+                        }`}
+                    >
+                      <FaCheckCircle />
+                    </div>
+                    <div className="mt-2">
+                      <h5
+                        className={`text-base sm:text-lg font-semibold ${selectedComponent === "SoldData"
+                          ? "text-white"
+                          : "text-gray-800"
+                          }`}
+                      >
+                        Unit Sold Data
+                      </h5>
+                      <p
+                        className={`${selectedComponent === "SoldData"
+                          ? "text-white"
+                          : "text-gray-600"
+                          }`}
+                      >
+                        {soldUnits}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Conditionally render the selected component */}
+            <div className="">
+              {selectedComponent === "LeadData" && <SuperLeadData />}
+              {selectedComponent === "metaLeadData" && <SuperMetaLeadData />}
+              {selectedComponent === "VisitData" && <SuperVisitData />}
+              {selectedComponent === "ClosedData" && <SuperCloseData />}
+              {selectedComponent === "SoldData" && <SuperSoldnit />}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default SuperDataExportContent;

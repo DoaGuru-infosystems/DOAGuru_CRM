@@ -1,0 +1,822 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================
+   APP SHELL LAYOUT & VIEWPORT OPTIMIZATION
+   ========================================== */
+
+/* Lock root dimensions and prevent browser-level bounce/scrolling */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #F7F7F5;
+  color: #111111;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Ensure the layout flexbox is restricted to 100vh/100vw */
+.flex.min-h-screen.w-full:has(> .main-content) {
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Optimize the main-content wrapper to prevent width/height overflow */
+.main-content {
+  width: auto !important;
+  flex-grow: 1 !important;
+  flex-shrink: 1 !important;
+  flex-basis: 0% !important;
+  min-width: 0 !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background-color: #F7F7F5 !important;
+}
+
+/* Optimize Topbar */
+.app-topbar {
+  height: 72px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Standardize the inner page container to scroll internally */
+.main-content .flex.mt-20,
+.main-content .flex.mt-16,
+.main-content .flex.mt-28,
+.main-content .flex.sm\:mt-20,
+.main-content .flex.sm\:mt-16 {
+  margin-top: 72px !important;
+  /* Fixed offset matching Topbar height */
+  height: calc(100vh - 72px) !important;
+  height: calc(100dvh - 72px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  padding: 16px !important;
+}
+
+/* Override inner container screen height constraints so they fit in scroll area */
+.main-content .min-h-screen {
+  min-height: 0 !important;
+}
+
+.main-content .flex.mt-20>div,
+.main-content .flex.mt-16>div,
+.main-content .flex.mt-28>div,
+.main-content .flex.sm\:mt-20>div,
+.main-content .flex.sm\:mt-16>div {
+  min-height: 0 !important;
+  height: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Scrollbar customizations for a premium experience */
+.thin-scrollbar::-webkit-scrollbar,
+.main-content .flex.mt-20::-webkit-scrollbar,
+.main-content .flex.mt-16::-webkit-scrollbar,
+.main-content .flex.mt-28::-webkit-scrollbar,
+.main-content .flex.sm\:mt-20::-webkit-scrollbar,
+.main-content .flex.sm\:mt-16::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track,
+.main-content .flex.mt-20::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb,
+.main-content .flex.mt-20::-webkit-scrollbar-thumb {
+  background-color: #E7E7E5;
+  border-radius: 10px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover,
+.main-content .flex.mt-20::-webkit-scrollbar-thumb:hover {
+  background-color: #B8B8B8;
+}
+
+/* ==========================================
+   RESPONSIVE LAYOUT & SIDEBAR BREAKPOINTS
+   ========================================== */
+
+/* Small Devices (Mobile & Tablet: < 1024px) */
+@media (max-width: 1023px) {
+  .app-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    width: 260px !important;
+    z-index: 1000 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .app-sidebar.sidebar-open {
+    transform: translateX(0) !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  .app-topbar {
+    left: 0 !important;
+    width: 100vw !important;
+  }
+
+  /* Maximize space on mobile/tablet viewports */
+  .main-content .flex.mt-20,
+  .main-content .flex.mt-16,
+  .main-content .flex.mt-28,
+  .main-content .flex.sm\:mt-20,
+  .main-content .flex.sm\:mt-16 {
+    padding: 10px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Force all width-constraining containers to utilize full viewport width */
+  .main-content [class*="w-[90%]"],
+  .main-content [class*="w-[89%]"],
+  .main-content [class*="w-[95%]"],
+  .main-content [class*="w-[80vw]"],
+  .main-content [class*="w-[90vw]"],
+  .main-content [class*="w-[95vw]"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .main-content .container,
+  .main-content .main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Force grid layout for filters/forms to wrap beautifully instead of compressing */
+  .main-content div.grid:has(input),
+  .main-content div.grid:has(select) {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  /* Ensure tables scroll horizontally on mobile/tablet without compressing columns */
+  .main-content .overflow-x-auto {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .main-content .overflow-x-auto table {
+    min-width: 1000px !important;
+  }
+}
+
+/* Laptops & Desktops (>= 1024px) */
+@media (min-width: 1024px) {
+  .app-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    width: 112px !important;
+    /* Default collapsed width */
+    z-index: 900 !important;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .app-sidebar.sidebar-open {
+    width: 240px !important;
+  }
+
+  .main-content {
+    margin-left: 112px !important;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .flex:has(> .app-sidebar.sidebar-open)>.main-content {
+    margin-left: 240px !important;
+  }
+
+  .app-topbar {
+    left: 112px !important;
+    width: calc(100vw - 112px) !important;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .flex:has(> .app-sidebar.sidebar-open) .app-topbar {
+    left: 240px !important;
+    width: calc(100vw - 240px) !important;
+  }
+}
+
+/* ==========================================
+   MONOCHROME DESIGN SYSTEM STYLE OVERRIDES
+   ========================================== */
+
+/* Typography & General Contrast */
+h1,
+.text-3xl {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.03em !important;
+  color: #111111 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+h2,
+.text-2xl {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.025em !important;
+  color: #111111 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+h3,
+.text-xl {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: #111111 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+h4,
+h5,
+h6 {
+  color: #111111 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  letter-spacing: -0.01em !important;
+}
+
+.text-sm {
+  font-size: 14px !important;
+  letter-spacing: -0.01em !important;
+}
+
+.text-xs {
+  font-size: 12px !important;
+  letter-spacing: -0.005em !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+/* Cards & Surfaces */
+.bg-white {
+  background-color: #FFFFFF;
+}
+
+/* Overlay Backdrop protection */
+.bg-black\/50,
+.bg-black\/40,
+.fixed.inset-0 {
+  background-color: rgba(17, 17, 17, 0.4) !important;
+}
+
+/* Buttons overrides */
+button,
+.btn,
+input[type="submit"],
+input[type="button"] {
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+/* Micro-interaction: Active state pressed scale */
+button:active,
+.btn:active,
+input[type="submit"]:active,
+input[type="button"]:active {
+  transform: scale(0.97) !important;
+}
+
+/* Primary Cyan Accent Styling */
+.bg-cyan-600 {
+  background-color: #0891b2 !important;
+  color: #FFFFFF !important;
+}
+
+.bg-cyan-600:hover {
+  background-color: #0e7490 !important;
+}
+
+.bg-cyan-700 {
+  background-color: #0e7490 !important;
+  color: #FFFFFF !important;
+}
+
+button[type="submit"],
+.btn-primary {
+  background-color: #0891b2 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #0891b2 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+button[type="submit"]:hover,
+.btn-primary:hover {
+  background-color: #0e7490 !important;
+  border-color: #0e7490 !important;
+}
+
+
+/* Ghost Button Accent (Transparent Background, Dark Text) */
+.bg-transparent,
+.btn-ghost {
+  background-color: transparent !important;
+  color: #111111 !important;
+  border: none !important;
+}
+
+.bg-transparent:hover,
+.btn-ghost:hover {
+  background-color: rgba(17, 17, 17, 0.04) !important;
+}
+
+/* Status Badges with Clean Borders (Linear / Stripe style) */
+.bg-emerald-50,
+.bg-green-50,
+.bg-emerald-100,
+.bg-green-100 {
+  background-color: #E8F5E9 !important;
+  color: #2E7D32 !important;
+  border: 1px solid #C8E6C9 !important;
+  border-radius: 9999px !important;
+  padding: 2px 10px !important;
+  font-weight: 500 !important;
+  font-size: 11px !important;
+}
+
+.bg-rose-50,
+.bg-red-50,
+.bg-rose-100,
+.bg-red-100 {
+  background-color: #FFEBEE !important;
+  color: #C62828 !important;
+  border: 1px solid #FFCDD2 !important;
+  border-radius: 9999px !important;
+  padding: 2px 10px !important;
+  font-weight: 500 !important;
+  font-size: 11px !important;
+}
+
+.bg-amber-50,
+.bg-yellow-50,
+.bg-amber-100,
+.bg-yellow-100 {
+  background-color: #FFF8E1 !important;
+  color: #C47B00 !important;
+  border: 1px solid #FFE082 !important;
+  border-radius: 9999px !important;
+  padding: 2px 10px !important;
+  font-weight: 500 !important;
+  font-size: 11px !important;
+}
+
+.bg-sky-50,
+.bg-sky-100 {
+  background-color: #F0F4F8 !important;
+  color: #4A5568 !important;
+  border: 1px solid #D0D7DE !important;
+  border-radius: 9999px !important;
+  padding: 2px 10px !important;
+  font-weight: 500 !important;
+  font-size: 11px !important;
+}
+
+/* Form Inputs styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E7E7E5 !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  color: #111111 !important;
+  font-size: 14px !important;
+  line-height: 1.25 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  outline: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #111111 !important;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.06) !important;
+}
+
+/* Read-only profile container fields style */
+.profile-readonly-field {
+  background-color: #FAFAF9 !important;
+  border: 1px solid #EFEFEE !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  color: #111111 !important;
+}
+
+/* Tables styling */
+table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+}
+
+th {
+  background-color: #FAFAF9 !important;
+  color: #5C5C5C !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 2px solid #EFEFEE !important;
+  padding: 14px 18px !important;
+}
+
+td {
+  padding: 14px 18px !important;
+  border-bottom: 1px solid #EFEFEE !important;
+  font-size: 13px !important;
+  color: #5C5C5C !important;
+  transition: background-color 0.2s ease !important;
+}
+
+tbody tr:hover td {
+  background-color: #F7F7F5 !important;
+}
+
+/* Sidebar & Navigation overrides */
+.app-sidebar,
+.fixed.bg-\[\#01060c\] {
+  background-color: #F3F3F1 !important;
+  border-right: 1px solid #E7E7E5 !important;
+  box-shadow: none !important;
+}
+
+.app-sidebar a,
+.app-sidebar nav a,
+.fixed.bg-\[\#01060c\] a {
+  color: #5C5C5C !important;
+  background-color: transparent !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  border-radius: 10px !important;
+}
+
+.app-sidebar a:hover,
+.app-sidebar nav a:hover,
+.fixed.bg-\[\#01060c\] a:hover {
+  color: #111111 !important;
+  background-color: #EFEFEE !important;
+}
+
+.app-sidebar a svg,
+.app-sidebar nav a svg,
+.fixed.bg-\[\#01060c\] a svg {
+  color: #8A8A8A !important;
+  transition: color 0.2s ease !important;
+}
+
+.app-sidebar a:hover svg,
+.app-sidebar nav a:hover svg,
+.fixed.bg-\[\#01060c\] a:hover svg {
+  color: #111111 !important;
+}
+
+.app-sidebar a.active,
+.app-sidebar nav a.active,
+.app-sidebar .bg-\[\#EEF0FF\],
+.fixed.bg-\[\#01060c\] .bg-blue-800 {
+  background-color: #E7E7E5 !important;
+  color: #111111 !important;
+  border-radius: 10px !important;
+}
+
+.app-sidebar a.active svg,
+.app-sidebar nav a.active svg,
+.app-sidebar .bg-\[\#EEF0FF\] svg,
+.fixed.bg-\[\#01060c\] .bg-blue-800 svg {
+  color: #111111 !important;
+}
+
+.app-sidebar h3,
+.fixed.bg-\[\#01060c\] h3 {
+  color: #5C5C5C !important;
+}
+
+.app-sidebar a.active h3,
+.app-sidebar nav a.active h3,
+.app-sidebar .bg-\[\#EEF0FF\] h3,
+.fixed.bg-\[\#01060c\] .bg-blue-800 h3 {
+  color: #111111 !important;
+}
+
+.app-sidebar hr,
+.fixed.bg-\[\#01060c\] hr {
+  border-color: #EFEFEE !important;
+}
+
+/* Topbar override (Frosted Glass Effect like Stripe/Vercel) */
+.app-topbar {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-bottom: 1px solid #E7E7E5 !important;
+  box-shadow: none !important;
+}
+
+.app-topbar p.text-cyan-600 {
+  color: #111111 !important;
+}
+
+.app-topbar span.text-gray-500 {
+  color: #5C5C5C !important;
+}
+
+/* Google OAuth Button & Badges */
+.bg-cyan-50,
+.bg-cyan-100 {
+  background-color: #F7F7F5 !important;
+  color: #111111 !important;
+}
+
+/* Category/Tab buttons */
+.flex.flex-wrap.gap-1\.5 button,
+.flex.flex-wrap.gap-2 button {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  padding: 6px 14px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-color: #E7E7E5 !important;
+}
+
+/* Active tabs */
+.flex.flex-wrap.gap-1\.5 button.bg-cyan-600,
+.flex.flex-wrap.gap-2 button.bg-cyan-600,
+button.bg-cyan-600.text-white {
+  background-color: #0891b2 !important;
+  border-color: #0891b2 !important;
+  color: #FFFFFF !important;
+}
+
+/* Active tab count badge */
+button.bg-cyan-600 span {
+  background-color: #FFFFFF !important;
+  color: #0891b2 !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 h1,
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 h3 {
+  color: #FFFFFF !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 p {
+  color: #B8B8B8 !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 span {
+  color: #FFFFFF !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 .group>div {
+  background-color: #1C1C1A !important;
+  background-image: none !important;
+  border: 1px solid #2C2C2A !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 .group:hover>div {
+  border-color: #E7E7E5 !important;
+  box-shadow: 0 10px 40px rgba(255, 255, 255, 0.05) !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 .inline-flex.items-center.justify-center {
+  background-color: #FFFFFF !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 .inline-flex.items-center.justify-center svg {
+  color: #111111 !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 .group-hover\:bg-white\/20 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.min-h-screen.bg-gradient-to-br.from-indigo-900.via-purple-900.to-pink-900 .group-hover\:bg-white\/20:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.backdrop-blur-xl.bg-white\/10 {
+  background-color: rgba(28, 28, 26, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+}
+
+.backdrop-blur-xl.bg-white\/10 input {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+.backdrop-blur-xl.bg-white\/10 input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.backdrop-blur-xl.bg-white\/10 input:focus {
+  border-color: #FFFFFF !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15) !important;
+}
+
+.backdrop-blur-xl.bg-white\/10 button[type="submit"] {
+  background-color: #FFFFFF !important;
+  color: #111111 !important;
+  border: 1px solid #FFFFFF !important;
+}
+
+.backdrop-blur-xl.bg-white\/10 button[type="submit"]:hover {
+  background-color: #EFEFEE !important;
+  border-color: #EFEFEE !important;
+}
+
+button.absolute.-top-16 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+button.absolute.-top-16:hover {
+  color: #FFFFFF !important;
+}
+
+/* Icon container overrides in cards */
+.bg-indigo-50,
+.bg-blue-50,
+.bg-emerald-50,
+.bg-violet-50,
+.bg-amber-50,
+.bg-rose-50,
+.bg-teal-50 {
+  background-color: #F3F3F1 !important;
+  color: #111111 !important;
+}
+
+/* Pagination controls (Stripe / Vercel style) */
+.pagination,
+ul.pagination,
+ul.pagination li {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.pagination a {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E7E7E5 !important;
+  color: #5C5C5C !important;
+  padding: 6px 14px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  margin: 0 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.pagination a:hover {
+  background-color: #F7F7F5 !important;
+  color: #111111 !important;
+}
+
+.pagination .selected a {
+  background-color: #111111 !important;
+  border-color: #111111 !important;
+  color: #FFFFFF !important;
+}
+
+
+
+
+
+/* Global Form input focus rings and inputs standardization */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E7E7E5 !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  color: #111111 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #111111 !important;
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.1) !important;
+  outline: none !important;
+}
+
+/* Accent bars & cyan divider lines */
+div[class*="bg-cyan-600"][class*="h-[3px]"],
+div[class*="bg-cyan-600"][class*="h-[2px]"],
+div.bg-cyan-600.h-1 {
+  background-color: #0891b2 !important;
+  display: block !important;
+}
+
+/* Clean background overrides for main wrapper views */
+.bg-\[\#F9FAFF\] {
+  background-color: #F7F7F5 !important;
+}
+
+/* Refined color badges for table status/pills */
+span.bg-emerald-100.text-emerald-800,
+span.bg-green-100.text-green-800 {
+  background-color: #E2F5EA !important;
+  color: #137A3E !important;
+  border: 1px solid #C4ECD2 !important;
+}
+
+span.bg-red-100.text-red-800,
+span.bg-rose-100.text-rose-800 {
+  background-color: #FCE8E6 !important;
+  color: #C5221F !important;
+  border: 1px solid #FAD2CF !important;
+}
+
+span.bg-yellow-100.text-yellow-800,
+span.bg-amber-100.text-amber-800 {
+  background-color: #FEF3D6 !important;
+  color: #B06000 !important;
+  border: 1px solid #FDE6A6 !important;
+}
+
+span.bg-blue-100.text-blue-800,
+span.bg-indigo-100.text-indigo-800 {
+  background-color: #E8F0FE !important;
+  color: #1A73E8 !important;
+  border: 1px solid #D2E3FC !important;
+}
