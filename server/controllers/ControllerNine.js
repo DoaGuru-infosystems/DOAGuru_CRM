@@ -427,24 +427,65 @@ const getEmployeeDetails = (req, res) => {
       }
 
       const target = result[0];
+      const targetRole = (target.staff_role || "").toLowerCase();
+      const isSelf = Number(target.staff_id) === Number(currentStaffId);
+      const isSameOrg = Number(target.staff_org_id) === Number(currentOrgId);
 
-      // Employee sirf apni details dekh sake
-      if (currentRole === "employee" && Number(target.staff_id) !== Number(currentStaffId)) {
-        return res.status(403).json({
-          success: false,
-          message: "Forbidden - Employees can only view their own details",
-        });
+      // SuperAdmin: sab dekh sakta hai
+      if (currentRole === "superadmin") {
+        return res.status(200).send(result);
       }
 
-      // Admin sirf apni org ke employees dekh sake
-      if (currentRole === "admin" && Number(target.staff_org_id) !== Number(currentOrgId)) {
-        return res.status(403).json({
-          success: false,
-          message: "Forbidden - Admins can only view employees within their organization",
-        });
+      // Employee: sirf apni details dekh sakta hai
+      if (currentRole === "employee") {
+        if (!isSelf) {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden - Employees can only view their own details",
+          });
+        }
+        return res.status(200).send(result);
       }
 
-      res.status(200).send(result);
+      // Admin:
+      // - apni details dekh sakta hai
+      // - apni org ke employee dekh sakta hai
+      // - doosre Admin (same org ya doosri org) aur SuperAdmin: 403
+      // - doosri org ka employee: 403
+      if (currentRole === "admin") {
+        if (isSelf) {
+          return res.status(200).send(result);
+        }
+
+        if (targetRole === "superadmin") {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden - Admins cannot view SuperAdmin details",
+          });
+        }
+
+        if (targetRole === "admin") {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden - Admins cannot view other admins",
+          });
+        }
+
+        if (!isSameOrg) {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden - Admins can only view employees within their organization",
+          });
+        }
+
+        // Same org employee
+        return res.status(200).send(result);
+      }
+
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden - Access denied",
+      });
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
