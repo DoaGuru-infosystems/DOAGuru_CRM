@@ -63,7 +63,7 @@ const PaymentCreatePopup = ({
 
     try {
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/addPaymentRecord",
+        "http://localhost:9000/api/addPaymentRecord",
         payment,
         {
           headers: {
@@ -110,7 +110,7 @@ const PaymentCreatePopup = ({
   const updateBookingStatusAfterPayment = async () => {
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updatePaymentStatus/${selectedPayment[0]?.booking_id}`
+        `http://localhost:9000/api/updatePaymentStatus/${selectedPayment[0]?.booking_id}`
       );
 
       toast.success("Booking Status Updated");
@@ -123,7 +123,7 @@ const PaymentCreatePopup = ({
   const updateRegistryStatusAfterPayment = async () => {
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateRegistryPaymentStatus/${selectedPayment?.registry_id}`
+        `http://localhost:9000/api/updateRegistryPaymentStatus/${selectedPayment?.registry_id}`
       );
 
       toast.success("Registry Status Updated");
@@ -136,7 +136,7 @@ const PaymentCreatePopup = ({
   const updateUtilityStatusAfterPayment = async () => {
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateUtilityPaymentStatus/${selectedPayment?.utility_id}`
+        `http://localhost:9000/api/updateUtilityPaymentStatus/${selectedPayment?.utility_id}`
       );
 
       toast.success("Utility Status Updated");

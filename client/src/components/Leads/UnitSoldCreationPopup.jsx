@@ -114,7 +114,7 @@ const UnitSoldCreationPopup = ({
       };
 
       await axios.post(
-        `https://crm-generalize.siarasystems.com/api/unit-sold`,
+        `http://localhost:9000/api/unit-sold`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

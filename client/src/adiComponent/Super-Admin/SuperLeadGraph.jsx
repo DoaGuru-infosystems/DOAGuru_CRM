@@ -28,7 +28,7 @@ const SuperLeadGraph = () => {
         setLoading(true);
         const [leadsRes, metaLeadsRes] = await Promise.all([
           axios.get(
-            `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${orgId}`,
+            `http://localhost:9000/api/getLeadsByOrg/${orgId}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -37,7 +37,7 @@ const SuperLeadGraph = () => {
             }
           ),
           axios.get(
-            `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${orgId}`,
+            `http://localhost:9000/api/getMetaLeadsByOrgId/${orgId}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }

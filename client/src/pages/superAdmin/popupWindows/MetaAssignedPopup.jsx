@@ -25,7 +25,7 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
   const fetchAllStaff = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getEmployeeByOrg/${user?.staff_org_id}`,
+        `http://localhost:9000/api/getEmployeeByOrg/${user?.staff_org_id}`,
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -39,7 +39,7 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
   const fetchAllProjects = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/all-project/${user?.staff_org_id}`,
+        `http://localhost:9000/api/all-project/${user?.staff_org_id}`,
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -54,7 +54,7 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
     if (!inputField?.meta_project_id) return;
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllUnitsByProjectId/${inputField?.meta_project_id}`,
+        `http://localhost:9000/api/getAllUnitsByProjectId/${inputField?.meta_project_id}`,
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -107,7 +107,7 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
       if (isBulk) {
         const updateRequests = lead.map((item) =>
           axios.put(
-            `https://crm-generalize.siarasystems.com/api/updateAndAssignedMetaLeads/${item.meta_id}`,
+            `http://localhost:9000/api/updateAndAssignedMetaLeads/${item.meta_id}`,
             inputField,
             {
               headers: { Authorization: `Bearer ${user?.token}` },
@@ -119,7 +119,7 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
         toast.success(`${lead.length} leads assigned successfully`);
       } else {
         await axios.put(
-          `https://crm-generalize.siarasystems.com/api/updateAndAssignedMetaLeads/${lead?.meta_id}`,
+          `http://localhost:9000/api/updateAndAssignedMetaLeads/${lead?.meta_id}`,
           inputField,
           {
             headers: { Authorization: `Bearer ${user?.token}` },

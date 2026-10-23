@@ -17,7 +17,7 @@ function SuperMainSocialMediaByProjectContent() {
     const fetchProjectDetail = async () => {
       try {
         const { data } = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/super-admin-all-project/${user?.staff_org_id}`,
+          `http://localhost:9000/api/super-admin-all-project/${user?.staff_org_id}`,
           {
             headers: {
               "Content-Type": "application/json",

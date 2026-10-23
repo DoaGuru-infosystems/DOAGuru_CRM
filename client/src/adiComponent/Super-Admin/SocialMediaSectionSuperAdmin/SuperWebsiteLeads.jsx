@@ -30,7 +30,7 @@ function SuperWebsiteLeads() {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/user-data-super-admin",
+        "http://localhost:9000/api/user-data-super-admin",
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ function SuperWebsiteLeads() {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/employee-super-admin",
+        "http://localhost:9000/api/employee-super-admin",
         {
           headers: {
             "Content-Type": "application/json",
@@ -68,7 +68,7 @@ function SuperWebsiteLeads() {
   const fetchLeadassigned = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/leads-super-admin",
+        "http://localhost:9000/api/leads-super-admin",
         {
           headers: {
             "Content-Type": "application/json",
@@ -122,7 +122,7 @@ function SuperWebsiteLeads() {
 
     try {
       setLoading(true);
-      await axios.post("https://crm-generalize.siarasystems.com/api/leads", {
+      await axios.post("http://localhost:9000/api/leads", {
         lead_no: selectedLead.leadId,
         assignedTo: currentLead.assignedTo,
         employeeId: currentLead.employeeId,

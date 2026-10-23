@@ -26,7 +26,7 @@ const AdminFollowUpViewContent = () => {
   const fetchFollowUp = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-follow-up/${id}`,
+        `http://localhost:9000/api/employe-follow-up/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ const AdminFollowUpViewContent = () => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/employe-follow-up/${followup.id}`
+          `http://localhost:9000/api/employe-follow-up/${followup.id}`
         );
         if (response.status === 200) {
           console.log("follow up deleted successfully");
@@ -81,7 +81,7 @@ const AdminFollowUpViewContent = () => {
   const updateVisit = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/employe-follow-up`,
+        `http://localhost:9000/api/employe-follow-up`,
         modalData,
         {
           headers: {

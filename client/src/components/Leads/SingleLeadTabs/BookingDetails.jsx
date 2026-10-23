@@ -27,7 +27,7 @@ const BookingDetails = () => {
   const fetchBookingData = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getBookingBYleadId/${id}`
+        `http://localhost:9000/api/getBookingBYleadId/${id}`
       );
       setBooking(data);
     } catch (error) {

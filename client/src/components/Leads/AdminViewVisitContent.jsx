@@ -25,7 +25,7 @@ const AdminViewVisitContent = () => {
   const fetchvisit = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-visit-admin/${id}`,
+        `http://localhost:9000/api/employe-visit-admin/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const AdminViewVisitContent = () => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/employe-visit/${id}`
+          `http://localhost:9000/api/employe-visit/${id}`
         );
         if (response.status === 200) {
           console.log("visit deleted successfully");
@@ -79,7 +79,7 @@ const AdminViewVisitContent = () => {
   const updateVisit = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/employe-visit`,
+        `http://localhost:9000/api/employe-visit`,
         modalData,
         {
           headers: {

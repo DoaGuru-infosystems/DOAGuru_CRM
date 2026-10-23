@@ -33,7 +33,7 @@ const SuperAdEmployeemanagementContent = () => {
   const fetchEmployees = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getEmployeeByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getEmployeeByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const SuperAdEmployeemanagementContent = () => {
     if (isConfirmed) {
       try {
         await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/deleteEmployee/${employeeId}`,
+          `http://localhost:9000/api/deleteEmployee/${employeeId}`,
           {
             headers: {
               "Content-Type": "application/json",

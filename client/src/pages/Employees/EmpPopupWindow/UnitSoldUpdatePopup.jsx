@@ -79,7 +79,7 @@ const UnitSoldUpdatePopup = ({
     setLoading(true);
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateEmployeeUnitSoldUpdate/${selectedUnit.esu_id}`,
+        `http://localhost:9000/api/updateEmployeeUnitSoldUpdate/${selectedUnit.esu_id}`,
         unitsold,
         {
           headers: { Authorization: `Bearer ${token}` },

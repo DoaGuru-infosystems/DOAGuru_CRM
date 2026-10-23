@@ -23,7 +23,7 @@ const EmployeeQuotationList = () => {
   const fetchQuotations = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/get-quotation-byEmploye/${EmpId}`
+        `http://localhost:9000/api/get-quotation-byEmploye/${EmpId}`
       );
       setQuotations(response.data);
       console.log(response);
@@ -39,7 +39,7 @@ const EmployeeQuotationList = () => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/quotation/${id}`
+          `http://localhost:9000/api/quotation/${id}`
         );
         if (response.status === 200) {
           console.log("Quotation deleted successfully");
@@ -55,7 +55,7 @@ const EmployeeQuotationList = () => {
   const handleCopyQuotation = async (quotationId) => {
     try {
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/copy-quotation/${quotationId}`
+        `http://localhost:9000/api/copy-quotation/${quotationId}`
       );
       console.log(response.data.message);
       // window.location.reload();

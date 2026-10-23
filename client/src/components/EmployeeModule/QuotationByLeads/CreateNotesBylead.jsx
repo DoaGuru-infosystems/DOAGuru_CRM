@@ -16,7 +16,7 @@ const CreateNotesBylead = () => {
     const fetchNotes = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/notes_data`
+          `http://localhost:9000/api/notes_data`
         );
         setNoteTexts(response.data);
       } catch (error) {
@@ -49,7 +49,7 @@ const CreateNotesBylead = () => {
   const handleCreateNotes = async () => {
     try {
       for (const note of selectedNotes) {
-        const response = await axios.post("https://crm-generalize.siarasystems.com/api/notes", {
+        const response = await axios.post("http://localhost:9000/api/notes", {
           noteTexts: [note],
           quotationId: id,
         });

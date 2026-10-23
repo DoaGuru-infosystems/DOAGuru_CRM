@@ -27,7 +27,7 @@ function SuperMetaLeadReport() {
   const fetchLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -45,7 +45,7 @@ function SuperMetaLeadReport() {
   const fetchEmployees = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -26,7 +26,7 @@ const SuperUpdateForm = ({ setShowUpdateForm, id }) => {
   const fetchFormData = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/forms/${id}`,
+        `http://localhost:9000/api/forms/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -48,7 +48,7 @@ const SuperUpdateForm = ({ setShowUpdateForm, id }) => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/deleteform/${form.id}`,
+          `http://localhost:9000/api/deleteform/${form.id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const SuperUpdateForm = ({ setShowUpdateForm, id }) => {
   const updateFrom = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateform`,
+        `http://localhost:9000/api/updateform`,
         modalData,
         {
           headers: {

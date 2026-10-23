@@ -23,8 +23,8 @@ const EmployeeResetPassword = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        // "https://crm-generalize.siarasystems.com/api/sendOtp-employee", // OTP Disabled
-        "https://crm-generalize.siarasystems.com/api/sendOtpOnlyOne", // Using unified system
+        // "http://localhost:9000/api/sendOtp-employee", // OTP Disabled
+        "http://localhost:9000/api/sendOtpOnlyOne", // Using unified system
         {
           email,
         },
@@ -53,8 +53,8 @@ const EmployeeResetPassword = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        // "https://crm-generalize.siarasystems.com/api/verifyOtp-employee", // OTP Disabled
-        "https://crm-generalize.siarasystems.com/api/verifyOtp-superadmin", // Using unified system
+        // "http://localhost:9000/api/verifyOtp-employee", // OTP Disabled
+        "http://localhost:9000/api/verifyOtp-superadmin", // Using unified system
         {
           email,
           otp,
@@ -85,8 +85,8 @@ const EmployeeResetPassword = () => {
       toast.error("Password reset service temporarily disabled. Please contact administrator.");
       /*
       const response = await axios.put(
-        // "https://crm-generalize.siarasystems.com/api/resetPassword-employee", // OTP Disabled
-        // "https://crm-generalize.siarasystems.com/api/resetPasswordOnlyOne", // API not available
+        // "http://localhost:9000/api/resetPassword-employee", // OTP Disabled
+        // "http://localhost:9000/api/resetPasswordOnlyOne", // API not available
         {
           email,
           password: newPassword,

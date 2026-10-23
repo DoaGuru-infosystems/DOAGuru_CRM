@@ -56,7 +56,7 @@ const FinanceCompanySavePopup = ({ isOpen, onClose, fetchCompanies }) => {
 
     try {
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/finance-companies/create",
+        "http://localhost:9000/api/finance-companies/create",
         formData,
         {
           headers: {

@@ -50,7 +50,7 @@ const UpdateBookingModal = ({
 
     try {
       const soldRes = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateBooking/${selected?.booking_id}`,
+        `http://localhost:9000/api/updateBooking/${selected?.booking_id}`,
         booking,
         { headers: { Authorization: `Bearer ${token}` } }
       );

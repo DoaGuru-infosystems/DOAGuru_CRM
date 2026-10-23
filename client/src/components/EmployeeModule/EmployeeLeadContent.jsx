@@ -116,7 +116,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-leads/${EmpId?.staff_id}`,
+        `http://localhost:9000/api/employe-leads/${EmpId?.staff_id}`,
         {
           params: {
             search: searchTerm || undefined,
@@ -146,7 +146,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const fetchProjects = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-all-project/${EmpId?.staff_org_id}`,
+        `http://localhost:9000/api/super-admin-all-project/${EmpId?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -163,7 +163,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getEmployeeByOrg/${EmpId?.staff_org_id}`,
+        `http://localhost:9000/api/getEmployeeByOrg/${EmpId?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -180,7 +180,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const fetchPendingRequests = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/leads/transfer-requests/pending",
+        "http://localhost:9000/api/leads/transfer-requests/pending",
         {
           headers: {
             "Content-Type": "application/json",
@@ -202,7 +202,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
     }
     try {
       const response = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/leads/transfer-request",
+        "http://localhost:9000/api/leads/transfer-request",
         {
           lead_id: transferLead.lead_id,
           receiver_id: Number(transferReceiverId)
@@ -230,7 +230,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const handleRespondToRequest = async (request_id, action) => {
     try {
       const response = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/leads/transfer-request/respond",
+        "http://localhost:9000/api/leads/transfer-request/respond",
         {
           request_id,
           action
@@ -263,7 +263,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
       }
 
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-project-unit/${main_project_id}`,
+        `http://localhost:9000/api/super-admin-project-unit/${main_project_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -286,7 +286,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const handleUpdate = async (lead) => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateOnlyLeadStatus/${lead.lead_id}`,
+        `http://localhost:9000/api/updateOnlyLeadStatus/${lead.lead_id}`,
         { lead_status: "active lead" },
         {
           headers: {
@@ -310,7 +310,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const handlePrimaryStatusChange = async (leadId, newStatus) => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateOnlyPrimaryStatus/${leadId}`,
+        `http://localhost:9000/api/updateOnlyPrimaryStatus/${leadId}`,
         { primary_status: newStatus },
         {
           headers: {
@@ -342,7 +342,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
     }
     try {
       const response = await axios.delete(
-        `https://crm-generalize.siarasystems.com/api/leads/${leadId}`,
+        `http://localhost:9000/api/leads/${leadId}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -28,7 +28,7 @@ const EmployeeLeadsGraph = () => {
 
         const [leadsRes, metaLeadsRes] = await Promise.all([
           axios.get(
-            `https://crm-generalize.siarasystems.com/api/employe-leads/${superadminuser?.staff_id}`,
+            `http://localhost:9000/api/employe-leads/${superadminuser?.staff_id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -37,7 +37,7 @@ const EmployeeLeadsGraph = () => {
             }
           ),
           axios.get(
-            `https://crm-generalize.siarasystems.com/api/getMetaLeadsByStaffId/${superadminuser.staff_id}`,
+            `http://localhost:9000/api/getMetaLeadsByStaffId/${superadminuser.staff_id}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }

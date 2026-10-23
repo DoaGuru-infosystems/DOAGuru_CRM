@@ -49,7 +49,7 @@ function SuperAdminAdminmanagementContent() {
   const fetchAdmins = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllAdmins/${userId}`,
+        `http://localhost:9000/api/getAllAdmins/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -118,7 +118,7 @@ function SuperAdminAdminmanagementContent() {
         const adminToUpdate = admins[editingIndex];
 
         await axios.put(
-          `https://crm-generalize.siarasystems.com/api/updateAdmin/${adminToUpdate.admin_id}`,
+          `http://localhost:9000/api/updateAdmin/${adminToUpdate.admin_id}`,
           newAdmin,
           {
             headers: {
@@ -130,7 +130,7 @@ function SuperAdminAdminmanagementContent() {
         toast.success("Admin updated successfully!");
       } else {
         const response = await axios.post(
-          "https://crm-generalize.siarasystems.com/api/addAdmin",
+          "http://localhost:9000/api/addAdmin",
           newAdmin,
           {
             headers: {
@@ -187,7 +187,7 @@ function SuperAdminAdminmanagementContent() {
     if (isConfirmed) {
       try {
         await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/deleteAdmin/${admin_id}`,
+          `http://localhost:9000/api/deleteAdmin/${admin_id}`,
           {
             headers: {
               "Content-Type": "application/json",

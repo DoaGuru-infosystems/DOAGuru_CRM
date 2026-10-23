@@ -109,7 +109,7 @@ const AddServiceByLead = () => {
       });
 
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/services/${id}`,
+        `http://localhost:9000/api/services/${id}`,
         {
           quotation_name: quotationName,
           services: servicesToSave,
@@ -136,7 +136,7 @@ const AddServiceByLead = () => {
   const getQuotationName = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/quotation/${id}`,
+        `http://localhost:9000/api/quotation/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -153,7 +153,7 @@ const AddServiceByLead = () => {
   const getServicelist = async () => {
     try {
       const res = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/servicelist/${userId}`,
+        `http://localhost:9000/api/servicelist/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",

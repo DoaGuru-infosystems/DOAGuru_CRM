@@ -30,7 +30,7 @@ const CreateServicelist = () => {
     event.preventDefault();
     try {
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/create-servicelist`,
+        `http://localhost:9000/api/create-servicelist`,
         {
           services: services.filter(
             (service) => service.service_name.trim() !== ""

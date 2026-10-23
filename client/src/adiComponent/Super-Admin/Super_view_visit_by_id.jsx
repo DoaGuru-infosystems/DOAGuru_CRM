@@ -28,7 +28,7 @@ const Super_view_visit_by_id = () => {
   const fetchvisit = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-visit-super-admin/${id}`,
+        `http://localhost:9000/api/employe-visit-super-admin/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const Super_view_visit_by_id = () => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/employe-visit/${id}`,
+          `http://localhost:9000/api/employe-visit/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -89,7 +89,7 @@ const Super_view_visit_by_id = () => {
   const updateVisit = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/employe-visit`,
+        `http://localhost:9000/api/employe-visit`,
         modalData,
         {
           headers: {

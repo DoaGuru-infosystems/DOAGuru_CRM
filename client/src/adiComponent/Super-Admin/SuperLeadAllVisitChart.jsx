@@ -24,7 +24,7 @@ const SuperLeadAllVisitChart = () => {
 
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-all-visits/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/leads-all-visits/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

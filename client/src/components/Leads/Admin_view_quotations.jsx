@@ -26,7 +26,7 @@ const Admin_view_quotations = () => {
   const fetchQuotations = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/get-quotation-byLead/${id}`,
+        `http://localhost:9000/api/get-quotation-byLead/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ const Admin_view_quotations = () => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/quotation/${id}`,
+          `http://localhost:9000/api/quotation/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const Admin_view_quotations = () => {
   const handleCopyQuotation = async (quotationId) => {
     try {
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/copy-quotation/${quotationId}`
+        `http://localhost:9000/api/copy-quotation/${quotationId}`
       );
       setRender(!render);
     } catch (error) {

@@ -72,7 +72,7 @@ const FinanceCompanyUpdatePopup = ({
 
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateFinanceCompany/${selected?.finance_company_id}`,
+        `http://localhost:9000/api/updateFinanceCompany/${selected?.finance_company_id}`,
         formData,
         {
           headers: {

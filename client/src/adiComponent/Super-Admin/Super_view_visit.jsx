@@ -23,7 +23,7 @@ const Super_view_visit = ({ selectedLeadId, closeModalVisit, type }) => {
   const fetchvisit = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-visit/${type}/${selectedLeadId?.lead_id || selectedLeadId?.leadgen_id
+        `http://localhost:9000/api/employe-visit/${type}/${selectedLeadId?.lead_id || selectedLeadId?.leadgen_id
         }`,
         {
           headers: {

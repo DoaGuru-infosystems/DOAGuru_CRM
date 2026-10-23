@@ -53,7 +53,7 @@ const EmployeeCloseGraph = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads`,
+        `http://localhost:9000/api/leads`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -27,7 +27,7 @@ const VisitTab = () => {
   const fetchvisit = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-visit/${type}/${id}`,
+        `http://localhost:9000/api/employe-visit/${type}/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const VisitTab = () => {
 
     try {
       const res = await axios.delete(
-        `https://crm-generalize.siarasystems.com/api/employe-visit/${visit?.visit_id}`,
+        `http://localhost:9000/api/employe-visit/${visit?.visit_id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ const VisitTab = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/employe-visit/${modalData?.visit_id}`,
+        `http://localhost:9000/api/employe-visit/${modalData?.visit_id}`,
         modalData,
         {
           headers: {

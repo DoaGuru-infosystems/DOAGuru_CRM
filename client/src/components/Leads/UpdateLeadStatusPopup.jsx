@@ -34,7 +34,7 @@ const UpdateLeadStatusPopup = ({
     try {
       setLoading(true);
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateOnlyLeadStatusEmployeeEnd/${leads[0]?.lead_id}`,
+        `http://localhost:9000/api/updateOnlyLeadStatusEmployeeEnd/${leads[0]?.lead_id}`,
         currentLead,
         {
           headers: {
@@ -61,7 +61,7 @@ const UpdateLeadStatusPopup = ({
     try {
       setLoading(true);
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateOnlyMetaLeadStatusEmployeeEnd/${leads[0]?.meta_id}`,
+        `http://localhost:9000/api/updateOnlyMetaLeadStatusEmployeeEnd/${leads[0]?.meta_id}`,
         currentLead,
         {
           headers: {

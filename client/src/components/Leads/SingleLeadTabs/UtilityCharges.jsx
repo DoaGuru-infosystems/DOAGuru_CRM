@@ -31,7 +31,7 @@ const UtilityCharges = () => {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getUtilityBYleadId/${id}`
+        `http://localhost:9000/api/getUtilityBYleadId/${id}`
       );
       setUtility(data);
       setLoading(false);
@@ -50,7 +50,7 @@ const UtilityCharges = () => {
       const confirm = window.confirm(`Do you really want to delete ?`);
       if (confirm) {
         const res = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/deleteUtilityCharges/${id}`
+          `http://localhost:9000/api/deleteUtilityCharges/${id}`
         );
         toast.success("utility bill deleted successfully");
         fetchUtilityBills();

@@ -31,7 +31,7 @@ const SuperAdminImportDataContent = () => {
   const fetchEmployees = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setEmployees(data);
@@ -43,7 +43,7 @@ const SuperAdminImportDataContent = () => {
   const fetchProjects = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-all-project/${userId}/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/super-admin-all-project/${userId}/${superadminuser?.staff_org_id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProjects(data);
@@ -55,7 +55,7 @@ const SuperAdminImportDataContent = () => {
   const fetchProjectUnits = async (projectId) => {
     try {
       const res = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-project-unit/${projectId}`,
+        `http://localhost:9000/api/super-admin-project-unit/${projectId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProjectUnits(res.data);
@@ -119,7 +119,7 @@ const SuperAdminImportDataContent = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/import-leads",
+        "http://localhost:9000/api/import-leads",
         formData,
         {
           headers: {

@@ -49,7 +49,7 @@ const UpdateUtilityPopup = ({
 
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateUtilityCharges/${selected?.utility_id}`,
+        `http://localhost:9000/api/updateUtilityCharges/${selected?.utility_id}`,
         utility,
         { headers: { Authorization: `Bearer ${token}` } }
       );

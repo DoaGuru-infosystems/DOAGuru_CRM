@@ -60,7 +60,7 @@ const UpdateRegistryModal = ({
       if (registryDoc) formData.append("registry_document_url", registryDoc);
 
       const soldRes = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateRegistry/${selected?.registry_id}`,
+        `http://localhost:9000/api/updateRegistry/${selected?.registry_id}`,
         formData,
         {
           headers: {

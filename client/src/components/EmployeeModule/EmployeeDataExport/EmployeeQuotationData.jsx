@@ -22,7 +22,7 @@ const EmployeeQuotationData = () => {
     const fetchQuotations = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/get-quotation-byEmploye/${EmpId}`,
+          `http://localhost:9000/api/get-quotation-byEmploye/${EmpId}`,
           {
             headers: {
               "Content-Type": "application/json",

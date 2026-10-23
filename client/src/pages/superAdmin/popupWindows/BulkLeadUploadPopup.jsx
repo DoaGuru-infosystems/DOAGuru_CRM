@@ -31,7 +31,7 @@ const BulkLeadUploadPopup = ({
 
     try {
       const res = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-project-unit/${projectId}`,
+        `http://localhost:9000/api/super-admin-project-unit/${projectId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -88,7 +88,7 @@ const BulkLeadUploadPopup = ({
   // ✅ Download sample Excel
   const handleDownloadSample = () => {
     const sampleUrl =
-      "https://crm-generalize.siarasystems.com/api/download-sample-bulk-lead";
+      "http://localhost:9000/api/download-sample-bulk-lead";
     const link = document.createElement("a");
     link.href = sampleUrl;
     link.download = "sample_leads_upload.xlsx";
@@ -112,7 +112,7 @@ const BulkLeadUploadPopup = ({
   //     setLoading(true);
 
   //     const response = await axios.post(
-  //       "https://crm-generalize.siarasystems.com/api/bulk-upload-leads",
+  //       "http://localhost:9000/api/bulk-upload-leads",
   //       formData,
   //       {
   //         headers: {
@@ -154,7 +154,7 @@ const BulkLeadUploadPopup = ({
       setLoading(true);
 
       const response = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/bulk-upload-leads",
+        "http://localhost:9000/api/bulk-upload-leads",
         formData,
         {
           headers: {

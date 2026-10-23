@@ -36,7 +36,7 @@ const OwnerLoanAddPopup = ({
 
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getFinanceCompanyByOrg/${user.staff_org_id}`,
+        `http://localhost:9000/api/getFinanceCompanyByOrg/${user.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -152,7 +152,7 @@ const OwnerLoanAddPopup = ({
 
     try {
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/createOwnerLoan",
+        "http://localhost:9000/api/createOwnerLoan",
         formData,
         {
           headers: {

@@ -21,7 +21,7 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads/${id}`,
+        `http://localhost:9000/api/leads/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -48,7 +48,7 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
   const fetchFollowUp = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-follow-up-admin/${id}`,
+        `http://localhost:9000/api/employe-follow-up-admin/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -65,7 +65,7 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
   const fetchUnitSoldEmployee = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/admin-unit-sold-lead-id/${leads[0].lead_id}`,
+        `http://localhost:9000/api/admin-unit-sold-lead-id/${leads[0].lead_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -83,7 +83,7 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
   const fetchRemark = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/remarks-admin/${id}`,
+        `http://localhost:9000/api/remarks-admin/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -105,7 +105,7 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
   const fetchVisit = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-visit-admin/${id}`,
+        `http://localhost:9000/api/employe-visit-admin/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -31,7 +31,7 @@ const AddImageComponent = () => {
       formData.append("image", selectedFile);
 
       await axios.post(
-        `https://crm-generalize.siarasystems.com/api/${quotationId}/${imageType}`,
+        `http://localhost:9000/api/${quotationId}/${imageType}`,
         formData
       );
 

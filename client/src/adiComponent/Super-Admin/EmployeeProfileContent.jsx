@@ -19,7 +19,7 @@ function EmployeeProfileContent() {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-leads-super-admin/${employeeId}`,
+        `http://localhost:9000/api/employe-leads-super-admin/${employeeId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ function EmployeeProfileContent() {
     const fetchEmployee = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/employeeProfile-super-admin/${employeeId}`,
+          `http://localhost:9000/api/employeeProfile-super-admin/${employeeId}`,
           {
             headers: {
               "Content-Type": "application/json",

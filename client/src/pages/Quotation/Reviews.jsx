@@ -20,7 +20,7 @@ function Reviews({ handleClose }) {
     try {
       const response = await axios.get(
         `
-        https://crm-generalize.siarasystems.com/api/quotation/${id}`
+        http://localhost:9000/api/quotation/${id}`
       );
 
       if (response.status === 200) {
@@ -37,7 +37,7 @@ function Reviews({ handleClose }) {
     try {
       const response = await axios.get(
         `
-        https://crm-generalize.siarasystems.com/api/notes/${id}`
+        http://localhost:9000/api/notes/${id}`
       );
 
       if (response.status === 200) {
@@ -51,7 +51,7 @@ function Reviews({ handleClose }) {
     try {
       const response = await axios.get(
         `
-        https://crm-generalize.siarasystems.com/api/${id}/header`
+        http://localhost:9000/api/${id}/header`
       );
 
       if (response.status === 200) {

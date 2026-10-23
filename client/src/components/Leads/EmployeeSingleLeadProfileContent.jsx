@@ -206,7 +206,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const fetchProjects = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-all-project/${EmpId?.staff_org_id}`,
+        `http://localhost:9000/api/super-admin-all-project/${EmpId?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -223,7 +223,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-employee/${id}`,
+        `http://localhost:9000/api/leads-employee/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -252,7 +252,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const fetchMetaLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByLeadId/${id}`,
+        `http://localhost:9000/api/getMetaLeadsByLeadId/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -350,7 +350,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
     try {
       const targetId = type === "meta" ? editedLead?.leadgen_id : editedLead?.lead_id;
       await axios.put(
-        `https://crm-generalize.siarasystems.com/api/leads/${targetId}`,
+        `http://localhost:9000/api/leads/${targetId}`,
         leadData,
         {
           headers: {
@@ -377,7 +377,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const fetchVisit = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-visit/${type}/${id}`,
+        `http://localhost:9000/api/employe-visit/${type}/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -397,9 +397,9 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeFollow_UpMeta/${id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/employe-follow-up/${id}`;
+        apiUrl = `http://localhost:9000/api/employe-follow-up/${id}`;
       }
 
       const { data } = await axios.get(apiUrl, {
@@ -420,9 +420,9 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeUnitSoldByLeadIdMeta/${leads[0]?.leadgen_id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeUnitSoldByLeadIdMeta/${leads[0]?.leadgen_id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/unit-sold-lead-id/${leads[0]?.lead_id}`;
+        apiUrl = `http://localhost:9000/api/unit-sold-lead-id/${leads[0]?.lead_id}`;
       }
 
       const response = await axios.get(apiUrl, {
@@ -443,9 +443,9 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeRemarkMeta/${id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/remarks/${id}`;
+        apiUrl = `http://localhost:9000/api/remarks/${id}`;
       }
 
       const response = await axios.get(apiUrl, {
@@ -463,7 +463,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const fetchUnitdata = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/unit-data/${leads[0]?.unit_id}`,
+        `http://localhost:9000/api/unit-data/${leads[0]?.unit_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -555,7 +555,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       }
       setLoading(true);
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateLeadStatus/${currentLead.lead_id}`,
+        `http://localhost:9000/api/updateLeadStatus/${currentLead.lead_id}`,
         leadData,
         {
           headers: {
@@ -595,7 +595,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const fetchBookingData = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getBookingBYleadId/${id}`
+        `http://localhost:9000/api/getBookingBYleadId/${id}`
       );
       setBooking(data);
     } catch (error) {

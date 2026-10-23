@@ -21,7 +21,7 @@ function TotalEmployee() {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/getAllEmployees",
+        "http://localhost:9000/api/getAllEmployees",
         {
           headers: {
             "Content-Type": "application/json",

@@ -22,7 +22,7 @@ function Login() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/login",
+        "http://localhost:9000/api/login",
         formData,
         {
           headers: {

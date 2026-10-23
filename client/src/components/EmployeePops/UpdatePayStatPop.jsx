@@ -59,7 +59,7 @@ const UpdatePayStatPop = ({
 
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updatePaymentRecord/${selected?.pt_id}`,
+        `http://localhost:9000/api/updatePaymentRecord/${selected?.pt_id}`,
         payment,
         {
           headers: {

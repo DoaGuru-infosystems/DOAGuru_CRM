@@ -24,7 +24,7 @@ function MetaLeadData() {
     const fetchLeads = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
+          `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -41,7 +41,7 @@ function MetaLeadData() {
     const fetchEmployees = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
+          `http://localhost:9000/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
           {
             headers: {
               "Content-Type": "application/json",

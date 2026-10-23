@@ -76,7 +76,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -98,7 +98,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
   const fetchEmployees = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getEmployeeByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getEmployeeByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -115,7 +115,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
   const fetchProjects = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-all-project/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/super-admin-all-project/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -137,7 +137,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
       }
 
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-project-unit/${main_project_id}`,
+        `http://localhost:9000/api/super-admin-project-unit/${main_project_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -167,7 +167,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
   const updateAnswerRemark = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateOnlyAnswerRemark`,
+        `http://localhost:9000/api/updateOnlyAnswerRemark`,
         modalData,
         {
           headers: {
@@ -330,7 +330,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
     if (isConfirmed) {
       try {
         await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/leads/${id}`,
+          `http://localhost:9000/api/leads/${id}`,
           {
             headers: {
               "Content-Type": "application/json",

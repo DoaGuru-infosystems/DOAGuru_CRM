@@ -13,7 +13,7 @@ function AdminProfileContent() {
     const fetchEmployee = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/getAdminById/${adminId}`,
+          `http://localhost:9000/api/getAdminById/${adminId}`,
           {
             headers: {
               "Content-Type": "application/json",

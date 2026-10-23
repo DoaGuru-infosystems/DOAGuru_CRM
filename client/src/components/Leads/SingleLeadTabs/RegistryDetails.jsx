@@ -30,7 +30,7 @@ const RegistryDetails = () => {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getRegistryBYleadId/${id}`
+        `http://localhost:9000/api/getRegistryBYleadId/${id}`
       );
       setRegistry(data);
       setLoading(false);
@@ -51,7 +51,7 @@ const RegistryDetails = () => {
       const confirm = window.confirm("Do you really want to delete ?");
       if (confirm) {
         const res = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/deleteRegistry/${id}`
+          `http://localhost:9000/api/deleteRegistry/${id}`
         );
 
         toast.success("registry deleted successfully");
@@ -143,7 +143,7 @@ const RegistryDetails = () => {
                     <td className="px-6 py-4 border-b border-gray-200">
                       {lead?.registry_document_url ? (
                         <a
-                          href={`https://crm-generalize.siarasystems.com/${lead.registry_document_url}`}
+                          href={`http://localhost:9000/${lead.registry_document_url}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-cyan-600"

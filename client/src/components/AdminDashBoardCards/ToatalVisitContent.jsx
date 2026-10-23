@@ -22,7 +22,7 @@ const TotalVisitContent = () => {
   const fetchLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-all-visits/${adminuser?.staff_org_id}`,
+        `http://localhost:9000/api/leads-all-visits/${adminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

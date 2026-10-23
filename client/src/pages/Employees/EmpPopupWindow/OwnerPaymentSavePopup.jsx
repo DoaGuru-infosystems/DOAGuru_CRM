@@ -110,7 +110,7 @@ const OwnerPaymentSavePopup = ({
 
     try {
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/createOwnerPayments",
+        "http://localhost:9000/api/createOwnerPayments",
         formData,
         {
           headers: {

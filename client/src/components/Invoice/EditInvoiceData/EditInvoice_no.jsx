@@ -13,7 +13,7 @@ const EditInvoice_no = () => {
 
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/invoice-no/${id}`,
+        `http://localhost:9000/api/invoice-no/${id}`,
         { newInvoice_no: newInvoiceNo }
       );
       if (response.status === 200) {

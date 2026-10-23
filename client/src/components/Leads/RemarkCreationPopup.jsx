@@ -60,7 +60,7 @@ const RemarkCreationPopup = ({
     setLoading(true);
     try {
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/remarks`,
+        `http://localhost:9000/api/remarks`,
         remark,
         {
           headers: {

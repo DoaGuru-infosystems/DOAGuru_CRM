@@ -38,7 +38,7 @@ const SuperSoldnit = () => {
   const fetchEmployeeUnitSold = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -56,7 +56,7 @@ const SuperSoldnit = () => {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employee-super-admin/${userId}`,
+        `http://localhost:9000/api/employee-super-admin/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const SuperSoldnit = () => {
   const fetchSoldUnits = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-unit-sold/${userId}`,
+        `http://localhost:9000/api/super-admin-unit-sold/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const SuperSoldnit = () => {
   const fetchEmployeeData = async (employeeId) => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getAllEmployeeData/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

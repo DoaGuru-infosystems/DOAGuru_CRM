@@ -25,7 +25,7 @@ function SuperAdminLogin() {
     try {
       setLoading(true);
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/OneOnlylogin",
+        "http://localhost:9000/api/OneOnlylogin",
         formData
       );
       if (res.data.success) {

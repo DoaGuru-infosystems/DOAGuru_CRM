@@ -70,7 +70,7 @@ const UpdateOrgModal = ({ isOpen, onClose, getOrgDataById, selected }) => {
     setLoading(true);
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateOrgDetails/${user?.staff_org_id}`,
+        `http://localhost:9000/api/updateOrgDetails/${user?.staff_org_id}`,
         inputField,
         {
           headers: { Authorization: `Bearer ${user?.token}` },

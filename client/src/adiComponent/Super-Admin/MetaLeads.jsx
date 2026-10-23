@@ -18,7 +18,7 @@ const MetaLeads = () => {
   const fetchLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

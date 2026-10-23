@@ -31,7 +31,7 @@ const ResetPasswordOnly = () => {
     try {
       setLoading(true);
       await axios.post(
-        "https://crm-generalize.siarasystems.com/api/verifyOtp-superadmin",
+        "http://localhost:9000/api/verifyOtp-superadmin",
         { email, otp }
       );
       setShowOtp(false);
@@ -49,7 +49,7 @@ const ResetPasswordOnly = () => {
     try {
       setLoading(true);
       await axios.put(
-        "https://crm-generalize.siarasystems.com/api/resetPasswordOnlyOne",
+        "http://localhost:9000/api/resetPasswordOnlyOne",
         { email, password: newPassword }
       );
       toast.success("Password updated successfully");

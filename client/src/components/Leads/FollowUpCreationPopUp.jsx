@@ -70,7 +70,7 @@ const FollowUpCreationPopUp = ({
     setLoading(true);
     try {
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/employe-follow-up`,
+        `http://localhost:9000/api/employe-follow-up`,
         follow_up,
         {
           headers: {

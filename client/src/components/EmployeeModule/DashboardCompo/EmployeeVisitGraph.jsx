@@ -23,7 +23,7 @@ const EmployeeVisitGraph = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/leads-visits/${EmpId.staff_id}`,
+          `http://localhost:9000/api/leads-visits/${EmpId.staff_id}`,
           {
             headers: {
               "Content-Type": "application/json",

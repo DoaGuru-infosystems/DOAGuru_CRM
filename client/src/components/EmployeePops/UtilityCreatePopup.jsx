@@ -45,7 +45,7 @@ const UtilityCreatePopup = ({ isOpen, onClose, booking, leads }) => {
 
     try {
       const res = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/addUtilityCharges`,
+        `http://localhost:9000/api/addUtilityCharges`,
         utility,
         { headers: { Authorization: `Bearer ${token}` } }
       );

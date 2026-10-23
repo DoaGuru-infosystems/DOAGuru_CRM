@@ -13,7 +13,7 @@ const FormSelector = ({ setLoading, setMe, setError, id, onFormSelect }) => {
   const fetchForms = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/forms/${id}`,
+        `http://localhost:9000/api/forms/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -52,7 +52,7 @@ const FormSelector = ({ setLoading, setMe, setError, id, onFormSelect }) => {
     try {
       // Fetch leads from Meta API via backend
       const response = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/leads/fetch",
+        "http://localhost:9000/api/leads/fetch",
         {
           formId: selectedFormId,
         },

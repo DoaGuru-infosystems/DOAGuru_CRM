@@ -21,7 +21,7 @@ function SuperAdminTotalEmployee() {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/getAllEmployees-super-admin",
+        "http://localhost:9000/api/getAllEmployees-super-admin",
         {
           headers: {
             "Content-Type": "application/json",

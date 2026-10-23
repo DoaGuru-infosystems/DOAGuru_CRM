@@ -23,7 +23,7 @@ const AdminTotalLeadContent = () => {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${adminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getLeadsByOrg/${adminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -337,7 +337,7 @@ const AdminEditLeadPopup = ({
         setLoading(true);
         if (isEditing) {
           await axios.put(
-            `https://crm-generalize.siarasystems.com/api/leads/${selectedLead?.lead_id}`,
+            `http://localhost:9000/api/leads/${selectedLead?.lead_id}`,
             leadData,
             {
               headers: {
@@ -353,7 +353,7 @@ const AdminEditLeadPopup = ({
         } else {
           // Create new lead
           const response = await axios.post(
-            "https://crm-generalize.siarasystems.com/api/leads",
+            "http://localhost:9000/api/leads",
             leadData,
             {
               headers: {

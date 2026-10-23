@@ -134,7 +134,7 @@ const RegistryReceipt = () => {
 
         {registry.registry_document_url ? (
           <a
-            href={`https://crm-generalize.siarasystems.com/${registry.registry_document_url}`}
+            href={`http://localhost:9000/${registry.registry_document_url}`}
             target="_blank"
             className="text-blue-600 underline"
           >

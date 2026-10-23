@@ -26,7 +26,7 @@ function SuperAccrs() {
   const fetchResponses = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/get-responses-super-admin",
+        "http://localhost:9000/api/get-responses-super-admin",
         {
           headers: {
             "Content-Type": "application/json",
@@ -42,7 +42,7 @@ function SuperAccrs() {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/employee-super-admin",
+        "http://localhost:9000/api/employee-super-admin",
         {
           headers: {
             "Content-Type": "application/json",
@@ -58,7 +58,7 @@ function SuperAccrs() {
   const fetchLeadassigned = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/leads-super-admin",
+        "http://localhost:9000/api/leads-super-admin",
         {
           headers: {
             "Content-Type": "application/json",
@@ -112,7 +112,7 @@ function SuperAccrs() {
     try {
       setLoading(true);
       await axios.post(
-        "https://crm-generalize.siarasystems.com/api/leads",
+        "http://localhost:9000/api/leads",
         {
           lead_no: selectedLead.leadId,
           assignedTo: currentLead.assignedTo,

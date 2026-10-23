@@ -24,7 +24,7 @@ const Super_view_unit_byid = () => {
   const fetchEmployeeUnitSold = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-unit-sold-lead-id/${id}`,
+        `http://localhost:9000/api/super-admin-unit-sold-lead-id/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

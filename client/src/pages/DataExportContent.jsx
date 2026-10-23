@@ -33,7 +33,7 @@ const DataExportContent = () => {
   const fetchMetaLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const DataExportContent = () => {
   const fetchLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -67,7 +67,7 @@ const DataExportContent = () => {
   const fetchEmployee = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employee-super-admin/${userId}`,
+        `http://localhost:9000/api/employee-super-admin/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -84,7 +84,7 @@ const DataExportContent = () => {
   const employeesoldunit = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllUnitSoldByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getAllUnitSoldByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -101,7 +101,7 @@ const DataExportContent = () => {
   const fetchVisit = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-all-visits/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/leads-all-visits/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

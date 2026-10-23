@@ -30,7 +30,7 @@ const GenLeadAssignedPopup = ({
   const fetchAllStaff = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getEmployeeByOrg/${user?.staff_org_id}`,
+        `http://localhost:9000/api/getEmployeeByOrg/${user?.staff_org_id}`,
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -44,7 +44,7 @@ const GenLeadAssignedPopup = ({
   const fetchAllProjects = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/all-project/${user?.staff_org_id}`,
+        `http://localhost:9000/api/all-project/${user?.staff_org_id}`,
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -59,7 +59,7 @@ const GenLeadAssignedPopup = ({
     if (!inputField?.main_project_id) return;
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllUnitsByProjectId/${inputField?.main_project_id}`,
+        `http://localhost:9000/api/getAllUnitsByProjectId/${inputField?.main_project_id}`,
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -108,7 +108,7 @@ const GenLeadAssignedPopup = ({
       if (selectedLeads && selectedLeads.length > 0) {
         const updateRequests = selectedLeads?.map((item) =>
           axios.put(
-            `https://crm-generalize.siarasystems.com/api/updateLeadAssignment/${item}`,
+            `http://localhost:9000/api/updateLeadAssignment/${item}`,
             inputField,
             {
               headers: { Authorization: `Bearer ${user?.token}` },

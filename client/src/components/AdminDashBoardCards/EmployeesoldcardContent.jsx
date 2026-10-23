@@ -22,7 +22,7 @@ const EmployeesoldUnitCardsContent = () => {
   const fetchEmployeeSoldUnits = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllUnitSoldByOrg/${adminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getAllUnitSoldByOrg/${adminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -28,7 +28,7 @@ const Super_view_follow_by_id = () => {
   const fetchFollowUp = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-follow-up-super-admin/${id}`,
+        `http://localhost:9000/api/employe-follow-up-super-admin/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const Super_view_follow_by_id = () => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/employe-follow-up/${followup.id}`,
+          `http://localhost:9000/api/employe-follow-up/${followup.id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const Super_view_follow_by_id = () => {
   const updateVisit = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/employe-follow-up`,
+        `http://localhost:9000/api/employe-follow-up`,
         modalData,
         {
           headers: {

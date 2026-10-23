@@ -69,7 +69,7 @@ const UpdateProfilePopup = ({
     setLoading(true);
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateEmployeeDetails/${selected?.staff_id}`,
+        `http://localhost:9000/api/updateEmployeeDetails/${selected?.staff_id}`,
         newEmployee,
         {
           headers: {

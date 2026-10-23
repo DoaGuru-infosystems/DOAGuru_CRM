@@ -38,7 +38,7 @@ const Overview = () => {
   const fetchCompanies = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/getOrganization",
+        "http://localhost:9000/api/getOrganization",
         {
           headers: {
             "Content-Type": "application/json",
@@ -124,7 +124,7 @@ const Overview = () => {
       if (editingIndex !== null) {
         const companyId = companies[editingIndex].companyId;
         await axios.put(
-          `https://crm-generalize.siarasystems.com/api/updateOrganization/${companyId}`,
+          `http://localhost:9000/api/updateOrganization/${companyId}`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -137,7 +137,7 @@ const Overview = () => {
         setEditingIndex(null);
       } else {
         await axios.post(
-          "https://crm-generalize.siarasystems.com/api/addOrganization",
+          "http://localhost:9000/api/addOrganization",
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -225,7 +225,7 @@ const Overview = () => {
     if (isConfirmed) {
       try {
         await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/deleteOrganization/${companyId}`,
+          `http://localhost:9000/api/deleteOrganization/${companyId}`,
           {
             headers: {
               "Content-Type": "application/json",

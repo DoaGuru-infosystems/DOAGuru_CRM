@@ -60,7 +60,7 @@ const RegistryCreatePopup = ({ isOpen, onClose, leads, booking }) => {
       if (registryDoc) formData.append("registry_document_url", registryDoc);
 
       const soldRes = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/createRegistry`,
+        `http://localhost:9000/api/createRegistry`,
         formData,
         {
           headers: {

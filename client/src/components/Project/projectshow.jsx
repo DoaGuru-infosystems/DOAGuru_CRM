@@ -33,7 +33,7 @@ const Projectshow = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/project-add",
+        "http://localhost:9000/api/project-add",
         formData,
         {
           headers: {
@@ -79,7 +79,7 @@ const Projectshow = () => {
   const fetchProjects = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-all-project/${superadminuser.staff_org_id}`,
+        `http://localhost:9000/api/super-admin-all-project/${superadminuser.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -104,7 +104,7 @@ const Projectshow = () => {
 
     try {
       const res = await axios.delete(
-        `https://crm-generalize.siarasystems.com/api/delete-project/${id}`,
+        `http://localhost:9000/api/delete-project/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -128,7 +128,7 @@ const Projectshow = () => {
   const handleUpdate = async () => {
     try {
       const { data } = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/edit-project/${editProject.project_id}`,
+        `http://localhost:9000/api/edit-project/${editProject.project_id}`,
         editProject,
         {
           headers: {

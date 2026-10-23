@@ -31,7 +31,7 @@ const MainQuoatationPage = () => {
   const fetchQuotations = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/quotation-data`,
+        `http://localhost:9000/api/quotation-data`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const MainQuoatationPage = () => {
   //   if (isConfirmed) {
   //     try {
   //       const response = await axios.delete(
-  //         `https://crm-generalize.siarasystems.com/api/quotation/${id}`
+  //         `http://localhost:9000/api/quotation/${id}`
   //       );
   //       if (response.status === 200) {
   //         console.log("Quotation deleted successfully");
@@ -77,7 +77,7 @@ const MainQuoatationPage = () => {
       try {
         // Delete the quotation
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/quotation/${quotation.id}`
+          `http://localhost:9000/api/quotation/${quotation.id}`
         );
 
         if (response.status === 200) {
@@ -86,7 +86,7 @@ const MainQuoatationPage = () => {
           // After deletion, update the leads table status
           try {
             const updateResponse = await axios.put(
-              `https://crm-generalize.siarasystems.com/api/updateOnlyQuotationStatus/${quotation.lead_id}`,
+              `http://localhost:9000/api/updateOnlyQuotationStatus/${quotation.lead_id}`,
               { quotation: "not created" }
             );
 
@@ -113,7 +113,7 @@ const MainQuoatationPage = () => {
   const handleCopyQuotation = async (quotationId) => {
     try {
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/copy-quotation/${quotationId}`
+        `http://localhost:9000/api/copy-quotation/${quotationId}`
       );
       setRender(!render);
     } catch (error) {

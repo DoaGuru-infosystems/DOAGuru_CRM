@@ -23,7 +23,7 @@ const AdminTotalClosedDealContent = () => {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-data-user-id/${userId}`,
+        `http://localhost:9000/api/leads-data-user-id/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",

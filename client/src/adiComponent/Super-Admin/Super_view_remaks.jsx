@@ -22,9 +22,9 @@ const Super_view_remarks = ({ selectedLeadId, closeModalRemark, type }) => {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeRemarkMeta/${selectedLeadId?.leadgen_id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${selectedLeadId?.leadgen_id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/remarks/${selectedLeadId?.lead_id}`;
+        apiUrl = `http://localhost:9000/api/remarks/${selectedLeadId?.lead_id}`;
       }
 
       const response = await axios.get(apiUrl, {

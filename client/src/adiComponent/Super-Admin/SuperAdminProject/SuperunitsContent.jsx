@@ -36,7 +36,7 @@ const SuperunitsContent = () => {
     if (!id) return;
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-getUnitsdistributeById/${id}`,
+        `http://localhost:9000/api/super-admin-getUnitsdistributeById/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ const SuperunitsContent = () => {
     try {
       console.log("Updating unit:", editProject);
       const { data } = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/edit-unit/${editProject.unit_id}`,
+        `http://localhost:9000/api/edit-unit/${editProject.unit_id}`,
         editProject,
         {
           headers: {
@@ -115,7 +115,7 @@ const SuperunitsContent = () => {
 
     try {
       const res = await axios.delete(
-        `https://crm-generalize.siarasystems.com/api/delete-unit/${id}`,
+        `http://localhost:9000/api/delete-unit/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

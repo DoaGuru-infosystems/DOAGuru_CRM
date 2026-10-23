@@ -36,7 +36,7 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
 
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-super-admin-byid/${selectedLeadId?.lead_id}`,
+        `http://localhost:9000/api/leads-super-admin-byid/${selectedLeadId?.lead_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -54,7 +54,7 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
   const fetchMetaLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByLeadId/${selectedLeadId?.leadgen_id}`,
+        `http://localhost:9000/api/getMetaLeadsByLeadId/${selectedLeadId?.leadgen_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -74,9 +74,9 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeFollow_UpMeta/${selectedLeadId?.leadgen_id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${selectedLeadId?.leadgen_id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/employe-follow-up/${selectedLeadId?.lead_id}`;
+        apiUrl = `http://localhost:9000/api/employe-follow-up/${selectedLeadId?.lead_id}`;
       }
 
       const response = await axios.get(apiUrl, {
@@ -96,9 +96,9 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeRemarkMeta/${selectedLeadId?.leadgen_id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${selectedLeadId?.leadgen_id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/remarks/${selectedLeadId?.lead_id}`;
+        apiUrl = `http://localhost:9000/api/remarks/${selectedLeadId?.lead_id}`;
       }
 
       const response = await axios.get(apiUrl, {
@@ -119,9 +119,9 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeUnitSoldByLeadIdMeta/${selectedLeadId.leadgen_id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeUnitSoldByLeadIdMeta/${selectedLeadId.leadgen_id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/unit-sold-lead-id/${selectedLeadId.lead_id}`;
+        apiUrl = `http://localhost:9000/api/unit-sold-lead-id/${selectedLeadId.lead_id}`;
       }
 
       const response = await axios.get(apiUrl, {
@@ -143,7 +143,7 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
   const fetchVisit = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employe-visit/${type}/${selectedLeadId?.lead_id || selectedLeadId?.leadgen_id
+        `http://localhost:9000/api/employe-visit/${type}/${selectedLeadId?.lead_id || selectedLeadId?.leadgen_id
         }`,
         {
           headers: {

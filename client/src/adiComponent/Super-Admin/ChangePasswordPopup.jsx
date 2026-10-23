@@ -59,7 +59,7 @@ const ChangePasswordPopup = ({ isOpen, onClose, selected }) => {
     setLoading(true);
     try {
       await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateEmployeeDetails/${selected?.staff_id}`,
+        `http://localhost:9000/api/updateEmployeeDetails/${selected?.staff_id}`,
         {
           staff_password: passwords.new_password,
         },

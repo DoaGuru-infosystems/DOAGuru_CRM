@@ -17,7 +17,7 @@ const EmployeeSingleContent = () => {
     const fetchEmployee = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/employeeProfile/${userId}`,
+          `http://localhost:9000/api/employeeProfile/${userId}`,
           {
             headers: {
               "Content-Type": "application/json",

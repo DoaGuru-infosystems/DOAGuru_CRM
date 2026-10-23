@@ -22,7 +22,7 @@ const UpdateHeaderImageForm = ({ quotationId }) => {
       formData.append("file", selectedFile);
 
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/header/${quotationId}`,
+        `http://localhost:9000/api/header/${quotationId}`,
         formData,
         {
           headers: {

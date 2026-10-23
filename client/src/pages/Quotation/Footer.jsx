@@ -11,7 +11,7 @@ function Footer({ companyName }) {
     const fetchImages = async () => {
       try {
         const response = await axios.post(
-          "https://crm-generalize.siarasystems.com/api/company-header-footer",
+          "http://localhost:9000/api/company-header-footer",
           {
             company_name: companyName,
           }

@@ -27,9 +27,9 @@ const ViewAllFollowUpContent = () => {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeFollow_UpMeta/${id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/employe-follow-up/${id}`;
+        apiUrl = `http://localhost:9000/api/employe-follow-up/${id}`;
       }
 
       const { data } = await axios.get(apiUrl, {
@@ -52,7 +52,7 @@ const ViewAllFollowUpContent = () => {
     if (isConfirmed) {
       try {
         const response = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/employe-follow-up/${followup.follow_up_id}`,
+          `http://localhost:9000/api/employe-follow-up/${followup.follow_up_id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -88,7 +88,7 @@ const ViewAllFollowUpContent = () => {
   const updateVisit = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/employe-follow-up/${modalData?.follow_up_id}`,
+        `http://localhost:9000/api/employe-follow-up/${modalData?.follow_up_id}`,
         modalData,
         {
           headers: {

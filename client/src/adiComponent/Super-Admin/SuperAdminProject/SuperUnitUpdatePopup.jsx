@@ -68,7 +68,7 @@ const SuperUnitUpdatePopup = ({ isOpen, onClose, fetchUnits, selected }) => {
     setLoading(true);
     try {
       await axios.put(
-        `https://crm-generalize.siarasystems.com/api/edit-unit/${selected?.unit_id}`,
+        `http://localhost:9000/api/edit-unit/${selected?.unit_id}`,
         unitData,
         {
           headers: {

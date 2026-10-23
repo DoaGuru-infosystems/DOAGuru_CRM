@@ -15,7 +15,7 @@ function TotalInvoice() {
     const fetchInvoices = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/invoice-data`,
+          `http://localhost:9000/api/invoice-data`,
           {
             headers: {
               "Content-Type": "application/json",

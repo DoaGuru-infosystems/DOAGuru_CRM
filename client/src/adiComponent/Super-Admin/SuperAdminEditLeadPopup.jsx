@@ -113,7 +113,7 @@ const SuperAdminEditLeadPopup = ({
     }
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-project-unit/${projectId}`,
+        `http://localhost:9000/api/super-admin-project-unit/${projectId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -353,7 +353,7 @@ const SuperAdminEditLeadPopup = ({
       setLoading(true);
       if (isEditing) {
         await axios.put(
-          `https://crm-generalize.siarasystems.com/api/leads/${selectedLead?.lead_id}`,
+          `http://localhost:9000/api/leads/${selectedLead?.lead_id}`,
           leadData,
           {
             headers: {
@@ -365,7 +365,7 @@ const SuperAdminEditLeadPopup = ({
         fetchLeads();
       } else {
         await axios.post(
-          "https://crm-generalize.siarasystems.com/api/leads",
+          "http://localhost:9000/api/leads",
           leadData,
           {
             headers: {

@@ -28,7 +28,7 @@ const AdminProfileContent = () => {
   const fetchEmployeeData = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getEmployeeDetails/${superAdmin?.staff_id}`,
+        `http://localhost:9000/api/getEmployeeDetails/${superAdmin?.staff_id}`,
         {
           headers: {
             "Content-Type": "application/json",

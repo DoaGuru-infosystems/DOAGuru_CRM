@@ -27,9 +27,9 @@ const Super_view_followup = ({ selectedLeadId, closeModalFollowUp, type }) => {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeFollow_UpMeta/${selectedLeadId?.leadgen_id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${selectedLeadId?.leadgen_id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/employe-follow-up/${selectedLeadId?.lead_id}`;
+        apiUrl = `http://localhost:9000/api/employe-follow-up/${selectedLeadId?.lead_id}`;
       }
 
       const response = await axios.get(apiUrl, {

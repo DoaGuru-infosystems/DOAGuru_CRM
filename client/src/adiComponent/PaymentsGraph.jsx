@@ -15,7 +15,7 @@ const PaymentsGraph = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://crm-generalize.siarasystems.com/api/payments",
+          "http://localhost:9000/api/payments",
           {
             headers: {
               "Content-Type": "application/json",

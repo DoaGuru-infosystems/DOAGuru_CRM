@@ -66,7 +66,7 @@ const UserProfile = () => {
 
     try {
       const response = await fetch(
-        "https://crm-generalize.siarasystems.com/api/editProfile",
+        "http://localhost:9000/api/editProfile",
         {
           method: "POST",
           body: formData,
@@ -91,7 +91,7 @@ const UserProfile = () => {
     if (window.confirm("Are you sure you want to delete your profile?")) {
       try {
         const response = await fetch(
-          "https://crm-generalize.siarasystems.com/api/deleteUser",
+          "http://localhost:9000/api/deleteUser",
           {
             method: "DELETE",
             headers: {

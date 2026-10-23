@@ -63,7 +63,7 @@ const SuperLeadsTable = ({ isSidebarOpen, type }) => {
   const getOrgDataById = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getOrgDetailsById/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getOrgDetailsById/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const SuperLeadsTable = ({ isSidebarOpen, type }) => {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${superadminuser.staff_org_id}`,
+        `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser.staff_org_id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -108,7 +108,7 @@ const SuperLeadsTable = ({ isSidebarOpen, type }) => {
     setNewLoading(true);
     try {
       await axios.post(
-        `https://crm-generalize.siarasystems.com/api/metaLeadFetchByPageId`,
+        `http://localhost:9000/api/metaLeadFetchByPageId`,
         {
           pageId: orgData?.org_page_id,
           accessToken: orgData?.org_page_access_token,

@@ -50,7 +50,7 @@ const FInalSalePopup = ({ isOpen, onClose, leads, booking }) => {
 
     try {
       await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateSoldDetails/${booking[0]?.esu_id}/${id}/${type}`,
+        `http://localhost:9000/api/updateSoldDetails/${booking[0]?.esu_id}/${id}/${type}`,
         unitsold,
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -25,7 +25,7 @@ function Accrs() {
   const fetchResponses = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/get-responses-admin",
+        "http://localhost:9000/api/get-responses-admin",
         {
           headers: {
             "Content-Type": "application/json",
@@ -42,7 +42,7 @@ function Accrs() {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/employee",
+        "http://localhost:9000/api/employee",
         {
           headers: {
             "Content-Type": "application/json",
@@ -58,7 +58,7 @@ function Accrs() {
   const fetchLeadassigned = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/leads",
+        "http://localhost:9000/api/leads",
         {
           headers: {
             "Content-Type": "application/json",
@@ -113,7 +113,7 @@ function Accrs() {
     }
     try {
       setLoading(true);
-      await axios.post("https://crm-generalize.siarasystems.com/api/leads", {
+      await axios.post("http://localhost:9000/api/leads", {
         lead_no: selectedLead.leadId,
         assignedTo: currentLead.assignedTo,
         employeeId: currentLead.employeeId,

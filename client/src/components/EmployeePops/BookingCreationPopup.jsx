@@ -124,7 +124,7 @@ const BookingCreationPopup = ({
       };
 
       const soldRes = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/unit-sold`,
+        `http://localhost:9000/api/unit-sold`,
         unitPayload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -145,7 +145,7 @@ const BookingCreationPopup = ({
       };
 
       await axios.post(
-        "https://crm-generalize.siarasystems.com/api/createBooking",
+        "http://localhost:9000/api/createBooking",
         bookingPayload
       );
 

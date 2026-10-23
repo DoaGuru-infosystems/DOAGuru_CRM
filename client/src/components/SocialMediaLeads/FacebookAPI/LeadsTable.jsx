@@ -42,7 +42,7 @@ const LeadsTable = () => {
   const fetchLeadsByFormId = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/Leads-data-fetch-admin/${gotId}`,
+        `http://localhost:9000/api/Leads-data-fetch-admin/${gotId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -62,7 +62,7 @@ const LeadsTable = () => {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/employee",
+        "http://localhost:9000/api/employee",
         {
           headers: {
             "Content-Type": "application/json",
@@ -78,7 +78,7 @@ const LeadsTable = () => {
   const fetchLeadassigned = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/leads",
+        "http://localhost:9000/api/leads",
         {
           headers: {
             "Content-Type": "application/json",
@@ -132,7 +132,7 @@ const LeadsTable = () => {
     try {
       setLoadingsave(true);
       await axios.post(
-        "https://crm-generalize.siarasystems.com/api/leads",
+        "http://localhost:9000/api/leads",
         {
           lead_no: selectedLead.leadId,
           assignedTo: currentLead.assignedTo,
@@ -204,7 +204,7 @@ const LeadsTable = () => {
     try {
       // Fetch leads from Meta API via backend
       const response = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/leads/fetch",
+        "http://localhost:9000/api/leads/fetch",
         {
           formId: gotId,
         }
@@ -251,7 +251,7 @@ const LeadsTable = () => {
   // const saveIntoDB = async () => {
   //   try {
   //     // Fetch leads from Meta API via backend
-  //     const response = await axios.post('https://crm-generalize.siarasystems.com/api/leads/fetch', {
+  //     const response = await axios.post('http://localhost:9000/api/leads/fetch', {
   //       formId: gotId,
   //     });
   //     setLoading(true);

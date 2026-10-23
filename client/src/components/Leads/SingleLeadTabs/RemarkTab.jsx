@@ -28,9 +28,9 @@ const RemarkTab = () => {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeRemarkMeta/${id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/remarks/${id}`;
+        apiUrl = `http://localhost:9000/api/remarks/${id}`;
       }
 
       const { data } = await axios.get(apiUrl, {
@@ -57,7 +57,7 @@ const RemarkTab = () => {
     try {
       // Delete the remark
       const deleteResponse = await axios.delete(
-        `https://crm-generalize.siarasystems.com/api/remarks/${remark.remark_id}`,
+        `http://localhost:9000/api/remarks/${remark.remark_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -97,7 +97,7 @@ const RemarkTab = () => {
   const updateRemark = async () => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/remarks/${modalData?.remark_id}`,
+        `http://localhost:9000/api/remarks/${modalData?.remark_id}`,
         modalData,
         {
           headers: {

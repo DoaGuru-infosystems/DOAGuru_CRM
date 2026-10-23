@@ -17,7 +17,7 @@ const FormInput = ({ setShowForm, onFormSubmit, id }) => {
     try {
       // Make POST request to save form ID and form name
       const response = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/forms",
+        "http://localhost:9000/api/forms",
         {
           formId,
           formName,

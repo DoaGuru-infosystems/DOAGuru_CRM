@@ -193,7 +193,7 @@ const AddEditEmployeePopup = ({
     try {
       if (editingIndex !== null) {
         await axios.put(
-          `https://crm-generalize.siarasystems.com/api/updateEmployee/${editingIndex?.employeeId}`,
+          `http://localhost:9000/api/updateEmployee/${editingIndex?.employeeId}`,
           newEmployee,
           {
             headers: {
@@ -205,7 +205,7 @@ const AddEditEmployeePopup = ({
         toast.success("Data updated successfully");
       } else {
         await axios.post(
-          "https://crm-generalize.siarasystems.com/api/addEmployee",
+          "http://localhost:9000/api/addEmployee",
           newEmployee,
           {
             headers: {

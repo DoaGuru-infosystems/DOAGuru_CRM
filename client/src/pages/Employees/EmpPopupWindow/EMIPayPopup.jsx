@@ -61,7 +61,7 @@ const EMIPayPopup = ({
 
     try {
       const res = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateInstallments/${selectedEMI?.installment_id}`,
+        `http://localhost:9000/api/updateInstallments/${selectedEMI?.installment_id}`,
         formData,
         {
           headers: {

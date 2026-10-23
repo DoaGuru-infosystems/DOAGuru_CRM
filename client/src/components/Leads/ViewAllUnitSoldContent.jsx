@@ -47,7 +47,7 @@ const ViewAllUnitSoldContent = () => {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-employee/${id}`,
+        `http://localhost:9000/api/leads-employee/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -65,7 +65,7 @@ const ViewAllUnitSoldContent = () => {
   const fetchMetaLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByLeadId/${id}`,
+        `http://localhost:9000/api/getMetaLeadsByLeadId/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -87,7 +87,7 @@ const ViewAllUnitSoldContent = () => {
   const fetchLoanInstallments = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getLoanEmiDetailsByLoanID/${unitSoldData[0]?.esu_owner_id}/${EmpId?.staff_org_id}/${unitSoldData[0]?.esu_id}`,
+        `http://localhost:9000/api/getLoanEmiDetailsByLoanID/${unitSoldData[0]?.esu_owner_id}/${EmpId?.staff_org_id}/${unitSoldData[0]?.esu_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -104,7 +104,7 @@ const ViewAllUnitSoldContent = () => {
   const fetchOwnerPayments = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getOwnerPaymentsByMultiIds/${unitSoldData[0]?.esu_id}/${unitSoldData[0]?.esu_owner_id}/${EmpId?.staff_org_id}`
+        `http://localhost:9000/api/getOwnerPaymentsByMultiIds/${unitSoldData[0]?.esu_id}/${unitSoldData[0]?.esu_owner_id}/${EmpId?.staff_org_id}`
       );
       setOwnPayment(data);
     } catch (error) {
@@ -124,8 +124,8 @@ const ViewAllUnitSoldContent = () => {
       setLoading(true);
       const apiUrl =
         type === "meta"
-          ? `https://crm-generalize.siarasystems.com/api/getEmployeeUnitSoldByLeadIdMeta/${id}`
-          : `https://crm-generalize.siarasystems.com/api/unit-sold-lead-id/${id}`;
+          ? `http://localhost:9000/api/getEmployeeUnitSoldByLeadIdMeta/${id}`
+          : `http://localhost:9000/api/unit-sold-lead-id/${id}`;
 
       const { data } = await axios.get(apiUrl, {
         headers: {
@@ -152,7 +152,7 @@ const ViewAllUnitSoldContent = () => {
 
     try {
       await axios.delete(
-        `https://crm-generalize.siarasystems.com/api/unit-sold/${type}/${esu_id}`,
+        `http://localhost:9000/api/unit-sold/${type}/${esu_id}`,
         {
           headers: {
             "Content-Type": "application/json",

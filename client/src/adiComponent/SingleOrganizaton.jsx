@@ -18,7 +18,7 @@ const SingleOrganization = () => {
   const fetchOrganization = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getOrganization/${id}`,
+        `http://localhost:9000/api/getOrganization/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -47,7 +47,7 @@ const SuperBulkUnitUploadPopup = ({ isOpen, onClose, fetchUnits }) => {
     try {
       setLoading(true);
       await axios.post(
-        "https://crm-generalize.siarasystems.com/api/addUnitsBulk",
+        "http://localhost:9000/api/addUnitsBulk",
         formData,
         {
           headers: {
@@ -73,7 +73,7 @@ const SuperBulkUnitUploadPopup = ({ isOpen, onClose, fetchUnits }) => {
 
   const handleDownloadSample = () => {
     const sampleFileUrl =
-      "https://crm-generalize.siarasystems.com/api/download-sample-bulk-unit";
+      "http://localhost:9000/api/download-sample-bulk-unit";
 
     const link = document.createElement("a");
     link.href = sampleFileUrl;

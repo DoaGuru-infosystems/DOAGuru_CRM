@@ -18,9 +18,9 @@ const Super_view_unit_sold = ({ selectedLeadId, closeModalUnitSold, type }) => {
       let apiUrl = "";
 
       if (type === "meta") {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/getEmployeeUnitSoldByLeadIdMeta/${selectedLeadId.leadgen_id}`;
+        apiUrl = `http://localhost:9000/api/getEmployeeUnitSoldByLeadIdMeta/${selectedLeadId.leadgen_id}`;
       } else {
-        apiUrl = `https://crm-generalize.siarasystems.com/api/unit-sold-lead-id/${selectedLeadId.lead_id}`;
+        apiUrl = `http://localhost:9000/api/unit-sold-lead-id/${selectedLeadId.lead_id}`;
       }
 
       const response = await axios.get(apiUrl, {

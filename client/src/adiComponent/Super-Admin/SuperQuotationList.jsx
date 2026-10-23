@@ -20,7 +20,7 @@ const SuperQuotationList = () => {
     const fetchQuotations = async () => {
       try {
         const response = await axios.get(
-          `https://crm-generalize.siarasystems.com/api/quotation-data-super-admin`,
+          `http://localhost:9000/api/quotation-data-super-admin`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const SuperQuotationList = () => {
 
     try {
       await axios.post(
-        `https://crm-generalize.siarasystems.com/api/update-quotation-status`,
+        `http://localhost:9000/api/update-quotation-status`,
         {
           id: id,
           status: newStatus,

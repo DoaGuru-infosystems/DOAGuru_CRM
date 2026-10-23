@@ -41,9 +41,9 @@ const Topbar = ({ isSidebarOpen }) => {
     try {
       let url = "";
       if (isEmployee) {
-        url = `https://crm-generalize.siarasystems.com/api/employe-leads/${user.staff_id}`;
+        url = `http://localhost:9000/api/employe-leads/${user.staff_id}`;
       } else if (isAdmin || isSuperAdmin) {
-        url = `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${user.staff_org_id || user.org_id}`;
+        url = `http://localhost:9000/api/getLeadsByOrg/${user.staff_org_id || user.org_id}`;
       }
       if (!url) return;
 
@@ -75,7 +75,7 @@ const Topbar = ({ isSidebarOpen }) => {
   const handleNotificationStatusChange = async (leadId, status) => {
     try {
       const response = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/updateOnlyPrimaryStatus/${leadId}`,
+        `http://localhost:9000/api/updateOnlyPrimaryStatus/${leadId}`,
         { primary_status: status },
         {
           headers: {

@@ -25,7 +25,7 @@ const FinanceCompanySettingContent = () => {
 
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getFinanceCompanyByOrg/${user.staff_org_id}`,
+        `http://localhost:9000/api/getFinanceCompanyByOrg/${user.staff_org_id}`,
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -47,7 +47,7 @@ const FinanceCompanySettingContent = () => {
       );
       if (confirm) {
         const res = await axios.delete(
-          `https://crm-generalize.siarasystems.com/api/deleteFinanceCompany/${id}`,
+          `http://localhost:9000/api/deleteFinanceCompany/${id}`,
           {
             headers: { Authorization: `Bearer ${user?.token}` },
           }

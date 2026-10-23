@@ -269,7 +269,7 @@ const SuperAddEditEmployeePopup = ({
           delete payload.staff_org_id;
         }
         await axios.put(
-          `https://crm-generalize.siarasystems.com/api/updateEmployeeDetails/${editingIndex?.staff_id}`,
+          `http://localhost:9000/api/updateEmployeeDetails/${editingIndex?.staff_id}`,
           payload,
           {
             headers: {
@@ -281,7 +281,7 @@ const SuperAddEditEmployeePopup = ({
         toast.success("Employee data updated successfully");
       } else {
         await axios.post(
-          "https://crm-generalize.siarasystems.com/api/addNewCompanyStaff",
+          "http://localhost:9000/api/addNewCompanyStaff",
           newEmployee,
           {
             headers: {

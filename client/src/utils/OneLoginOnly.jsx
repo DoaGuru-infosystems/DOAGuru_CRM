@@ -28,7 +28,7 @@ const OneLoginOnly = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/OneOnlylogin",
+        "http://localhost:9000/api/OneOnlylogin",
         { email, password },
       );
 
@@ -67,7 +67,7 @@ const OneLoginOnly = () => {
       setLoading(true);
       try {
         await axios.post(
-          "https://crm-generalize.siarasystems.com/api/verifyOtp-superadmin",
+          "http://localhost:9000/api/verifyOtp-superadmin",
           { email, otp },
         );
         dispatch(loginUser(localhost));

@@ -23,7 +23,7 @@ const EmployeesoldunitContent = () => {
   const fetchEmployeeSoldUnits = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/unit-sold/${EmpId.staff_id}`,
+        `http://localhost:9000/api/unit-sold/${EmpId.staff_id}`,
         {
           headers: {
             "Content-Type": "application/json",

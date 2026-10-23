@@ -28,7 +28,7 @@ const Overview2 = () => {
   const fetchLeads = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getLeadsByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -49,7 +49,7 @@ const Overview2 = () => {
   const fetchDashboardAnalytics = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getDashboardAnalytics/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getDashboardAnalytics/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const Overview2 = () => {
   const fetchAllMetaLeads = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getMetaLeadsByOrgId/${superadminuser.staff_org_id}`,
+        `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser.staff_org_id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -83,7 +83,7 @@ const Overview2 = () => {
   const fetchVisit = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/leads-all-visits/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/leads-all-visits/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -100,7 +100,7 @@ const Overview2 = () => {
   const fetchProjects = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-all-project/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/super-admin-all-project/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -117,7 +117,7 @@ const Overview2 = () => {
   const employeesoldunit = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllUnitSoldByOrg/${superadminuser?.staff_org_id}`,
+        `http://localhost:9000/api/getAllUnitSoldByOrg/${superadminuser?.staff_org_id}`,
         {
           headers: {
             "Content-Type": "application/json",

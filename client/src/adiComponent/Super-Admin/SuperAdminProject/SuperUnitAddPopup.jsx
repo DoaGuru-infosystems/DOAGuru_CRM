@@ -53,7 +53,7 @@ const SuperUnitAddPopup = ({ isOpen, onClose, fetchUnits }) => {
     setLoading(true);
     try {
       await axios.post(
-        "https://crm-generalize.siarasystems.com/api/add-unit",
+        "http://localhost:9000/api/add-unit",
         unitData,
         {
           headers: {

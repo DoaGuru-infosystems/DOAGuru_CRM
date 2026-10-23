@@ -31,7 +31,7 @@ const ImportLeadsAdminContent = () => {
   const fetchEmployees = async () => {
     try {
       const res = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/employee/${userId}`,
+        `http://localhost:9000/api/employee/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setEmployees(res.data);
@@ -43,7 +43,7 @@ const ImportLeadsAdminContent = () => {
   const fetchProjects = async () => {
     try {
       const res = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/all-project/${userId}`,
+        `http://localhost:9000/api/all-project/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProjects(res.data);
@@ -55,7 +55,7 @@ const ImportLeadsAdminContent = () => {
   const fetchProjectUnits = async (projectId) => {
     try {
       const res = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/super-admin-project-unit/${projectId}`,
+        `http://localhost:9000/api/super-admin-project-unit/${projectId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProjectUnits(res.data);
@@ -114,7 +114,7 @@ const ImportLeadsAdminContent = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "https://crm-generalize.siarasystems.com/api/import-leads",
+        "http://localhost:9000/api/import-leads",
         formData,
         {
           headers: {

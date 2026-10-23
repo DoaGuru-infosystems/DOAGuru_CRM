@@ -48,7 +48,7 @@ const VisitCreationPopup = ({
     try {
       // First API call: Create a visit
       const response = await axios.post(
-        `https://crm-generalize.siarasystems.com/api/employe-visit`,
+        `http://localhost:9000/api/employe-visit`,
         visitLead,
         {
           headers: {

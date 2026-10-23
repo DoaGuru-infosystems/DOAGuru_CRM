@@ -19,7 +19,7 @@ const Transactions = ({ booking }) => {
   const fetchTransactionData = async () => {
     try {
       const { data } = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getAllTransanctionByESUId/${booking[0]?.esu_id}/${user?.staff_org_id}`
+        `http://localhost:9000/api/getAllTransanctionByESUId/${booking[0]?.esu_id}/${user?.staff_org_id}`
       );
       setTransaction(data);
     } catch (error) {

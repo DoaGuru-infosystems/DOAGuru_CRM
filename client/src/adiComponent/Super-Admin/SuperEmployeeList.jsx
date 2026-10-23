@@ -40,7 +40,7 @@ const SuperEmployeeList = () => {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        "https://crm-generalize.siarasystems.com/api/getAllEmployee-Toal-lead",
+        "http://localhost:9000/api/getAllEmployee-Toal-lead",
         {
           headers: {
             "Content-Type": "application/json",
@@ -180,7 +180,7 @@ const SuperEmployeeList = () => {
       try {
         setLoading(true);
         await axios.post(
-          "https://crm-generalize.siarasystems.com/api/leads",
+          "http://localhost:9000/api/leads",
           leadData,
           {
             headers: {

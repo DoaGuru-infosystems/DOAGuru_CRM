@@ -22,7 +22,7 @@ const UnitDetailDashContent = () => {
     if (!id) return;
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/getUntitsDetailById/${id}`,
+        `http://localhost:9000/api/getUntitsDetailById/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -75,7 +75,7 @@ const UnitDetailDashContent = () => {
     try {
       console.log("Updating unit:", editProject);
       const { data } = await axios.put(
-        `https://crm-generalize.siarasystems.com/api/editUnitdetailsinner/${editProject.id}`,
+        `http://localhost:9000/api/editUnitdetailsinner/${editProject.id}`,
         editProject,
         {
           headers: {

@@ -22,7 +22,7 @@ const Admin_RemarksViewContent = () => {
   const fetchRemarks = async () => {
     try {
       const response = await axios.get(
-        `https://crm-generalize.siarasystems.com/api/remarks-admin/${id}`,
+        `http://localhost:9000/api/remarks-admin/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
