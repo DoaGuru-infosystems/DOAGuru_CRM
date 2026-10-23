@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+﻿import React, { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -31,23 +31,37 @@ const SuperAddEditEmployeePopup = ({
     staff_phone: "",
     staff_password: "",
     staff_status: "",
-    referred_by: "",
+    // HIDDEN (IT/DM CRM): Referred By
+    // referred_by: "",
     alternative_number: "",
-    dob: "",
-    anniversary_date: "",
+    // HIDDEN (IT/DM CRM): Date of Birth
+    // dob: "",
+    // HIDDEN (IT/DM CRM): Anniversary Date
+    // anniversary_date: "",
     office_business_name: "",
     office_address: "",
-    nature_of_job: "",
-    department: "",
-    designation: "",
-    badge: "",
-    salary: "",
-    campaign: "",
-    interest_in_project_secondary: "",
-    lead_sub_source: "",
-    budget: "",
-    primary_status: "",
-    secondary_status: "",
+    // HIDDEN (IT/DM CRM): Nature Of Job
+    // nature_of_job: "",
+    // HIDDEN (IT/DM CRM): Department
+    // department: "",
+    // HIDDEN (IT/DM CRM): Designation
+    // designation: "",
+    // HIDDEN (IT/DM CRM): Badge
+    // badge: "",
+    // HIDDEN (IT/DM CRM): Salary
+    // salary: "",
+    // HIDDEN (IT/DM CRM): Campaign
+    // campaign: "",
+    // HIDDEN (IT/DM CRM): Secondary Project Interest
+    // interest_in_project_secondary: "",
+    // HIDDEN (IT/DM CRM): Sub Source
+    // lead_sub_source: "",
+    // HIDDEN (IT/DM CRM): Budget Range
+    // budget: "",
+    // HIDDEN (IT/DM CRM): Primary Status
+    // primary_status: "",
+    // HIDDEN (IT/DM CRM): Secondary Status
+    // secondary_status: "",
     lead_review: "",
   });
 
@@ -134,23 +148,37 @@ const SuperAddEditEmployeePopup = ({
         staff_phone: editingIndex?.staff_phone || "",
         staff_password: "",
         staff_status: editingIndex?.staff_status || "",
-        referred_by: editingIndex?.referred_by || "",
+        // HIDDEN (IT/DM CRM): Referred By
+        // referred_by: editingIndex?.referred_by || "",
         alternative_number: editingIndex?.alternative_number || "",
-        dob: editingIndex?.dob || "",
-        anniversary_date: editingIndex?.anniversary_date || "",
+        // HIDDEN (IT/DM CRM): Date of Birth
+        // dob: editingIndex?.dob || "",
+        // HIDDEN (IT/DM CRM): Anniversary Date
+        // anniversary_date: editingIndex?.anniversary_date || "",
         office_business_name: editingIndex?.office_business_name || "",
         office_address: editingIndex?.office_address || "",
-        nature_of_job: editingIndex?.nature_of_job || "",
-        department: editingIndex?.department || "",
-        designation: editingIndex?.designation || "",
-        badge: editingIndex?.badge || "",
-        salary: editingIndex?.salary || "",
-        campaign: editingIndex?.campaign || "",
-        interest_in_project_secondary: editingIndex?.interest_in_project_secondary || "",
-        lead_sub_source: editingIndex?.lead_sub_source || "",
-        budget: editingIndex?.budget || "",
-        primary_status: editingIndex?.primary_status || "",
-        secondary_status: editingIndex?.secondary_status || "",
+        // HIDDEN (IT/DM CRM): Nature Of Job
+        // nature_of_job: editingIndex?.nature_of_job || "",
+        // HIDDEN (IT/DM CRM): Department
+        // department: editingIndex?.department || "",
+        // HIDDEN (IT/DM CRM): Designation
+        // designation: editingIndex?.designation || "",
+        // HIDDEN (IT/DM CRM): Badge
+        // badge: editingIndex?.badge || "",
+        // HIDDEN (IT/DM CRM): Salary
+        // salary: editingIndex?.salary || "",
+        // HIDDEN (IT/DM CRM): Campaign
+        // campaign: editingIndex?.campaign || "",
+        // HIDDEN (IT/DM CRM): Secondary Project Interest
+        // interest_in_project_secondary: editingIndex?.interest_in_project_secondary || "",
+        // HIDDEN (IT/DM CRM): Sub Source
+        // lead_sub_source: editingIndex?.lead_sub_source || "",
+        // HIDDEN (IT/DM CRM): Budget Range
+        // budget: editingIndex?.budget || "",
+        // HIDDEN (IT/DM CRM): Primary Status
+        // primary_status: editingIndex?.primary_status || "",
+        // HIDDEN (IT/DM CRM): Secondary Status
+        // secondary_status: editingIndex?.secondary_status || "",
         lead_review: editingIndex?.lead_review || "",
       });
     } else {
@@ -162,23 +190,37 @@ const SuperAddEditEmployeePopup = ({
         staff_phone: "",
         staff_password: "",
         staff_status: "",
-        referred_by: "",
+        // HIDDEN (IT/DM CRM): Referred By
+        // referred_by: "",
         alternative_number: "",
-        dob: "",
-        anniversary_date: "",
+        // HIDDEN (IT/DM CRM): Date of Birth
+        // dob: "",
+        // HIDDEN (IT/DM CRM): Anniversary Date
+        // anniversary_date: "",
         office_business_name: "",
         office_address: "",
-        nature_of_job: "",
-        department: "",
-        designation: "",
-        badge: "",
-        salary: "",
-        campaign: "",
-        interest_in_project_secondary: "",
-        lead_sub_source: "",
-        budget: "",
-        primary_status: "",
-        secondary_status: "",
+        // HIDDEN (IT/DM CRM): Nature Of Job
+        // nature_of_job: "",
+        // HIDDEN (IT/DM CRM): Department
+        // department: "",
+        // HIDDEN (IT/DM CRM): Designation
+        // designation: "",
+        // HIDDEN (IT/DM CRM): Badge
+        // badge: "",
+        // HIDDEN (IT/DM CRM): Salary
+        // salary: "",
+        // HIDDEN (IT/DM CRM): Campaign
+        // campaign: "",
+        // HIDDEN (IT/DM CRM): Secondary Project Interest
+        // interest_in_project_secondary: "",
+        // HIDDEN (IT/DM CRM): Sub Source
+        // lead_sub_source: "",
+        // HIDDEN (IT/DM CRM): Budget Range
+        // budget: "",
+        // HIDDEN (IT/DM CRM): Primary Status
+        // primary_status: "",
+        // HIDDEN (IT/DM CRM): Secondary Status
+        // secondary_status: "",
         lead_review: "",
       });
     }
@@ -259,23 +301,37 @@ const SuperAddEditEmployeePopup = ({
         staff_phone: "",
         staff_password: "",
         staff_status: "",
-        referred_by: "",
+        // HIDDEN (IT/DM CRM): Referred By
+        // referred_by: "",
         alternative_number: "",
-        dob: "",
-        anniversary_date: "",
+        // HIDDEN (IT/DM CRM): Date of Birth
+        // dob: "",
+        // HIDDEN (IT/DM CRM): Anniversary Date
+        // anniversary_date: "",
         office_business_name: "",
         office_address: "",
-        nature_of_job: "",
-        department: "",
-        designation: "",
-        badge: "",
-        salary: "",
-        campaign: "",
-        interest_in_project_secondary: "",
-        lead_sub_source: "",
-        budget: "",
-        primary_status: "",
-        secondary_status: "",
+        // HIDDEN (IT/DM CRM): Nature Of Job
+        // nature_of_job: "",
+        // HIDDEN (IT/DM CRM): Department
+        // department: "",
+        // HIDDEN (IT/DM CRM): Designation
+        // designation: "",
+        // HIDDEN (IT/DM CRM): Badge
+        // badge: "",
+        // HIDDEN (IT/DM CRM): Salary
+        // salary: "",
+        // HIDDEN (IT/DM CRM): Campaign
+        // campaign: "",
+        // HIDDEN (IT/DM CRM): Secondary Project Interest
+        // interest_in_project_secondary: "",
+        // HIDDEN (IT/DM CRM): Sub Source
+        // lead_sub_source: "",
+        // HIDDEN (IT/DM CRM): Budget Range
+        // budget: "",
+        // HIDDEN (IT/DM CRM): Primary Status
+        // primary_status: "",
+        // HIDDEN (IT/DM CRM): Secondary Status
+        // secondary_status: "",
         lead_review: "",
       });
 
@@ -472,8 +528,8 @@ const SuperAddEditEmployeePopup = ({
                     )}
                   </div>
 
-                  {/* Date of Birth */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Date of Birth */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Date of Birth</label>
                     <input
                       type="date"
@@ -482,10 +538,10 @@ const SuperAddEditEmployeePopup = ({
                       onChange={handleInputChange}
                       className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none bg-white"
                     />
-                  </div>
+                  </div> */}
 
-                  {/* Anniversary Date */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Anniversary Date */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Anniversary Date</label>
                     <input
                       type="date"
@@ -494,18 +550,19 @@ const SuperAddEditEmployeePopup = ({
                       onChange={handleInputChange}
                       className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none bg-white"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
-              {/* Section 2: Professional Information */}
+              {/* HIDDEN (IT/DM CRM): Section 2: Professional Information - all fields hidden */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-1 border-b border-gray-100">
+                {/* HIDDEN (IT/DM CRM): Professional & Employment Details - section heading hidden */}
+                {/* <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-1 border-b border-gray-100">
                   Professional & Employment Details
-                </h3>
+                </h3> */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Department */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Department */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Department</label>
                     <select
                       name="department"
@@ -518,10 +575,10 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {/* Designation */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Designation */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Designation</label>
                     <select
                       name="designation"
@@ -534,10 +591,10 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {/* Badge */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Badge */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Badge</label>
                     <select
                       name="badge"
@@ -550,10 +607,10 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {/* Salary */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Salary */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Salary</label>
                     <input
                       type="text"
@@ -563,10 +620,10 @@ const SuperAddEditEmployeePopup = ({
                       placeholder="e.g. 50000"
                       className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none"
                     />
-                  </div>
+                  </div> */}
 
-                  {/* Nature of Job */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Nature Of Job */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Nature Of Job</label>
                     <select
                       name="nature_of_job"
@@ -579,10 +636,10 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {/* Budget */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Budget Range */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Budget Range</label>
                     <input
                       type="text"
@@ -592,7 +649,7 @@ const SuperAddEditEmployeePopup = ({
                       placeholder="e.g. 5-10 Lakhs"
                       className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -630,14 +687,15 @@ const SuperAddEditEmployeePopup = ({
                 </div>
               </div>
 
-              {/* Section 4: Lead/Marketing Info */}
+              {/* HIDDEN (IT/DM CRM): Section 4: Lead/Marketing Info - all fields hidden */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-1 border-b border-gray-100">
+                {/* HIDDEN (IT/DM CRM): Marketing & Referral Info - section heading hidden */}
+                {/* <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-1 border-b border-gray-100">
                   Marketing & Referral Info
-                </h3>
+                </h3> */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {/* Referred By */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Referred By */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Referred By</label>
                     <input
                       type="text"
@@ -647,10 +705,10 @@ const SuperAddEditEmployeePopup = ({
                       placeholder="Referred By"
                       className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none"
                     />
-                  </div>
+                  </div> */}
 
-                  {/* Campaign */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Campaign */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Campaign</label>
                     <select
                       name="campaign"
@@ -663,10 +721,10 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {/* Lead Sub Source */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Sub Source */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Sub Source</label>
                     <select
                       name="lead_sub_source"
@@ -679,10 +737,10 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {/* Secondary Project Interest */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Secondary Project Interest */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Secondary Project Interest</label>
                     <input
                       type="text"
@@ -692,7 +750,7 @@ const SuperAddEditEmployeePopup = ({
                       placeholder="e.g. Project B"
                       className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -702,8 +760,8 @@ const SuperAddEditEmployeePopup = ({
                   Status Tracking & Reviews
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Primary Status */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Primary Status */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Primary Status</label>
                     <select
                       name="primary_status"
@@ -716,10 +774,10 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {/* Secondary Status */}
-                  <div className="flex flex-col">
+                  {/* HIDDEN (IT/DM CRM): Secondary Status */}
+                  {/* <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Secondary Status</label>
                     <select
                       name="secondary_status"
@@ -750,7 +808,7 @@ const SuperAddEditEmployeePopup = ({
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
                   {/* Employee Review / Notes */}
                   <div className="flex flex-col md:col-span-3">

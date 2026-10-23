@@ -107,23 +107,37 @@ const addNewCompanyStaff = (req, res) => {
       staff_email,
       staff_phone,
       staff_password,
-      referred_by,
+      // HIDDEN (IT/DM CRM): Referred By
+      // referred_by,
       alternative_number,
-      dob,
-      anniversary_date,
+      // HIDDEN (IT/DM CRM): Date of Birth
+      // dob,
+      // HIDDEN (IT/DM CRM): Anniversary Date
+      // anniversary_date,
       office_business_name,
       office_address,
-      nature_of_job,
-      department,
-      designation,
-      badge,
-      salary,
-      campaign,
-      interest_in_project_secondary,
-      lead_sub_source,
-      budget,
-      primary_status,
-      secondary_status,
+      // HIDDEN (IT/DM CRM): Nature Of Job
+      // nature_of_job,
+      // HIDDEN (IT/DM CRM): Department
+      // department,
+      // HIDDEN (IT/DM CRM): Designation
+      // designation,
+      // HIDDEN (IT/DM CRM): Badge
+      // badge,
+      // HIDDEN (IT/DM CRM): Salary
+      // salary,
+      // HIDDEN (IT/DM CRM): Campaign
+      // campaign,
+      // HIDDEN (IT/DM CRM): Secondary Project Interest
+      // interest_in_project_secondary,
+      // HIDDEN (IT/DM CRM): Sub Source
+      // lead_sub_source,
+      // HIDDEN (IT/DM CRM): Budget Range
+      // budget,
+      // HIDDEN (IT/DM CRM): Primary Status
+      // primary_status,
+      // HIDDEN (IT/DM CRM): Secondary Status
+      // secondary_status,
       lead_review,
     } = req.body;
 
@@ -191,12 +205,11 @@ const addNewCompanyStaff = (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(staff_password, saltRounds);
 
+        // HIDDEN (IT/DM CRM): Omit unused columns (referred_by, dob, anniversary_date, nature_of_job, department, designation, badge, salary, campaign, interest_in_project_secondary, lead_sub_source, budget, primary_status, secondary_status)
         const insertQuery = `INSERT INTO company_staff 
           (staff_org_id, staff_role, staff_name, staff_email, staff_phone, staff_password, staff_status, staff_created_at,
-           referred_by, alternative_number, dob, anniversary_date, office_business_name, office_address, nature_of_job,
-           department, designation, badge, salary, campaign, interest_in_project_secondary, lead_sub_source,
-           budget, primary_status, secondary_status, lead_review) 
-          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+           alternative_number, office_business_name, office_address, lead_review) 
+          VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
 
         const insertParams = [
           finalOrgId,
@@ -207,23 +220,9 @@ const addNewCompanyStaff = (req, res) => {
           hashedPassword,
           finalStatus,
           dateTime,
-          referred_by || null,
           alternative_number || null,
-          dob || null,
-          anniversary_date || null,
           office_business_name || null,
           office_address || null,
-          nature_of_job || null,
-          department || null,
-          designation || null,
-          badge || null,
-          salary || null,
-          campaign || null,
-          interest_in_project_secondary || null,
-          lead_sub_source || null,
-          budget || null,
-          primary_status || null,
-          secondary_status || null,
           lead_review || null,
         ];
 
@@ -616,23 +615,37 @@ const updateEmployeeDetails = async (req, res) => {
         staff_phone,
         staff_password,
         staff_status,
-        referred_by,
+        // HIDDEN (IT/DM CRM): Referred By
+        // referred_by,
         alternative_number,
-        dob,
-        anniversary_date,
+        // HIDDEN (IT/DM CRM): Date of Birth
+        // dob,
+        // HIDDEN (IT/DM CRM): Anniversary Date
+        // anniversary_date,
         office_business_name,
         office_address,
-        nature_of_job,
-        department,
-        designation,
-        badge,
-        salary,
-        campaign,
-        interest_in_project_secondary,
-        lead_sub_source,
-        budget,
-        primary_status,
-        secondary_status,
+        // HIDDEN (IT/DM CRM): Nature Of Job
+        // nature_of_job,
+        // HIDDEN (IT/DM CRM): Department
+        // department,
+        // HIDDEN (IT/DM CRM): Designation
+        // designation,
+        // HIDDEN (IT/DM CRM): Badge
+        // badge,
+        // HIDDEN (IT/DM CRM): Salary
+        // salary,
+        // HIDDEN (IT/DM CRM): Campaign
+        // campaign,
+        // HIDDEN (IT/DM CRM): Secondary Project Interest
+        // interest_in_project_secondary,
+        // HIDDEN (IT/DM CRM): Sub Source
+        // lead_sub_source,
+        // HIDDEN (IT/DM CRM): Budget Range
+        // budget,
+        // HIDDEN (IT/DM CRM): Primary Status
+        // primary_status,
+        // HIDDEN (IT/DM CRM): Secondary Status
+        // secondary_status,
         lead_review,
       } = req.body;
 
@@ -670,22 +683,25 @@ const updateEmployeeDetails = async (req, res) => {
         fields.push("staff_password = ?");
         values.push(hashedPassword);
       }
-      if (referred_by !== undefined) {
-        fields.push("referred_by = ?");
-        values.push(referred_by);
-      }
+      // HIDDEN (IT/DM CRM): Referred By
+      // if (referred_by !== undefined) {
+      //   fields.push("referred_by = ?");
+      //   values.push(referred_by);
+      // }
       if (alternative_number !== undefined) {
         fields.push("alternative_number = ?");
         values.push(alternative_number);
       }
-      if (dob !== undefined) {
-        fields.push("dob = ?");
-        values.push(dob);
-      }
-      if (anniversary_date !== undefined) {
-        fields.push("anniversary_date = ?");
-        values.push(anniversary_date);
-      }
+      // HIDDEN (IT/DM CRM): Date of Birth
+      // if (dob !== undefined) {
+      //   fields.push("dob = ?");
+      //   values.push(dob);
+      // }
+      // HIDDEN (IT/DM CRM): Anniversary Date
+      // if (anniversary_date !== undefined) {
+      //   fields.push("anniversary_date = ?");
+      //   values.push(anniversary_date);
+      // }
       if (office_business_name !== undefined) {
         fields.push("office_business_name = ?");
         values.push(office_business_name);
@@ -694,50 +710,61 @@ const updateEmployeeDetails = async (req, res) => {
         fields.push("office_address = ?");
         values.push(office_address);
       }
-      if (nature_of_job !== undefined) {
-        fields.push("nature_of_job = ?");
-        values.push(nature_of_job);
-      }
-      if (department !== undefined) {
-        fields.push("department = ?");
-        values.push(department);
-      }
-      if (designation !== undefined) {
-        fields.push("designation = ?");
-        values.push(designation);
-      }
-      if (badge !== undefined) {
-        fields.push("badge = ?");
-        values.push(badge);
-      }
-      if (salary !== undefined) {
-        fields.push("salary = ?");
-        values.push(salary);
-      }
-      if (campaign !== undefined) {
-        fields.push("campaign = ?");
-        values.push(campaign);
-      }
-      if (interest_in_project_secondary !== undefined) {
-        fields.push("interest_in_project_secondary = ?");
-        values.push(interest_in_project_secondary);
-      }
-      if (lead_sub_source !== undefined) {
-        fields.push("lead_sub_source = ?");
-        values.push(lead_sub_source);
-      }
-      if (budget !== undefined) {
-        fields.push("budget = ?");
-        values.push(budget);
-      }
-      if (primary_status !== undefined) {
-        fields.push("primary_status = ?");
-        values.push(primary_status);
-      }
-      if (secondary_status !== undefined) {
-        fields.push("secondary_status = ?");
-        values.push(secondary_status);
-      }
+      // HIDDEN (IT/DM CRM): Nature Of Job
+      // if (nature_of_job !== undefined) {
+      //   fields.push("nature_of_job = ?");
+      //   values.push(nature_of_job);
+      // }
+      // HIDDEN (IT/DM CRM): Department
+      // if (department !== undefined) {
+      //   fields.push("department = ?");
+      //   values.push(department);
+      // }
+      // HIDDEN (IT/DM CRM): Designation
+      // if (designation !== undefined) {
+      //   fields.push("designation = ?");
+      //   values.push(designation);
+      // }
+      // HIDDEN (IT/DM CRM): Badge
+      // if (badge !== undefined) {
+      //   fields.push("badge = ?");
+      //   values.push(badge);
+      // }
+      // HIDDEN (IT/DM CRM): Salary
+      // if (salary !== undefined) {
+      //   fields.push("salary = ?");
+      //   values.push(salary);
+      // }
+      // HIDDEN (IT/DM CRM): Campaign
+      // if (campaign !== undefined) {
+      //   fields.push("campaign = ?");
+      //   values.push(campaign);
+      // }
+      // HIDDEN (IT/DM CRM): Secondary Project Interest
+      // if (interest_in_project_secondary !== undefined) {
+      //   fields.push("interest_in_project_secondary = ?");
+      //   values.push(interest_in_project_secondary);
+      // }
+      // HIDDEN (IT/DM CRM): Sub Source
+      // if (lead_sub_source !== undefined) {
+      //   fields.push("lead_sub_source = ?");
+      //   values.push(lead_sub_source);
+      // }
+      // HIDDEN (IT/DM CRM): Budget Range
+      // if (budget !== undefined) {
+      //   fields.push("budget = ?");
+      //   values.push(budget);
+      // }
+      // HIDDEN (IT/DM CRM): Primary Status
+      // if (primary_status !== undefined) {
+      //   fields.push("primary_status = ?");
+      //   values.push(primary_status);
+      // }
+      // HIDDEN (IT/DM CRM): Secondary Status
+      // if (secondary_status !== undefined) {
+      //   fields.push("secondary_status = ?");
+      //   values.push(secondary_status);
+      // }
       if (lead_review !== undefined) {
         fields.push("lead_review = ?");
         values.push(lead_review);
