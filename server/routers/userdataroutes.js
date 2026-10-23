@@ -119,9 +119,7 @@ const {
   updateForm,
   deleteForm,
   getByProjectIdForms,
-  googleOAuthLogin,
-  googleOAuthCallback,
-  getGoogleAuthUrl,
+// Google OAuth removed
   createServiceList,
   getServicelist,
   deleteServicename,
@@ -259,10 +257,7 @@ const httpLogger = require("../httpLogger");
 // Public /register route removed
 
 
-// Google OAuth routes for Super Admin
-router.post("/google-oauth-login", httpLogger, googleOAuthLogin);
-router.post("/google-oauth-callback", httpLogger, googleOAuthCallback);
-router.get("/google-auth-url", httpLogger, getGoogleAuthUrl);
+// Google OAuth routes removed
 // router.post("/verifyOtp-superadmin", httpLogger, verifyOtpSuperAdmin);
 router.put("/quotation/:quotationId", authenticate, httpLogger, updateServices);
 router.post("/quotation", authenticate, httpLogger, Quotation);

@@ -5,7 +5,6 @@ import "./index.css";
 import AdminRoutes from "./routes/AdminRoutes";
 import EmployeeRoutes from "./routes/EmployeeRoutes";
 import SuperAdminRoutes from "./routes/SuperAdminRoutes";
-import GoogleOAuthCallback from "./components/GoogleOAuthCallback";
 import OneLoginOnly from "./utils/OneLoginOnly";
 import ResetPasswordOnly from "./utils/ResetPasswordOnly";
 import { Toaster } from "react-hot-toast";
@@ -20,10 +19,6 @@ function App() {
         <>
           <Route path="/" element={<OneLoginOnly />} />
           <Route path="/reset-password" element={<ResetPasswordOnly />} />
-          <Route
-            path="/google-oauth-callback"
-            element={<GoogleOAuthCallback />}
-          />
           <Route path="*" element={<OneLoginOnly />} />
         </>
       );

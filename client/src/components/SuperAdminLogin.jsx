@@ -7,7 +7,6 @@ import { loginUser } from "../store/UserSlice";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { FaCrown, FaArrowLeft } from "react-icons/fa";
 import { MdEmail, MdLock } from "react-icons/md";
-import GoogleOAuthButton from "./GoogleOAuthButton";
 
 function SuperAdminLogin() {
   const [formData, setFormData] = useState({});
@@ -161,16 +160,6 @@ function SuperAdminLogin() {
               </Link>
             </div>
           </form>
-
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-white/20"></div>
-            <span className="px-4 text-white/60 text-sm">or</span>
-            <div className="flex-1 h-px bg-white/20"></div>
-          </div>
-
-          {/* Google OAuth Section */}
-          <GoogleOAuthButton />
         </div>
 
         {/* Footer */}
