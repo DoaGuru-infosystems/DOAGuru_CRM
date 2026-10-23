@@ -506,10 +506,12 @@ const updateEmployeeDetails = async (req, res) => {
       }
 
       // Admin check:
-      // - SIRF apni org ke aise user ka staff_status badal sakta hai jiska staff_role = "employee" hai
-      // - Status sirf "active" ya "inactive" (suspended nahi)
-      // - Admin ye NAHI kar sakta (403): doosre Admin ka status, SuperAdmin ka status, apna khud ka status,
-      //   doosri org ke employee ka status, kisi ka staff_role ya staff_org_id badalna
+      // - Admin kisi DOOSRE Admin ki koi bhi details edit nahi kar sakta (naam, phone, password, kuch bhi): 403 (same org ya doosri org)
+      // - Admin SuperAdmin ko bhi edit nahi kar sakta: 403
+      // - Admin kisi ka staff_role ya staff_org_id nahi badal sakta: 403
+      // - Admin doosri org ke kisi staff ko edit nahi kar sakta: 403
+      // - Admin apni org ke employee ka status sirf "active" ya "inactive" kar sakta hai (suspended nahi)
+      // - Admin apna khud ka status nahi badal sakta: 403
       if (currentRole === "admin") {
         // Admin cannot change anyone's staff_role or staff_org_id
         if (
@@ -522,7 +524,26 @@ const updateEmployeeDetails = async (req, res) => {
           });
         }
 
-        // Admin cannot edit outside their organization
+        // Admin cannot edit SuperAdmin accounts
+        if (targetRole === "superadmin") {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden - Admins cannot edit SuperAdmin accounts",
+          });
+        }
+
+        // Admin cannot edit any other Admin (same org or other org)
+        if (
+          targetRole === "admin" &&
+          Number(targetStaffId) !== Number(currentStaffId)
+        ) {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden - Admins cannot edit other admins",
+          });
+        }
+
+        // Admin cannot edit staff outside their organization
         if (
           targetOrgId == null ||
           currentOrgId == null ||
@@ -531,14 +552,6 @@ const updateEmployeeDetails = async (req, res) => {
           return res.status(403).json({
             success: false,
             message: "Forbidden - Admins can only edit staff within their organization",
-          });
-        }
-
-        // Admin cannot edit SuperAdmin accounts
-        if (targetRole === "superadmin") {
-          return res.status(403).json({
-            success: false,
-            message: "Forbidden - Admins cannot edit SuperAdmin accounts",
           });
         }
 
@@ -565,17 +578,6 @@ const updateEmployeeDetails = async (req, res) => {
             return res.status(403).json({
               success: false,
               message: "Forbidden - Admins can only set status to active or inactive",
-            });
-          }
-        } else {
-          // If not changing status, Admin can only edit employees or their own profile in their org
-          if (
-            targetRole !== "employee" &&
-            Number(targetStaffId) !== Number(currentStaffId)
-          ) {
-            return res.status(403).json({
-              success: false,
-              message: "Forbidden - Admins can only edit employees or their own profile",
             });
           }
         }
