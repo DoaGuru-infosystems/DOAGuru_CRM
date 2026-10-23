@@ -130,7 +130,6 @@ const {
 } = require("../controllers/Company_Data_Controller");
 
 const {
-  register,
   sendOtp,
   verifyOtp,
   resetPassword,
@@ -257,7 +256,7 @@ const authenticate = require("../Middleware/authMiddleware");
 const httpLogger = require("../httpLogger");
 
 // ========== Router Begins =====================
-router.post("/register", httpLogger, register);
+// Public /register route removed
 
 
 // Google OAuth routes for Super Admin
