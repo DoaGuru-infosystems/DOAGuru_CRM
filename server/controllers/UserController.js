@@ -583,23 +583,32 @@ const getnotes_text = (req, res) => {
 const createLead = (req, res) => {
   const {
     lead_org_id,
-    name,
-    phone,
+    name: rawName,
+    customer_name,
+    phone: rawPhone,
+    mobile_number,
     lead_email,
     assignedTo,
-    leadSource,
+    leadSource: rawLeadSource,
+    lead_source,
+    lead_status: rawLeadStatus,
     main_project_id,
     unit_type,
     unit_id,
     address,
     createdTime,
     actual_date,
+    calling_date: rawCallingDate,
+    next_follow_date_time: rawNextFollowDateTime,
+    remark: rawRemark,
+    interested_follow_up,
     referred_by,
     assignedBy,
     alternative_number,
     dob,
     anniversary_date,
-    office_business_name,
+    office_business_name: rawOfficeBusinessName,
+    business_name,
     office_address,
     nature_of_job,
     department,
@@ -616,6 +625,15 @@ const createLead = (req, res) => {
     visit_time,
     project_type,
   } = req.body;
+
+  const name = customer_name || rawName || "";
+  const phone = mobile_number || rawPhone || "";
+  const office_business_name = business_name || rawOfficeBusinessName || "";
+  const leadSource = rawLeadSource || lead_source || "others";
+  const lead_status = rawLeadStatus || "Pending";
+  const calling_date = rawCallingDate || actual_date || createdTime || "";
+  const next_follow_date_time = rawNextFollowDateTime || visit_time || "";
+  const remark = rawRemark || lead_review || "";
 
   if (!lead_org_id || !name || !leadSource) {
     return res.status(400).json({
@@ -646,8 +664,8 @@ const createLead = (req, res) => {
   }
 
   const sql = `INSERT INTO leads 
-    (lead_org_id, name, phone, lead_email, assignedTo, leadSource, main_project_id, unit_type, unit_id, address, createdTime, actual_date, referred_by, assignedBy, alternative_number, dob, anniversary_date, office_business_name, office_address, nature_of_job, department, designation, badge, salary, campaign, interest_in_project_secondary, lead_sub_source, budget, primary_status, secondary_status, lead_review, visit_time, project_type) 
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    (lead_org_id, name, phone, lead_email, assignedTo, leadSource, main_project_id, unit_type, unit_id, address, createdTime, actual_date, referred_by, assignedBy, alternative_number, dob, anniversary_date, office_business_name, office_address, nature_of_job, department, designation, badge, salary, campaign, interest_in_project_secondary, lead_sub_source, budget, primary_status, secondary_status, lead_review, visit_time, project_type, calling_date, next_follow_date_time, remark, interested_follow_up, lead_status) 
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
   db.query(
     sql,
@@ -682,9 +700,14 @@ const createLead = (req, res) => {
       budget || null,
       primary_status || null,
       secondary_status || null,
-      lead_review || null,
+      lead_review || remark || null,
       visit_time || null,
       project_type || null,
+      calling_date || null,
+      next_follow_date_time || null,
+      remark || null,
+      interested_follow_up || null,
+      lead_status || 'Pending',
     ],
     async (err, results) => {
       if (err) {
@@ -763,7 +786,7 @@ CRMGuru Team`;
 const getleadbyid = (req, res) => {
   try {
     const { id } = req.params;
-    const getQuery = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name, units.unit_status FROM leads join company_staff on company_staff.staff_id = leads.assignedTo left join projects on projects.project_id = leads.main_project_id left join units on units.unit_id = leads.unit_id WHERE leads.lead_id = ?`;
+    const getQuery = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name, units.unit_status FROM leads left join company_staff on company_staff.staff_id = leads.assignedTo left join projects on projects.project_id = leads.main_project_id left join units on units.unit_id = leads.unit_id WHERE leads.lead_id = ?`;
     db.query(getQuery, [id], (error, result) => {
       if (error) {
         res.status(500).json({ error: "Internal Server Error" });
@@ -860,12 +883,20 @@ const updateLead = async (req, res) => {
   try {
     const { leadId } = req.params;
     const {
-      name,
-      phone,
+      name: rawName,
+      customer_name,
+      phone: rawPhone,
+      mobile_number,
       assignedTo,
-      leadSource,
+      leadSource: rawLeadSource,
+      lead_source,
+      lead_status: rawLeadStatus,
       createdTime,
       actual_date,
+      calling_date: rawCallingDate,
+      next_follow_date_time: rawNextFollowDateTime,
+      remark: rawRemark,
+      interested_follow_up,
       main_project_id,
       unit_type,
       unit_id,
@@ -874,7 +905,8 @@ const updateLead = async (req, res) => {
       alternative_number,
       dob,
       anniversary_date,
-      office_business_name,
+      office_business_name: rawOfficeBusinessName,
+      business_name,
       office_address,
       nature_of_job,
       department,
@@ -891,6 +923,15 @@ const updateLead = async (req, res) => {
       visit_time,
       project_type
     } = req.body;
+
+    const name = customer_name || rawName || "";
+    const phone = mobile_number || rawPhone || "";
+    const office_business_name = business_name || rawOfficeBusinessName || "";
+    const leadSource = rawLeadSource || lead_source || "others";
+    const lead_status = rawLeadStatus || "Pending";
+    const calling_date = rawCallingDate || actual_date || createdTime || "";
+    const next_follow_date_time = rawNextFollowDateTime || visit_time || "";
+    const remark = rawRemark || lead_review || "";
 
     if (!name || !leadSource) {
       return res.status(400).json({
@@ -920,7 +961,7 @@ const updateLead = async (req, res) => {
       });
     }
 
-    const sql = `UPDATE leads SET name = ?, phone = ?, assignedTo = ?, leadSource = ?, createdTime = ?, actual_date = ?, main_project_id = ?, unit_type = ?, unit_id = ?, address = ?, referred_by = ?, alternative_number = ?, dob = ?, anniversary_date = ?, office_business_name = ?, office_address = ?, nature_of_job = ?, department = ?, designation = ?, badge = ?, salary = ?, campaign = ?, interest_in_project_secondary = ?, lead_sub_source = ?, budget = ?, primary_status = ?, secondary_status = ?, lead_review = ?, visit_time = ?, project_type = ? WHERE lead_id = ?`;
+    const sql = `UPDATE leads SET name = ?, phone = ?, assignedTo = ?, leadSource = ?, createdTime = ?, actual_date = ?, main_project_id = ?, unit_type = ?, unit_id = ?, address = ?, referred_by = ?, alternative_number = ?, dob = ?, anniversary_date = ?, office_business_name = ?, office_address = ?, nature_of_job = ?, department = ?, designation = ?, badge = ?, salary = ?, campaign = ?, interest_in_project_secondary = ?, lead_sub_source = ?, budget = ?, primary_status = ?, secondary_status = ?, lead_review = ?, visit_time = ?, project_type = ?, calling_date = ?, next_follow_date_time = ?, remark = ?, interested_follow_up = ?, lead_status = ? WHERE lead_id = ?`;
 
     await new Promise((resolve, reject) => {
       db.query(
@@ -953,9 +994,14 @@ const updateLead = async (req, res) => {
           budget || null,
           primary_status || null,
           secondary_status || null,
-          lead_review || null,
+          lead_review || remark || null,
           visit_time || null,
           project_type || null,
+          calling_date || null,
+          next_follow_date_time || null,
+          remark || null,
+          interested_follow_up || null,
+          lead_status || 'Pending',
           leadId,
         ],
         (err, results) => {

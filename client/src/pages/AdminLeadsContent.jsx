@@ -592,47 +592,47 @@ function AdminLeadsContent({ isSidebarOpen }) {
               <table className={`${isSidebarOpen ? "w-[78rem]" : "w-[86rem]"} bg-white border`}>
                 <thead>
                   <tr className="text-nowrap">
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
                       S.no
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Project Name
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Lead ID
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Lead Id
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left cursor-pointer" onClick={toggleSortOrder}>
+                      Calling Date
+                      <span className="text-cyan-900 mx-1">{sortOrder === "desce" ? "▲" : "▼"}</span>
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Name
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Customer Name
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Phone
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Business Name
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Mobile Number
+                    </th>
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Address
+                    </th>
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
                       Lead Source
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Unit Type
-                    </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Assigned To
-                    </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
                       Lead Status
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Unit Status
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Next Follow Date Time
                     </th>
-
-                    <th
-                      className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left cursor-pointer"
-                      onClick={toggleSortOrder}
-                    >
-                      Assigned Date
-                      <span className="text-cyan-900 mx-2">
-                        {sortOrder === "desce" ? "▲" : "▼"}
-                      </span>
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Remark
                     </th>
-                    <th className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Interested Follow-up
+                    </th>
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                      Assigned To
+                    </th>
+                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
                       Action
                     </th>
                   </tr>
@@ -656,42 +656,58 @@ function AdminLeadsContent({ isSidebarOpen }) {
                           key={index}
                           className={index % 2 === 0 ? "bg-gray-100" : ""}
                         >
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold">
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
                             {leadsPerPage === Infinity
                               ? index + 1
                               : index + 1 + currentPage * leadsPerPage}
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold text-wrap">
-                            {lead.project_name}
-                          </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-cyan-600 font-semibold">
+                          <td className="px-4 py-3 border-b border-gray-200 text-cyan-600 font-semibold">
                             <Link to={`/lead-single-data/${lead.lead_id}`} className="hover:underline">
                               {lead.lead_id}
                             </Link>
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold text-wrap">
-                            {lead.name}
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                            {lead.calling_date || lead.actual_date || lead.createdTime || "-"}
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold">
-                            {lead.phone}
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-800 font-semibold text-wrap">
+                            {lead.name || lead.customer_name || "-"}
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold">
-                            {lead.leadSource}
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                            {lead.office_business_name || lead.business_name || "-"}
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 font-semibold">
-                            {lead.unit_type}
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-semibold">
+                            <a href={`tel:${lead.phone}`} className="text-cyan-600 hover:underline">
+                              {lead.phone || "-"}
+                            </a>
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold">
-                            {lead.staff_name}
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 max-w-[200px] truncate" title={lead.address}>
+                            {lead.address || "-"}
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 font-semibold">
-                            {lead.lead_status}
+                          <td className="px-4 py-3 border-b border-gray-200 font-medium">
+                            <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 border text-gray-700">
+                              {lead.leadSource || "-"}
+                            </span>
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 font-semibold">
-                            {lead.unit_status}
+                          <td className="px-4 py-3 border-b border-gray-200 font-medium">
+                            <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-50 border border-cyan-200 text-cyan-700 font-semibold">
+                              {lead.lead_status || "Pending"}
+                            </span>
                           </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold">
-                            {lead.createdTime}
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                            {lead.next_follow_date_time || lead.visit_time || "-"}
+                          </td>
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 max-w-[200px] truncate" title={lead.remark || lead.lead_review}>
+                            {lead.remark || lead.lead_review || "-"}
+                          </td>
+                          <td className="px-4 py-3 border-b border-gray-200 font-medium">
+                            {lead.interested_follow_up ? (
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 border border-amber-200 text-amber-800 font-medium">
+                                {lead.interested_follow_up}
+                              </span>
+                            ) : "-"}
+                          </td>
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                            {lead.staff_name || "-"}
                           </td>
                           <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold text-nowrap">
                             {lead.unit_status === "sold" ||

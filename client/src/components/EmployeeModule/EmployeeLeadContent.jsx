@@ -947,241 +947,47 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                 >
                   <thead className="bg-gray-200">
                     <tr>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
                         S.no
                       </th>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap relative">
-                        {activeSearchCol === "name" ? (
-                          <div onClick={(e) => e.stopPropagation()} className="absolute inset-0 flex items-center gap-0.5 sm:gap-1 bg-gray-200 z-10 px-1 sm:px-4">
-                            <input
-                              type="text"
-                              placeholder="Search Name..."
-                              value={columnSearchValues.name}
-                              onChange={(e) => setColumnSearchValues({ ...columnSearchValues, name: e.target.value })}
-                              className="w-full p-0.5 sm:p-1 text-[10px] sm:text-xs border border-cyan-500 rounded bg-white text-gray-800 font-normal focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                              autoFocus
-                              onBlur={() => { if (!columnSearchValues.name) setActiveSearchCol(""); }}
-                            />
-                            <button
-                              onClick={() => {
-                                setColumnSearchValues({ ...columnSearchValues, name: "" });
-                                setActiveSearchCol("");
-                              }}
-                              className="text-red-500 hover:text-red-700 font-bold px-0.5 sm:px-1 text-[10px] sm:text-xs"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : null}
-                        <div
-                          onClick={() => setActiveSearchCol("name")}
-                          className="flex items-center justify-between gap-1 cursor-pointer select-none group text-[10px] sm:text-sm"
-                        >
-                          <span>Name</span>
-                          <span className="text-gray-400 group-hover:text-cyan-600 text-[10px] sm:text-xs transition-colors ml-0.5 sm:ml-1">
-                            {/* 🔍 */}
-                          </span>
-                          {columnSearchValues.name && (
-                            <span className="text-cyan-600 font-bold ml-0.5 sm:ml-1 text-[10px] sm:text-xs">*</span>
-                          )}
-                        </div>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Lead ID
                       </th>
-
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap relative">
-                        {activeSearchCol === "project_name" ? (
-                          <div onClick={(e) => e.stopPropagation()} className="absolute inset-0 flex items-center gap-0.5 sm:gap-1 bg-gray-200 z-10 px-1 sm:px-4">
-                            <input
-                              type="text"
-                              placeholder="Search Project..."
-                              value={columnSearchValues.project_name}
-                              onChange={(e) => setColumnSearchValues({ ...columnSearchValues, project_name: e.target.value })}
-                              className="w-full p-0.5 sm:p-1 text-[10px] sm:text-xs border border-cyan-500 rounded bg-white text-gray-800 font-normal focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                              autoFocus
-                              onBlur={() => { if (!columnSearchValues.project_name) setActiveSearchCol(""); }}
-                            />
-                            <button
-                              onClick={() => {
-                                setColumnSearchValues({ ...columnSearchValues, project_name: "" });
-                                setActiveSearchCol("");
-                              }}
-                              className="text-red-500 hover:text-red-700 font-bold px-0.5 sm:px-1 text-[10px] sm:text-xs"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : null}
-                        <div
-                          onClick={() => setActiveSearchCol("project_name")}
-                          className="flex items-center justify-between gap-1 cursor-pointer select-none group text-[10px] sm:text-sm"
-                        >
-                          <span>Project Name</span>
-                          <span className="text-gray-400 group-hover:text-cyan-600 text-[10px] sm:text-xs transition-colors ml-0.5 sm:ml-1">
-                            {/* 🔍 */}
-                          </span>
-                          {columnSearchValues.project_name && (
-                            <span className="text-cyan-600 font-bold ml-0.5 sm:ml-1 text-[10px] sm:text-xs">*</span>
-                          )}
-                        </div>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap cursor-pointer" onClick={toggleSortOrder}>
+                        Calling Date
+                        <span className="text-cyan-900 mx-1 text-xs">{sortOrder === "desce" ? "▲" : "▼"}</span>
                       </th>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap relative">
-                        {activeSearchCol === "phone" ? (
-                          <div onClick={(e) => e.stopPropagation()} className="absolute inset-0 flex items-center gap-0.5 sm:gap-1 bg-gray-200 z-10 px-1 sm:px-4">
-                            <input
-                              type="text"
-                              placeholder="Search Phone..."
-                              value={columnSearchValues.phone}
-                              onChange={(e) => setColumnSearchValues({ ...columnSearchValues, phone: e.target.value })}
-                              className="w-full p-0.5 sm:p-1 text-[10px] sm:text-xs border border-cyan-500 rounded bg-white text-gray-800 font-normal focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                              autoFocus
-                              onBlur={() => { if (!columnSearchValues.phone) setActiveSearchCol(""); }}
-                            />
-                            <button
-                              onClick={() => {
-                                setColumnSearchValues({ ...columnSearchValues, phone: "" });
-                                setActiveSearchCol("");
-                              }}
-                              className="text-red-500 hover:text-red-700 font-bold px-0.5 sm:px-1 text-[10px] sm:text-xs"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : null}
-                        <div
-                          onClick={() => setActiveSearchCol("phone")}
-                          className="flex items-center justify-between gap-1 cursor-pointer select-none group text-[10px] sm:text-sm"
-                        >
-                          <span>Phone</span>
-                          <span className="text-gray-400 group-hover:text-cyan-600 text-[10px] sm:text-xs transition-colors ml-0.5 sm:ml-1">
-                            {/* 🔍 */}
-                          </span>
-                          {columnSearchValues.phone && (
-                            <span className="text-cyan-600 font-bold ml-0.5 sm:ml-1 text-[10px] sm:text-xs">*</span>
-                          )}
-                        </div>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Customer Name
                       </th>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap relative">
-                        {activeSearchCol === "leadSource" ? (
-                          <div onClick={(e) => e.stopPropagation()} className="absolute inset-0 flex items-center gap-0.5 sm:gap-1 bg-gray-200 z-10 px-1 sm:px-4">
-                            <input
-                              type="text"
-                              placeholder="Search Source..."
-                              value={columnSearchValues.leadSource}
-                              onChange={(e) => setColumnSearchValues({ ...columnSearchValues, leadSource: e.target.value })}
-                              className="w-full p-0.5 sm:p-1 text-[10px] sm:text-xs border border-cyan-500 rounded bg-white text-gray-800 font-normal focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                              autoFocus
-                              onBlur={() => { if (!columnSearchValues.leadSource) setActiveSearchCol(""); }}
-                            />
-                            <button
-                              onClick={() => {
-                                setColumnSearchValues({ ...columnSearchValues, leadSource: "" });
-                                setActiveSearchCol("");
-                              }}
-                              className="text-red-500 hover:text-red-700 font-bold px-0.5 sm:px-1 text-[10px] sm:text-xs"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : null}
-                        <div
-                          onClick={() => setActiveSearchCol("leadSource")}
-                          className="flex items-center justify-between gap-1 cursor-pointer select-none group text-[10px] sm:text-sm"
-                        >
-                          <span>Lead Source</span>
-                          <span className="text-gray-400 group-hover:text-cyan-600 text-[10px] sm:text-xs transition-colors ml-0.5 sm:ml-1">
-                            {/* 🔍 */}
-                          </span>
-                          {columnSearchValues.leadSource && (
-                            <span className="text-cyan-600 font-bold ml-0.5 sm:ml-1 text-[10px] sm:text-xs">*</span>
-                          )}
-                        </div>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Business Name
                       </th>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap relative">
-                        {activeSearchCol === "primary_status" ? (
-                          <div onClick={(e) => e.stopPropagation()} className="absolute inset-0 flex items-center gap-0.5 sm:gap-1 bg-gray-200 z-10 px-1 sm:px-4">
-                            <input
-                              type="text"
-                              placeholder="Search Visit..."
-                              value={columnSearchValues.primary_status}
-                              onChange={(e) => setColumnSearchValues({ ...columnSearchValues, primary_status: e.target.value })}
-                              className="w-full p-0.5 sm:p-1 text-[10px] sm:text-xs border border-cyan-500 rounded bg-white text-gray-800 font-normal focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                              autoFocus
-                              onBlur={() => { if (!columnSearchValues.primary_status) setActiveSearchCol(""); }}
-                            />
-                            <button
-                              onClick={() => {
-                                setColumnSearchValues({ ...columnSearchValues, primary_status: "" });
-                                setActiveSearchCol("");
-                              }}
-                              className="text-red-500 hover:text-red-700 font-bold px-0.5 sm:px-1 text-[10px] sm:text-xs"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : null}
-                        <div
-                          onClick={() => setActiveSearchCol("primary_status")}
-                          className="flex items-center justify-between gap-1 cursor-pointer select-none group text-[10px] sm:text-sm"
-                        >
-                          <span>Visit Status</span>
-                          <span className="text-gray-400 group-hover:text-cyan-600 text-[10px] sm:text-xs transition-colors ml-0.5 sm:ml-1">
-                            {/* 🔍 */}
-                          </span>
-                          {columnSearchValues.primary_status && (
-                            <span className="text-cyan-600 font-bold ml-0.5 sm:ml-1 text-[10px] sm:text-xs">*</span>
-                          )}
-                        </div>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Mobile Number
                       </th>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap relative">
-                        {activeSearchCol === "lead_status" ? (
-                          <div onClick={(e) => e.stopPropagation()} className="absolute inset-0 flex items-center gap-0.5 sm:gap-1 bg-gray-200 z-10 px-1 sm:px-4">
-                            <input
-                              type="text"
-                              placeholder="Search Status..."
-                              value={columnSearchValues.lead_status}
-                              onChange={(e) => setColumnSearchValues({ ...columnSearchValues, lead_status: e.target.value })}
-                              className="w-full p-0.5 sm:p-1 text-[10px] sm:text-xs border border-cyan-500 rounded bg-white text-gray-800 font-normal focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                              autoFocus
-                              onBlur={() => { if (!columnSearchValues.lead_status) setActiveSearchCol(""); }}
-                            />
-                            <button
-                              onClick={() => {
-                                setColumnSearchValues({ ...columnSearchValues, lead_status: "" });
-                                setActiveSearchCol("");
-                              }}
-                              className="text-red-500 hover:text-red-700 font-bold px-0.5 sm:px-1 text-[10px] sm:text-xs"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : null}
-                        <div
-                          onClick={() => setActiveSearchCol("lead_status")}
-                          className="flex items-center justify-between gap-1 cursor-pointer select-none group text-[10px] sm:text-sm"
-                        >
-                          <span>Lead Status</span>
-                          <span className="text-gray-400 group-hover:text-cyan-600 text-[1px] sm:text-xs transition-colors ml-0.5 sm:ml-1">
-                            {/* 🔍 */}
-                          </span>
-                          {columnSearchValues.lead_status && (
-                            <span className="text-cyan-600 font-bold ml-0.5 sm:ml-1 text-[10px] sm:text-xs">*</span>
-                          )}
-                        </div>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Address
                       </th>
-
-
-                      <th
-                        className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap cursor-pointer"
-                        onClick={toggleSortOrder}
-                      >
-                        Assigned Date
-                        <span className="text-cyan-900 mx-1 sm:mx-2 text-[10px] sm:text-xs">
-                          {sortOrder === "desce" ? "▲" : "▼"}
-                        </span>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Lead Source
                       </th>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Lead Status
+                      </th>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Next Follow Date Time
+                      </th>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Remark
+                      </th>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                        Interested Follow-up
+                      </th>
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
                         Action
                       </th>
-                      <th className="px-1 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
                         Delete
                       </th>
                     </tr>
@@ -1194,56 +1000,66 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                           key={lead.id}
                           className={`${index % 2 === 0 ? "bg-gray-100" : ""} `}
                         >
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 text-gray-600 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-xs sm:text-sm">
                             {leadsPerPage === Infinity
                               ? index + 1
                               : index + 1 + currentPage * leadsPerPage}
                           </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 font-semibold text-cyan-600 text-[10px] sm:text-xs md:text-sm whitespace-normal break-words text-wrap">
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-semibold text-cyan-600 text-xs sm:text-sm">
                             <Link
                               to={`/employee-lead-single-data/general/${lead.lead_id}`}
                               className="hover:underline"
                             >
-                              {lead.name}
+                              {lead.lead_id}
                             </Link>
                           </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 text-gray-600 font-semibold whitespace-normal break-words text-wrap text-[10px] sm:text-xs md:text-sm">
-                            {lead.project_name}
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                            {lead.calling_date || lead.actual_date || (lead.createdTime ? moment(lead.createdTime).format("DD MMM YYYY") : "-")}
                           </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 text-gray-600 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-semibold text-gray-800 text-xs sm:text-sm whitespace-normal break-words">
+                            <Link
+                              to={`/employee-lead-single-data/general/${lead.lead_id}`}
+                              className="hover:underline text-cyan-600"
+                            >
+                              {lead.name || lead.customer_name || "-"}
+                            </Link>
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                            {lead.office_business_name || lead.business_name || "-"}
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
                             <a
                               href={`tel:${lead.phone}`}
-                              className="text-cyan-600 cursor-pointer"
+                              className="text-cyan-600 cursor-pointer hover:underline"
                             >
-                              {lead.phone}
+                              {lead.phone || "-"}
                             </a>
                           </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 text-gray-600 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
-                            {lead.leadSource}
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm max-w-[180px] truncate" title={lead.address}>
+                            {lead.address || "-"}
                           </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 text-gray-600 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
-                            <select
-                              value={lead.primary_status || "new leads"}
-                              onChange={(e) => handlePrimaryStatusChange(lead.lead_id, e.target.value)}
-                              className="border rounded px-1 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs bg-white font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                            >
-                              <option value="new leads">new leads</option>
-                              <option value="Intrested">Intrested</option>
-                              <option value="Site visit schedule">Site visit schedule</option>
-                              <option value="visit done">visit done</option>
-                              <option value="Deal close">Deal close</option>
-                              <option value="Deal cancel">Deal cancel</option>
-                              <option value="Dead deal">Dead deal</option>
-                            </select>
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                            <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 border text-gray-700">
+                              {lead.leadSource || "-"}
+                            </span>
                           </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 font-semibold text-gray-600 text-[10px] sm:text-xs md:text-sm">
-                            {lead.lead_status}
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-medium text-xs sm:text-sm">
+                            <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-50 border border-cyan-200 text-cyan-700 font-semibold">
+                              {lead.lead_status || "Pending"}
+                            </span>
                           </td>
-
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 text-gray-600 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
-                            {moment(lead.createdTime)
-                              .format("DD MMM YYYY")
-                              .toUpperCase()}
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                            {lead.next_follow_date_time || lead.visit_time || "-"}
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm max-w-[180px] truncate" title={lead.remark || lead.lead_review}>
+                            {lead.remark || lead.lead_review || "-"}
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-medium text-xs sm:text-sm">
+                            {lead.interested_follow_up ? (
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 border border-amber-200 text-amber-800 font-medium">
+                                {lead.interested_follow_up}
+                              </span>
+                            ) : "-"}
                           </td>
                           <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
