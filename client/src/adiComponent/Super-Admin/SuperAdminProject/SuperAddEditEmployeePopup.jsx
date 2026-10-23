@@ -18,6 +18,10 @@ const SuperAddEditEmployeePopup = ({
   const token = EmpId?.token;
   const userId = EmpId.user_id;
   const [loading, setLoading] = useState(false);
+  const currentUserRole = (EmpId?.staff_role || "").toLowerCase();
+  const isSuperAdmin = currentUserRole === "superadmin";
+  const isAdmin = currentUserRole === "admin";
+  const isTargetEmployee = editingIndex ? (editingIndex?.staff_role || "").toLowerCase() === "employee" : true;
 
   const [newEmployee, setNewEmployee] = useState({
     staff_org_id: EmpId?.staff_org_id,
@@ -217,9 +221,14 @@ const SuperAddEditEmployeePopup = ({
     setLoading(true);
     try {
       if (editingIndex !== null) {
+        const payload = { ...newEmployee };
+        if (isAdmin) {
+          delete payload.staff_role;
+          delete payload.staff_org_id;
+        }
         await axios.put(
           `https://crm-generalize.siarasystems.com/api/updateEmployeeDetails/${editingIndex?.staff_id}`,
-          newEmployee,
+          payload,
           {
             headers: {
               "Content-Type": "application/json",
@@ -401,34 +410,66 @@ const SuperAddEditEmployeePopup = ({
                   {/* Employee Role */}
                   <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Employee Role</label>
-                    <select
-                      required
-                      name="staff_role"
-                      value={newEmployee.staff_role}
-                      onChange={handleInputChange}
-                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none bg-white"
-                    >
-                      <option value="">Select Role</option>
-                      <option value="admin">Admin</option>
-                      <option value="employee">Employee</option>
-                    </select>
+                    {isAdmin ? (
+                      <input
+                        type="text"
+                        disabled
+                        value="Employee"
+                        className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                      />
+                    ) : (
+                      <select
+                        required
+                        name="staff_role"
+                        value={newEmployee.staff_role}
+                        onChange={handleInputChange}
+                        className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none bg-white"
+                      >
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="employee">Employee</option>
+                      </select>
+                    )}
                   </div>
 
                   {/* Employee Status */}
                   <div className="flex flex-col">
                     <label className="mb-1 text-sm font-semibold text-gray-700">Employee Status</label>
-                    <select
-                      required
-                      name="staff_status"
-                      value={newEmployee.staff_status}
-                      onChange={handleInputChange}
-                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none bg-white"
-                    >
-                      <option value="">Select Status</option>
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                      <option value="suspended">Suspended</option>
-                    </select>
+                    {isAdmin ? (
+                      isTargetEmployee ? (
+                        <select
+                          required
+                          name="staff_status"
+                          value={newEmployee.staff_status}
+                          onChange={handleInputChange}
+                          className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none bg-white"
+                        >
+                          <option value="">Select Status</option>
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          disabled
+                          value={newEmployee.staff_status || "N/A"}
+                          className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                        />
+                      )
+                    ) : (
+                      <select
+                        required
+                        name="staff_status"
+                        value={newEmployee.staff_status}
+                        onChange={handleInputChange}
+                        className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none bg-white"
+                      >
+                        <option value="">Select Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="suspended">Suspended</option>
+                      </select>
+                    )}
                   </div>
 
                   {/* Date of Birth */}

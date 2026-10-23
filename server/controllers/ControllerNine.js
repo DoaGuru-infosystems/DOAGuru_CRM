@@ -481,16 +481,23 @@ const updateEmployeeDetails = async (req, res) => {
       }
 
       const target = fetchResults[0];
+      const targetRole = (target.staff_role || "").toLowerCase();
+      const targetOrgId = target.staff_org_id;
+      const targetStaffId = target.staff_id;
 
-      // Employee check: sirf apni details edit kar sake, status/role nahi
+      // Employee check: sirf apni details edit kar sake, status/role/org nahi
       if (currentRole === "employee") {
-        if (Number(target.staff_id) !== Number(currentStaffId)) {
+        if (Number(targetStaffId) !== Number(currentStaffId)) {
           return res.status(403).json({
             success: false,
             message: "Forbidden - Employees can only edit their own details",
           });
         }
-        if (req.body.staff_status || req.body.staff_role || req.body.staff_org_id) {
+        if (
+          req.body.staff_status !== undefined ||
+          req.body.staff_role !== undefined ||
+          req.body.staff_org_id !== undefined
+        ) {
           return res.status(403).json({
             success: false,
             message: "Forbidden - Employees cannot change role, status, or organization",
@@ -498,30 +505,102 @@ const updateEmployeeDetails = async (req, res) => {
         }
       }
 
-      // Admin check: sirf apni org ke employee ki normal details edit kar sake, status/role nahi
+      // Admin check:
+      // - SIRF apni org ke aise user ka staff_status badal sakta hai jiska staff_role = "employee" hai
+      // - Status sirf "active" ya "inactive" (suspended nahi)
+      // - Admin ye NAHI kar sakta (403): doosre Admin ka status, SuperAdmin ka status, apna khud ka status,
+      //   doosri org ke employee ka status, kisi ka staff_role ya staff_org_id badalna
       if (currentRole === "admin") {
-        if (Number(target.staff_org_id) !== Number(currentOrgId)) {
+        // Admin cannot change anyone's staff_role or staff_org_id
+        if (
+          req.body.staff_role !== undefined ||
+          req.body.staff_org_id !== undefined
+        ) {
           return res.status(403).json({
             success: false,
-            message: "Forbidden - Admins can only edit employees within their organization",
+            message: "Forbidden - Admins cannot change staff role or organization",
           });
         }
-        if (target.staff_role === "superadmin") {
+
+        // Admin cannot edit outside their organization
+        if (
+          targetOrgId == null ||
+          currentOrgId == null ||
+          Number(targetOrgId) !== Number(currentOrgId)
+        ) {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden - Admins can only edit staff within their organization",
+          });
+        }
+
+        // Admin cannot edit SuperAdmin accounts
+        if (targetRole === "superadmin") {
           return res.status(403).json({
             success: false,
             message: "Forbidden - Admins cannot edit SuperAdmin accounts",
           });
         }
-        if (req.body.staff_status !== undefined || req.body.staff_role !== undefined) {
-          return res.status(403).json({
-            success: false,
-            message: "Forbidden - Only SuperAdmin can change employee status or role",
-          });
+
+        if (req.body.staff_status !== undefined) {
+          // Admin cannot change their own status
+          if (Number(targetStaffId) === Number(currentStaffId)) {
+            return res.status(403).json({
+              success: false,
+              message: "Forbidden - Admins cannot change their own status",
+            });
+          }
+
+          // Admin can ONLY change status for users whose staff_role is "employee"
+          if (targetRole !== "employee") {
+            return res.status(403).json({
+              success: false,
+              message: "Forbidden - Admins can only change status for employees",
+            });
+          }
+
+          // Status must be "active" or "inactive" (suspended not allowed for Admin)
+          const normalizedStatus = String(req.body.staff_status).toLowerCase();
+          if (normalizedStatus !== "active" && normalizedStatus !== "inactive") {
+            return res.status(403).json({
+              success: false,
+              message: "Forbidden - Admins can only set status to active or inactive",
+            });
+          }
+        } else {
+          // If not changing status, Admin can only edit employees or their own profile in their org
+          if (
+            targetRole !== "employee" &&
+            Number(targetStaffId) !== Number(currentStaffId)
+          ) {
+            return res.status(403).json({
+              success: false,
+              message: "Forbidden - Admins can only edit employees or their own profile",
+            });
+          }
+        }
+      }
+
+      // SuperAdmin check:
+      // Can change Admin and Employee staff_status (active / inactive / suspended) and staff_role
+      if (currentRole === "superadmin") {
+        if (req.body.staff_status !== undefined) {
+          const normalizedStatus = String(req.body.staff_status).toLowerCase();
+          if (!["active", "inactive", "suspended"].includes(normalizedStatus)) {
+            return res.status(400).json({
+              success: false,
+              message: "Invalid staff_status. Allowed values: active, inactive, suspended",
+            });
+          }
         }
       }
 
       // If user has another role
-      if (currentRole !== "superadmin" && currentRole !== "admin" && currentRole !== "employee") {
+      if (
+        currentRole !== "superadmin" &&
+        currentRole !== "admin" &&
+        currentRole !== "employee"
+      ) {
         return res.status(403).json({
           success: false,
           message: "Forbidden - Unauthorized role",
@@ -560,16 +639,16 @@ const updateEmployeeDetails = async (req, res) => {
       let fields = [];
       let values = [];
 
-      // Sirf superadmin staff_status ya staff_role change kar sake
-      if (currentRole === "superadmin") {
-        if (staff_role) {
-          fields.push("staff_role = ?");
-          values.push(staff_role);
-        }
-        if (staff_status) {
-          fields.push("staff_status = ?");
-          values.push(staff_status);
-        }
+      // SuperAdmin can change staff_role
+      if (currentRole === "superadmin" && staff_role !== undefined) {
+        fields.push("staff_role = ?");
+        values.push(staff_role);
+      }
+
+      // SuperAdmin and authorized Admin can change staff_status
+      if (staff_status !== undefined) {
+        fields.push("staff_status = ?");
+        values.push(String(staff_status).toLowerCase());
       }
 
       if (staff_name) {
