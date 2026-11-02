@@ -7,6 +7,25 @@ import ReactPaginate from "react-paginate";
 import { useSelector } from "react-redux";
 import AdminEditLeadPopup from "../components/AdminEditLeadPopup";
 import toast from "react-hot-toast";
+import ColumnCustomizer from "../components/common/ColumnCustomizer";
+import useColumnPreferences from "../components/common/useColumnPreferences";
+
+const ADMIN_LEAD_COLUMNS = [
+  { key: "s_no", label: "S.no" },
+  { key: "lead_id", label: "Lead ID" },
+  { key: "calling_date", label: "Calling Date" },
+  { key: "name", label: "Customer Name", locked: true },
+  { key: "office_business_name", label: "Business Name" },
+  { key: "phone", label: "Mobile Number" },
+  { key: "address", label: "Address" },
+  { key: "leadSource", label: "Lead Source" },
+  { key: "lead_status", label: "Lead Status" },
+  { key: "next_follow_date_time", label: "Next Follow Date Time" },
+  { key: "remark", label: "Remark" },
+  { key: "interested_follow_up", label: "Interested Follow-up" },
+  { key: "assignedTo", label: "Assigned To" },
+  { key: "action", label: "Action", locked: true },
+];
 
 function AdminLeadsContent({ isSidebarOpen }) {
   const navigate = useNavigate();
@@ -14,6 +33,13 @@ function AdminLeadsContent({ isSidebarOpen }) {
   const adminuser = useSelector((state) => state.auth.user);
   const token = adminuser.token;
   const userId = adminuser.user_id;
+
+  const {
+    visibleColumns,
+    toggleColumn,
+    resetToDefault,
+    isColumnVisible,
+  } = useColumnPreferences("admin_leads", ADMIN_LEAD_COLUMNS, adminuser);
   const [employees, setEmployees] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
 
@@ -574,11 +600,17 @@ function AdminLeadsContent({ isSidebarOpen }) {
                 Total Closed Lead: {totalClosedLeads}
               </div>
 
-              {/* Rows per page dropdown */}
-              <div className="w-full sm:w-auto text-sm sm:text-xl">
+              {/* Controls: Columns & Rows */}
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <ColumnCustomizer
+                  columns={ADMIN_LEAD_COLUMNS}
+                  visibleColumns={visibleColumns}
+                  toggleColumn={toggleColumn}
+                  resetToDefault={resetToDefault}
+                />
                 <select
                   onChange={handleLeadsPerPageChange}
-                  className="border rounded-2xl w-full p-2"
+                  className="border rounded-2xl p-2 text-sm"
                 >
                   <option value={10}>Number of rows: 10</option>
                   <option value={20}>20</option>
@@ -592,56 +624,84 @@ function AdminLeadsContent({ isSidebarOpen }) {
               <table className={`${isSidebarOpen ? "w-[78rem]" : "w-[86rem]"} bg-white border`}>
                 <thead>
                   <tr className="text-nowrap">
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      S.no
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Lead ID
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left cursor-pointer" onClick={toggleSortOrder}>
-                      Calling Date
-                      <span className="text-cyan-900 mx-1">{sortOrder === "desce" ? "▲" : "▼"}</span>
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Customer Name
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Business Name
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Mobile Number
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Address
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Lead Source
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Lead Status
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Next Follow Date Time
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Remark
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Interested Follow-up
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Assigned To
-                    </th>
-                    <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
-                      Action
-                    </th>
+                    {isColumnVisible("s_no") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        S.no
+                      </th>
+                    )}
+                    {isColumnVisible("lead_id") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Lead ID
+                      </th>
+                    )}
+                    {isColumnVisible("calling_date") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left cursor-pointer" onClick={toggleSortOrder}>
+                        Calling Date
+                        <span className="text-cyan-900 mx-1">{sortOrder === "desce" ? "▲" : "▼"}</span>
+                      </th>
+                    )}
+                    {isColumnVisible("name") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Customer Name
+                      </th>
+                    )}
+                    {isColumnVisible("office_business_name") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Business Name
+                      </th>
+                    )}
+                    {isColumnVisible("phone") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Mobile Number
+                      </th>
+                    )}
+                    {isColumnVisible("address") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Address
+                      </th>
+                    )}
+                    {isColumnVisible("leadSource") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Lead Source
+                      </th>
+                    )}
+                    {isColumnVisible("lead_status") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Lead Status
+                      </th>
+                    )}
+                    {isColumnVisible("next_follow_date_time") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Next Follow Date Time
+                      </th>
+                    )}
+                    {isColumnVisible("remark") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Remark
+                      </th>
+                    )}
+                    {isColumnVisible("interested_follow_up") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Interested Follow-up
+                      </th>
+                    )}
+                    {isColumnVisible("assignedTo") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Assigned To
+                      </th>
+                    )}
+                    {isColumnVisible("action") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Action
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {currentLeads.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="15"
+                        colSpan={visibleColumns.length}
                         className="px-6 py-4 border-b border-gray-200 text-center text-gray-500"
                       >
                         No data found
@@ -649,106 +709,132 @@ function AdminLeadsContent({ isSidebarOpen }) {
                     </tr>
                   ) : (
                     currentLeads.map((lead, index) => {
-                      console.log(lead, "fdfsdfsdfsdfds");
-
                       return (
                         <tr
                           key={index}
                           className={index % 2 === 0 ? "bg-gray-100" : ""}
                         >
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
-                            {leadsPerPage === Infinity
-                              ? index + 1
-                              : index + 1 + currentPage * leadsPerPage}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-cyan-600 font-semibold">
-                            <Link to={`/lead-single-data/${lead.lead_id}`} className="hover:underline">
-                              {lead.lead_id}
-                            </Link>
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                            {lead.calling_date || lead.actual_date || lead.createdTime || "-"}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-800 font-semibold text-wrap">
-                            {lead.name || lead.customer_name || "-"}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                            {lead.office_business_name || lead.business_name || "-"}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-semibold">
-                            <a href={`tel:${lead.phone}`} className="text-cyan-600 hover:underline">
-                              {lead.phone || "-"}
-                            </a>
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 max-w-[200px] truncate" title={lead.address}>
-                            {lead.address || "-"}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 font-medium">
-                            <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 border text-gray-700">
-                              {lead.leadSource || "-"}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 font-medium">
-                            <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-50 border border-cyan-200 text-cyan-700 font-semibold">
-                              {lead.lead_status || "Pending"}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                            {lead.next_follow_date_time || lead.visit_time || "-"}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 max-w-[200px] truncate" title={lead.remark || lead.lead_review}>
-                            {lead.remark || lead.lead_review || "-"}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 font-medium">
-                            {lead.interested_follow_up ? (
-                              <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 border border-amber-200 text-amber-800 font-medium">
-                                {lead.interested_follow_up}
+                          {isColumnVisible("s_no") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+                              {leadsPerPage === Infinity
+                                ? index + 1
+                                : index + 1 + currentPage * leadsPerPage}
+                            </td>
+                          )}
+                          {isColumnVisible("lead_id") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-cyan-600 font-semibold">
+                              <Link to={`/lead-single-data/${lead.lead_id}`} className="hover:underline">
+                                {lead.lead_id}
+                              </Link>
+                            </td>
+                          )}
+                          {isColumnVisible("calling_date") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                              {lead.calling_date || lead.actual_date || lead.createdTime || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("name") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-800 font-semibold text-wrap">
+                              {lead.name || lead.customer_name || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("office_business_name") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                              {lead.office_business_name || lead.business_name || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("phone") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-semibold">
+                              <a href={`tel:${lead.phone}`} className="text-cyan-600 hover:underline">
+                                {lead.phone || "-"}
+                              </a>
+                            </td>
+                          )}
+                          {isColumnVisible("address") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 max-w-[200px] truncate" title={lead.address}>
+                              {lead.address || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("leadSource") && (
+                            <td className="px-4 py-3 border-b border-gray-200 font-medium">
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 border text-gray-700">
+                                {lead.leadSource || "-"}
                               </span>
-                            ) : "-"}
-                          </td>
-                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                            {lead.staff_name || "-"}
-                          </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold text-nowrap">
-                            {lead.unit_status === "sold" ||
-                              lead.lead_status === "Sold" ? (
-                              <>
-                                <button
-                                  className="text-gray-500"
-                                  disabled
-                                // onClick={() => handleEditClick(lead)}
-                                >
-                                  <BsPencilSquare size={20} />
-                                </button>
-                                <button
-                                  className="text-gray-500 mx-2"
-                                  disabled
-                                // onClick={() =>
-                                //   handleDeleteClick(lead.lead_id)
-                                // }
-                                >
-                                  <BsTrash size={20} />
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button
-                                  className="text-cyan-500 hover:text-cyan-700"
-                                  onClick={() => handleEditClick(lead)}
-                                >
-                                  <BsPencilSquare size={20} />
-                                </button>
-                                <button
-                                  className="text-red-500 hover:text-red-700 mx-2"
-                                  onClick={() =>
-                                    handleDeleteClick(lead.lead_id)
-                                  }
-                                >
-                                  <BsTrash size={20} />
-                                </button>
-                              </>
-                            )}
-                          </td>
+                            </td>
+                          )}
+                          {isColumnVisible("lead_status") && (
+                            <td className="px-4 py-3 border-b border-gray-200 font-medium">
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-50 border border-cyan-200 text-cyan-700 font-semibold">
+                                {lead.lead_status || "Pending"}
+                              </span>
+                            </td>
+                          )}
+                          {isColumnVisible("next_follow_date_time") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                              {lead.next_follow_date_time || lead.visit_time || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("remark") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 max-w-[200px] truncate" title={lead.remark || lead.lead_review}>
+                              {lead.remark || lead.lead_review || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("interested_follow_up") && (
+                            <td className="px-4 py-3 border-b border-gray-200 font-medium">
+                              {lead.interested_follow_up ? (
+                                <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 border border-amber-200 text-amber-800 font-medium">
+                                  {lead.interested_follow_up}
+                                </span>
+                              ) : "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("assignedTo") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                              {lead.staff_name || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("action") && (
+                            <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-semibold text-nowrap">
+                              {lead.unit_status === "sold" ||
+                                lead.lead_status === "Sold" ? (
+                                <>
+                                  <button
+                                    className="text-gray-500"
+                                    disabled
+                                  // onClick={() => handleEditClick(lead)}
+                                  >
+                                    <BsPencilSquare size={20} />
+                                  </button>
+                                  <button
+                                    className="text-gray-500 mx-2"
+                                    disabled
+                                  // onClick={() =>
+                                  //   handleDeleteClick(lead.lead_id)
+                                  // }
+                                  >
+                                    <BsTrash size={20} />
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    className="text-cyan-500 hover:text-cyan-700"
+                                    onClick={() => handleEditClick(lead)}
+                                  >
+                                    <BsPencilSquare size={20} />
+                                  </button>
+                                  <button
+                                    className="text-red-500 hover:text-red-700 mx-2"
+                                    onClick={() =>
+                                      handleDeleteClick(lead.lead_id)
+                                    }
+                                  >
+                                    <BsTrash size={20} />
+                                  </button>
+                                </>
+                              )}
+                            </td>
+                          )}
                         </tr>
                       );
                     })

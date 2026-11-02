@@ -7,6 +7,25 @@ import axios from "axios";
 import ReactPaginate from "react-paginate";
 import { FaDatabase } from "react-icons/fa";
 import SuperAdminEditLeadPopup from "../../adiComponent/Super-Admin/SuperAdminEditLeadPopup";
+import ColumnCustomizer from "../common/ColumnCustomizer";
+import useColumnPreferences from "../common/useColumnPreferences";
+
+const EMPLOYEE_LEAD_COLUMNS = [
+  { key: "s_no", label: "S.no" },
+  { key: "lead_id", label: "Lead ID" },
+  { key: "calling_date", label: "Calling Date" },
+  { key: "name", label: "Customer Name", locked: true },
+  { key: "office_business_name", label: "Business Name" },
+  { key: "phone", label: "Mobile Number" },
+  { key: "address", label: "Address" },
+  { key: "leadSource", label: "Lead Source" },
+  { key: "lead_status", label: "Lead Status" },
+  { key: "next_follow_date_time", label: "Next Follow Date Time" },
+  { key: "remark", label: "Remark" },
+  { key: "interested_follow_up", label: "Interested Follow-up" },
+  { key: "action", label: "Action", locked: true },
+  { key: "delete", label: "Delete" },
+];
 
 const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const [leads, setLeads] = useState([]);
@@ -52,6 +71,13 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
 
   const navigate = useNavigate();
   const EmpId = useSelector((state) => state.auth.user);
+
+  const {
+    visibleColumns,
+    toggleColumn,
+    resetToDefault,
+    isColumnVisible,
+  } = useColumnPreferences("employee_leads", EMPLOYEE_LEAD_COLUMNS, EmpId);
   console.log(EmpId);
 
   const token = EmpId?.token;
@@ -923,8 +949,14 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                   </span>
                 </div>
 
-                {/* Dropdown */}
+                {/* Dropdown & Columns Customizer */}
                 <div className="flex items-center gap-2 w-auto">
+                  <ColumnCustomizer
+                    columns={EMPLOYEE_LEAD_COLUMNS}
+                    visibleColumns={visibleColumns}
+                    toggleColumn={toggleColumn}
+                    resetToDefault={resetToDefault}
+                  />
                   <span className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">
                     Number of rows:
                   </span>
@@ -947,49 +979,77 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                 >
                   <thead className="bg-gray-200">
                     <tr>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        S.no
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Lead ID
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap cursor-pointer" onClick={toggleSortOrder}>
-                        Calling Date
-                        <span className="text-cyan-900 mx-1 text-xs">{sortOrder === "desce" ? "▲" : "▼"}</span>
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Customer Name
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Business Name
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Mobile Number
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Address
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Lead Source
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Lead Status
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Next Follow Date Time
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Remark
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Interested Follow-up
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Action
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
-                        Delete
-                      </th>
+                      {isColumnVisible("s_no") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          S.no
+                        </th>
+                      )}
+                      {isColumnVisible("lead_id") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Lead ID
+                        </th>
+                      )}
+                      {isColumnVisible("calling_date") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap cursor-pointer" onClick={toggleSortOrder}>
+                          Calling Date
+                          <span className="text-cyan-900 mx-1 text-xs">{sortOrder === "desce" ? "▲" : "▼"}</span>
+                        </th>
+                      )}
+                      {isColumnVisible("name") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Customer Name
+                        </th>
+                      )}
+                      {isColumnVisible("office_business_name") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Business Name
+                        </th>
+                      )}
+                      {isColumnVisible("phone") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Mobile Number
+                        </th>
+                      )}
+                      {isColumnVisible("address") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Address
+                        </th>
+                      )}
+                      {isColumnVisible("leadSource") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Lead Source
+                        </th>
+                      )}
+                      {isColumnVisible("lead_status") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Lead Status
+                        </th>
+                      )}
+                      {isColumnVisible("next_follow_date_time") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Next Follow Date Time
+                        </th>
+                      )}
+                      {isColumnVisible("remark") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Remark
+                        </th>
+                      )}
+                      {isColumnVisible("interested_follow_up") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Interested Follow-up
+                        </th>
+                      )}
+                      {isColumnVisible("action") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Action
+                        </th>
+                      )}
+                      {isColumnVisible("delete") && (
+                        <th className="px-2 sm:px-4 py-2 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-gray-700 whitespace-nowrap">
+                          Delete
+                        </th>
+                      )}
                     </tr>
                   </thead>
 
@@ -1000,101 +1060,129 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                           key={lead.id}
                           className={`${index % 2 === 0 ? "bg-gray-100" : ""} `}
                         >
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-xs sm:text-sm">
-                            {leadsPerPage === Infinity
-                              ? index + 1
-                              : index + 1 + currentPage * leadsPerPage}
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-semibold text-cyan-600 text-xs sm:text-sm">
-                            <Link
-                              to={`/employee-lead-single-data/general/${lead.lead_id}`}
-                              className="hover:underline"
-                            >
-                              {lead.lead_id}
-                            </Link>
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
-                            {lead.calling_date || lead.actual_date || (lead.createdTime ? moment(lead.createdTime).format("DD MMM YYYY") : "-")}
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-semibold text-gray-800 text-xs sm:text-sm whitespace-normal break-words">
-                            <Link
-                              to={`/employee-lead-single-data/general/${lead.lead_id}`}
-                              className="hover:underline text-cyan-600"
-                            >
-                              {lead.name || lead.customer_name || "-"}
-                            </Link>
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
-                            {lead.office_business_name || lead.business_name || "-"}
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="text-cyan-600 cursor-pointer hover:underline"
-                            >
-                              {lead.phone || "-"}
-                            </a>
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm max-w-[180px] truncate" title={lead.address}>
-                            {lead.address || "-"}
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
-                            <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 border text-gray-700">
-                              {lead.leadSource || "-"}
-                            </span>
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-medium text-xs sm:text-sm">
-                            <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-50 border border-cyan-200 text-cyan-700 font-semibold">
-                              {lead.lead_status || "Pending"}
-                            </span>
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
-                            {lead.next_follow_date_time || lead.visit_time || "-"}
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm max-w-[180px] truncate" title={lead.remark || lead.lead_review}>
-                            {lead.remark || lead.lead_review || "-"}
-                          </td>
-                          <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-medium text-xs sm:text-sm">
-                            {lead.interested_follow_up ? (
-                              <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 border border-amber-200 text-amber-800 font-medium">
-                                {lead.interested_follow_up}
-                              </span>
-                            ) : "-"}
-                          </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                          {isColumnVisible("s_no") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-xs sm:text-sm">
+                              {leadsPerPage === Infinity
+                                ? index + 1
+                                : index + 1 + currentPage * leadsPerPage}
+                            </td>
+                          )}
+                          {isColumnVisible("lead_id") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-semibold text-cyan-600 text-xs sm:text-sm">
                               <Link
                                 to={`/employee-lead-single-data/general/${lead.lead_id}`}
-                                className="text-cyan-600 hover:text-cyan-800 transition duration-150"
+                                className="hover:underline"
                               >
-                                View Details
+                                {lead.lead_id}
                               </Link>
-                              <span className="hidden sm:inline text-gray-300">|</span>
-                              <span
-                                onClick={() => {
-                                  setTransferLead(lead);
-                                  setTransferReceiverId("");
-                                }}
-                                className="text-emerald-600 hover:text-emerald-800 transition duration-150 cursor-pointer"
+                            </td>
+                          )}
+                          {isColumnVisible("calling_date") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                              {lead.calling_date || lead.actual_date || (lead.createdTime ? moment(lead.createdTime).format("DD MMM YYYY") : "-")}
+                            </td>
+                          )}
+                          {isColumnVisible("name") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-semibold text-gray-800 text-xs sm:text-sm whitespace-normal break-words">
+                              <Link
+                                to={`/employee-lead-single-data/general/${lead.lead_id}`}
+                                className="hover:underline text-cyan-600"
                               >
-                                Transfer
+                                {lead.name || lead.customer_name || "-"}
+                              </Link>
+                            </td>
+                          )}
+                          {isColumnVisible("office_business_name") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                              {lead.office_business_name || lead.business_name || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("phone") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                              <a
+                                href={`tel:${lead.phone}`}
+                                className="text-cyan-600 cursor-pointer hover:underline"
+                              >
+                                {lead.phone || "-"}
+                              </a>
+                            </td>
+                          )}
+                          {isColumnVisible("address") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm max-w-[180px] truncate" title={lead.address}>
+                              {lead.address || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("leadSource") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 border text-gray-700">
+                                {lead.leadSource || "-"}
                               </span>
-                            </div>
-                          </td>
-                          <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
-                            <span
-                              onClick={() => handleDeleteLead(lead.lead_id)}
-                              className="text-red-500 hover:text-red-700 transition duration-150 cursor-pointer"
-                            >
-                              Delete
-                            </span>
-                          </td>
+                            </td>
+                          )}
+                          {isColumnVisible("lead_status") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-medium text-xs sm:text-sm">
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-50 border border-cyan-200 text-cyan-700 font-semibold">
+                                {lead.lead_status || "Pending"}
+                              </span>
+                            </td>
+                          )}
+                          {isColumnVisible("next_follow_date_time") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
+                              {lead.next_follow_date_time || lead.visit_time || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("remark") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm max-w-[180px] truncate" title={lead.remark || lead.lead_review}>
+                              {lead.remark || lead.lead_review || "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("interested_follow_up") && (
+                            <td className="px-2 sm:px-4 py-2 border-b border-gray-200 font-medium text-xs sm:text-sm">
+                              {lead.interested_follow_up ? (
+                                <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 border border-amber-200 text-amber-800 font-medium">
+                                  {lead.interested_follow_up}
+                                </span>
+                              ) : "-"}
+                            </td>
+                          )}
+                          {isColumnVisible("action") && (
+                            <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                                <Link
+                                  to={`/employee-lead-single-data/general/${lead.lead_id}`}
+                                  className="text-cyan-600 hover:text-cyan-800 transition duration-150"
+                                >
+                                  View Details
+                                </Link>
+                                <span className="hidden sm:inline text-gray-300">|</span>
+                                <span
+                                  onClick={() => {
+                                    setTransferLead(lead);
+                                    setTransferReceiverId("");
+                                  }}
+                                  className="text-emerald-600 hover:text-emerald-800 transition duration-150 cursor-pointer"
+                                >
+                                  Transfer
+                                </span>
+                              </div>
+                            </td>
+                          )}
+                          {isColumnVisible("delete") && (
+                            <td className="px-1 sm:px-4 py-1.5 sm:py-3 border-b border-gray-200 font-semibold whitespace-normal break-words text-[10px] sm:text-xs md:text-sm">
+                              <span
+                                onClick={() => handleDeleteLead(lead.lead_id)}
+                                className="text-red-500 hover:text-red-700 transition duration-150 cursor-pointer"
+                              >
+                                Delete
+                              </span>
+                            </td>
+                          )}
                         </tr>
                       ))
                     ) : (
                       <tr>
                         <td
-                          colSpan="20"
+                          colSpan={visibleColumns.length}
                           className="text-center py-4 text-gray-500"
                         >
                           No Data Available
