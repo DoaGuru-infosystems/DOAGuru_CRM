@@ -631,7 +631,7 @@ CREATE TABLE `leads` (
   `name` varchar(100) NOT NULL,
   `phone` varchar(15) NOT NULL,
   `lead_email` varchar(100) DEFAULT NULL,
-  `leadSource` enum('Referrals','Cold Calling','Email Campaigns','Networking Events','Paid Advertising','Content Marketing','SEO','Trade Shows','Affiliate Marketing','Direct Mail','Online Directories','others') NOT NULL DEFAULT 'others',
+  `leadSource` varchar(255) NOT NULL DEFAULT 'others',
   `main_project_id` int(100) DEFAULT NULL,
   `unit_type` varchar(255) DEFAULT NULL,
   `unit_id` int(100) DEFAULT NULL,

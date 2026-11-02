@@ -1,11 +1,17 @@
-const express = require("express");
+const buffer = require("buffer");
+if (!buffer.SlowBuffer) {
+  buffer.SlowBuffer = buffer.Buffer;
+}
+
+const path = require("path");
 const dotenv = require("dotenv");
+dotenv.config({ path: path.join(__dirname, ".env"), override: true });
+
+const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const path = require("path");
 const axios = require("axios");
 const { db } = require("./db");
-dotenv.config();
 const bodyParser = require("body-parser");
 const Router = require("./routers/userdataroutes");
 

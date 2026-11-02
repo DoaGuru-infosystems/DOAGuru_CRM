@@ -2,9 +2,12 @@ const { exec } = require("child_process");
 const fs = require("fs/promises");
 const path = require("path");
 const cron = require("node-cron");
-require("dotenv").config();
+require("dotenv").config({ path: path.join(__dirname, ".env"), override: true });
 
-const { HOST, USER, PASSWORD, DATABASE } = process.env;
+const HOST = process.env.HOST || "localhost";
+const USER = process.env.DB_USER || process.env.USER || "root";
+const PASSWORD = process.env.PASSWORD || "";
+const DATABASE = process.env.DATABASE || "doaguru_crm";
 
 const BACKUP_DIR = path.join(__dirname, "db_backups");
 const BACKUP_TIME_CRON = "0 22 * * *";
