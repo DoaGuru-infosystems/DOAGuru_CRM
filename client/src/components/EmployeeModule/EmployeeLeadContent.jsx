@@ -37,7 +37,8 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const [statusFilter, setStatusFilter] = useState("");
   const [visitFilter, setVisitFilter] = useState("");
   const [dealFilter, setDealFilter] = useState("");
-  const [soldunitFilter, setSoldUnitFilter] = useState("");
+  // HIDDEN (IT/DM CRM): Unit Sold filter state
+  // const [soldunitFilter, setSoldUnitFilter] = useState("");
   const [leadStatusFilter, setLeadStatusFilter] = useState("");
   const [leadnotInterestedStatusFilter, setLeadnotInterestedStatusFilter] =
     useState("");
@@ -138,7 +139,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
 
   useEffect(() => {
     fetchLeads();
-  }, [searchTerm, filterDate, leadSourceFilter, soldunitFilter, visitStatusFilter, activeTab]);
+  }, [searchTerm, filterDate, leadSourceFilter, /* soldunitFilter, */ visitStatusFilter, activeTab]);
 
   const fetchLeads = async () => {
     try {
@@ -149,7 +150,8 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
             search: searchTerm || undefined,
             filterDate: filterDate || undefined,
             leadSource: leadSourceFilter || undefined,
-            unitStatus: soldunitFilter || undefined,
+            // HIDDEN (IT/DM CRM): Unit Sold param
+            // unitStatus: soldunitFilter || undefined,
             visitStatus: visitStatusFilter || undefined,
             activeTab: activeTab !== "all" ? activeTab : undefined,
           },
@@ -558,9 +560,10 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
       );
     }
 
-    if (soldunitFilter) {
-      filtered = filtered.filter((lead) => lead.unit_status === soldunitFilter);
-    }
+    // HIDDEN (IT/DM CRM): Unit Sold filter logic
+    // if (soldunitFilter) {
+    //   filtered = filtered.filter((lead) => lead.unit_status === soldunitFilter);
+    // }
 
     if (monthFilter) {
       filtered = filtered.filter((lead) => {
@@ -600,7 +603,8 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
     leadStatusFilter,
     leadnotInterestedStatusFilter,
     meetingStatusFilter,
-    soldunitFilter,
+    // HIDDEN (IT/DM CRM): Unit Sold dependency
+    // soldunitFilter,
     visitStatusFilter,
     monthFilter,
     yearFilter,
@@ -613,15 +617,15 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   // Total Leads
   const totalLeads = applyFilters().length;
 
-  // Total Closed Leads
-  const totalClosedLeads = applyFilters().filter(
-    (lead) => lead.deal_status === "close"
-  ).length;
+  // HIDDEN (IT/DM CRM): Total Closed Leads calculation
+  // const totalClosedLeads = applyFilters().filter(
+  //   (lead) => lead.deal_status === "close"
+  // ).length;
 
-  // Total Visits
-  const totalVisits = applyFilters().filter((lead) =>
-    ["fresh", "re-visit", "self", "associative"].includes(lead.visit)
-  ).length;
+  // HIDDEN (IT/DM CRM): Total Visits calculation
+  // const totalVisits = applyFilters().filter((lead) =>
+  //   ["fresh", "re-visit", "self", "associative"].includes(lead.visit)
+  // ).length;
 
   const todayStr = moment().format("YYYY-MM-DD");
 
@@ -695,7 +699,8 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
     setLeadStatusFilter("");
     setLeadnotInterestedStatusFilter("");
     setMeetingStatusFilter("");
-    setSoldUnitFilter("");
+    // HIDDEN (IT/DM CRM): Unit Sold filter reset
+    // setSoldUnitFilter("");
     setVisitStatusFilter("");
     setMonthFilter("");
     setYearFilter("");
@@ -852,8 +857,8 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                   </select>
                 </div>
 
-                {/* Unit Sold */}
-                <div className="col-span-12 sm:col-span-2">
+                {/* HIDDEN (IT/DM CRM): Unit Sold Filter */}
+                {/* <div className="col-span-12 sm:col-span-2">
                   <label className="block mb-1 text-xs sm:text-sm font-semibold text-gray-700">
                     Unit Sold Filter
                   </label>
@@ -867,7 +872,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                     <option value="sold">Sold</option>
                     <option value="available">Available</option>
                   </select>
-                </div>
+                </div> */}
 
                 {/* Visit Status Filter */}
                 <div className="col-span-12 sm:col-span-2">
@@ -942,12 +947,14 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                   <span className="bg-cyan-50 border border-cyan-200 text-cyan-700 text-[10px] sm:text-sm px-2.5 py-1 rounded-full font-semibold shadow-sm">
                     Total Leads: <span className="font-bold">{totalLeads}</span>
                   </span>
-                  <span className="bg-orange-50 border border-orange-200 text-orange-700 text-[10px] sm:text-sm px-2.5 py-1 rounded-full font-semibold shadow-sm">
+                  {/* HIDDEN (IT/DM CRM): Total Site Visit badge */}
+                  {/* <span className="bg-orange-50 border border-orange-200 text-orange-700 text-[10px] sm:text-sm px-2.5 py-1 rounded-full font-semibold shadow-sm">
                     Total Site Visit: <span className="font-bold">{totalVisits}</span>
-                  </span>
-                  <span className="bg-green-50 border border-green-200 text-green-700 text-[10px] sm:text-sm px-2.5 py-1 rounded-full font-semibold shadow-sm">
+                  </span> */}
+                  {/* HIDDEN (IT/DM CRM): Total Closed Leads badge */}
+                  {/* <span className="bg-green-50 border border-green-200 text-green-700 text-[10px] sm:text-sm px-2.5 py-1 rounded-full font-semibold shadow-sm">
                     Total Closed Leads: <span className="font-bold">{totalClosedLeads}</span>
-                  </span>
+                  </span> */}
                 </div>
 
                 {/* Dropdown & Columns Customizer */}

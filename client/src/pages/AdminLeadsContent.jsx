@@ -59,7 +59,8 @@ function AdminLeadsContent({ isSidebarOpen }) {
   const [statusFilter, setStatusFilter] = useState("");
   const [visitFilter, setVisitFilter] = useState("");
   const [dealFilter, setDealFilter] = useState("");
-  const [soldunitFilter, setSoldUnitFilter] = useState("");
+  // HIDDEN (IT/DM CRM): Unit Sold filter
+  // const [soldunitFilter, setSoldUnitFilter] = useState("");
   const [employeeFilter, setEmployeeFilter] = useState("");
   const [visit, setVisit] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -257,9 +258,10 @@ function AdminLeadsContent({ isSidebarOpen }) {
       );
     }
 
-    if (soldunitFilter) {
-      filtered = filtered.filter((lead) => lead.unit_status === soldunitFilter);
-    }
+    // HIDDEN (IT/DM CRM): Unit Sold filter logic
+    // if (soldunitFilter) {
+    //   filtered = filtered.filter((lead) => lead.unit_status === soldunitFilter);
+    // }
 
     return filtered;
   };
@@ -286,20 +288,22 @@ function AdminLeadsContent({ isSidebarOpen }) {
     sortOrder,
     yearFilter,
     visitmonthFilter,
-    soldunitFilter,
+    // HIDDEN (IT/DM CRM): Unit Sold filter dependency
+    // soldunitFilter,
   ]);
 
   // Total Leads
   const totalLeads = applyFilters().length;
 
-  // Total Closed Leads
-  const totalClosedLeads = applyFilters().filter(
-    (lead) => lead.deal_status === "close"
-  ).length;
+  // HIDDEN (IT/DM CRM): Closed Leads badge calculation
+  // const totalClosedLeads = applyFilters().filter(
+  //   (lead) => lead.deal_status === "close"
+  // ).length;
 
-  const totalVisits = applyFilters().filter((lead) =>
-    ["fresh", "re-visit", "self", "associative"].includes(lead.visit)
-  ).length;
+  // HIDDEN (IT/DM CRM): Total Site Visit badge calculation
+  // const totalVisits = applyFilters().filter((lead) =>
+  //   ["fresh", "re-visit", "self", "associative"].includes(lead.visit)
+  // ).length;
 
   const indexOfLastLead = (currentPage + 1) * leadsPerPage;
   const indexOfFirstLead = indexOfLastLead - leadsPerPage;
@@ -401,7 +405,8 @@ function AdminLeadsContent({ isSidebarOpen }) {
     setMonthFilter("");
     setYearFilter("");
     setVisitMonthFilter("");
-    setSoldUnitFilter("");
+    // HIDDEN (IT/DM CRM): Unit Sold filter reset
+    // setSoldUnitFilter("");
   };
 
   return (
@@ -557,8 +562,8 @@ function AdminLeadsContent({ isSidebarOpen }) {
                   </select>
                 </div>
 
-                {/* Unit Sold Filter */}
-                <div className="flex flex-col">
+                {/* HIDDEN (IT/DM CRM): Unit Sold Filter */}
+                {/* <div className="flex flex-col">
                   <label className="mb-1 text-sm font-semibold text-gray-700">
                     Unit Sold
                   </label>
@@ -571,7 +576,7 @@ function AdminLeadsContent({ isSidebarOpen }) {
                     <option value="">All Deal</option>
                     <option value="sold">Sold</option>
                   </select>
-                </div>
+                </div> */}
 
                 {/* Reset Button */}
                 <div className="flex flex-col justify-end">
@@ -591,15 +596,15 @@ function AdminLeadsContent({ isSidebarOpen }) {
                 Total Lead: {totalLeads}
               </div>
 
-              {/* Total Lead Visits */}
-              <div className="w-full sm:w-auto text-gray-700 text-sm sm:text-xl">
+              {/* HIDDEN (IT/DM CRM): Total Site Visit badge */}
+              {/* <div className="w-full sm:w-auto text-gray-700 text-sm sm:text-xl">
                 Total Site Visit: {totalVisits}
-              </div>
+              </div> */}
 
-              {/* Total Closed Leads */}
-              <div className="w-full sm:w-auto text-gray-700 text-sm sm:text-xl">
+              {/* HIDDEN (IT/DM CRM): Total Closed Leads badge */}
+              {/* <div className="w-full sm:w-auto text-gray-700 text-sm sm:text-xl">
                 Total Closed Lead: {totalClosedLeads}
-              </div>
+              </div> */}
 
               {/* Controls: Columns & Rows */}
               <div className="flex items-center gap-2 w-full sm:w-auto">

@@ -69,7 +69,8 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
   const [meetingStatusFilter, setMeetingStatusFilter] = useState("");
   const [employees, setEmployees] = useState([]);
   const [employeeFilter, setEmployeeFilter] = useState("");
-  const [soldunitFilter, setSoldUnitFilter] = useState("");
+  // HIDDEN (IT/DM CRM): Unit Sold filter state
+  // const [soldunitFilter, setSoldUnitFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [isModalOpenLeadProfile, setIsModalOpenLeadProfile] = useState(false);
@@ -248,9 +249,10 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
       );
     }
 
-    if (soldunitFilter) {
-      filtered = filtered.filter((lead) => lead.unit_status === soldunitFilter);
-    }
+    // HIDDEN (IT/DM CRM): Unit Sold filter logic
+    // if (soldunitFilter) {
+    //   filtered = filtered.filter((lead) => lead.unit_status === soldunitFilter);
+    // }
 
     return filtered;
   };
@@ -277,20 +279,22 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
     sortOrder,
     yearFilter,
     visitmonthFilter,
-    soldunitFilter,
+    // HIDDEN (IT/DM CRM): Unit Sold dependency
+    // soldunitFilter,
   ]);
 
   // Total Leads
   const totalLeads = applyFilters().length;
 
-  // Total Closed Leads
-  const totalClosedLeads = applyFilters().filter(
-    (lead) => lead.deal_status === "close"
-  ).length;
+  // HIDDEN (IT/DM CRM): Closed Leads calculation
+  // const totalClosedLeads = applyFilters().filter(
+  //   (lead) => lead.deal_status === "close"
+  // ).length;
 
-  const totalVisits = applyFilters().filter((lead) =>
-    ["fresh", "re-visit", "self", "associative"].includes(lead.visit)
-  ).length;
+  // HIDDEN (IT/DM CRM): Total Site Visit calculation
+  // const totalVisits = applyFilters().filter((lead) =>
+  //   ["fresh", "re-visit", "self", "associative"].includes(lead.visit)
+  // ).length;
 
   const indexOfLastLead = (currentPage + 1) * leadsPerPage;
   const indexOfFirstLead = indexOfLastLead - leadsPerPage;
@@ -413,7 +417,8 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
     setMonthFilter("");
     setYearFilter("");
     setVisitMonthFilter("");
-    setSoldUnitFilter("");
+    // HIDDEN (IT/DM CRM): Unit Sold filter reset
+    // setSoldUnitFilter("");
   };
 
   console.log(leads);
@@ -594,8 +599,8 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
                   </select>
                 </div>
 
-                {/* Unit Sold Filter */}
-                <div className="flex flex-col">
+                {/* HIDDEN (IT/DM CRM): Unit Sold Filter */}
+                {/* <div className="flex flex-col">
                   <label className="mb-1 text-sm font-semibold text-gray-700">
                     Unit Sold
                   </label>
@@ -608,7 +613,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
                     <option value="">All Deal</option>
                     <option value="sold">Sold</option>
                   </select>
-                </div>
+                </div> */}
 
                 {/* Reset Button */}
                 <div className="flex flex-col justify-end">
@@ -629,14 +634,16 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
                   <span className="text-gray-900">Total Lead:</span>{" "}
                   {totalLeads}
                 </div>
-                <div className="px-4 py-2 bg-green-50 rounded-lg shadow-sm hover:shadow-md transition">
+                {/* HIDDEN (IT/DM CRM): Total Site Visit badge */}
+                {/* <div className="px-4 py-2 bg-green-50 rounded-lg shadow-sm hover:shadow-md transition">
                   <span className="text-gray-900">Total Site Visit:</span>{" "}
                   {totalVisits}
-                </div>
-                <div className="px-4 py-2 bg-yellow-50 rounded-lg shadow-sm hover:shadow-md transition">
+                </div> */}
+                {/* HIDDEN (IT/DM CRM): Closed Leads badge */}
+                {/* <div className="px-4 py-2 bg-yellow-50 rounded-lg shadow-sm hover:shadow-md transition">
                   <span className="text-gray-900">Closed Leads:</span>{" "}
                   {totalClosedLeads}
-                </div>
+                </div> */}
               </div>
 
               {/* Dropdown */}
