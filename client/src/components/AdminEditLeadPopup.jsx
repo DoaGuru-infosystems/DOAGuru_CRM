@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { IoCloseSharp } from "react-icons/io5";
+import { formatDateForInput, formatDateTimeForInput } from "../utils/dateUtils";
 
 const AdminEditLeadPopup = ({
   isOpen,
@@ -25,7 +26,7 @@ const AdminEditLeadPopup = ({
   const [errors, setErrors] = useState({});
   const [customLeadSource, setCustomLeadSource] = useState("");
   const [customFollowUp, setCustomFollowUp] = useState("");
-  const today = new Date().toISOString().split("T")[0];
+  const today = formatDateForInput(new Date());
 
   const initialLeadState = {
     lead_org_id: EmpId?.staff_org_id,
@@ -74,7 +75,12 @@ const AdminEditLeadPopup = ({
         lead_org_id: selectedLead.lead_org_id || EmpId?.staff_org_id,
         lead_id: selectedLead.lead_id,
         calling_date:
-          selectedLead.calling_date || selectedLead.createdTime || today,
+          formatDateForInput(
+            selectedLead.calling_date ||
+              selectedLead.actual_date ||
+              selectedLead.createdTime ||
+              today
+          ) || today,
         createdTime: selectedLead.createdTime || today,
         name: selectedLead.name || selectedLead.customer_name || "",
         office_business_name:
@@ -85,8 +91,9 @@ const AdminEditLeadPopup = ({
         address: selectedLead.address || "",
         leadSource: selectedLead.leadSource || "",
         lead_status: selectedLead.lead_status || "Pending",
-        next_follow_date_time:
-          selectedLead.next_follow_date_time || selectedLead.visit_time || "",
+        next_follow_date_time: formatDateTimeForInput(
+          selectedLead.next_follow_date_time || selectedLead.visit_time || ""
+        ),
         remark: selectedLead.remark || selectedLead.lead_review || "",
         lead_review: selectedLead.remark || selectedLead.lead_review || "",
         interested_follow_up: isCustomFollowUp ? "Other" : followUpVal,

@@ -9,6 +9,7 @@ import AdminEditLeadPopup from "../components/AdminEditLeadPopup";
 import toast from "react-hot-toast";
 import ColumnCustomizer from "../components/common/ColumnCustomizer";
 import useColumnPreferences from "../components/common/useColumnPreferences";
+import { formatDate, formatDateTime } from "../utils/dateUtils";
 
 const ADMIN_LEAD_COLUMNS = [
   { key: "s_no", label: "S.no" },
@@ -730,7 +731,7 @@ function AdminLeadsContent({ isSidebarOpen }) {
                           )}
                           {isColumnVisible("calling_date") && (
                             <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                              {lead.calling_date || lead.actual_date || lead.createdTime || "-"}
+                              {formatDate(lead.calling_date || lead.actual_date || lead.createdTime)}
                             </td>
                           )}
                           {isColumnVisible("name") && (
@@ -771,7 +772,7 @@ function AdminLeadsContent({ isSidebarOpen }) {
                           )}
                           {isColumnVisible("next_follow_date_time") && (
                             <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                              {lead.next_follow_date_time || lead.visit_time || "-"}
+                              {formatDateTime(lead.next_follow_date_time || lead.visit_time)}
                             </td>
                           )}
                           {isColumnVisible("remark") && (

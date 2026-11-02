@@ -9,6 +9,7 @@ import { FaDatabase } from "react-icons/fa";
 import SuperAdminEditLeadPopup from "../../adiComponent/Super-Admin/SuperAdminEditLeadPopup";
 import ColumnCustomizer from "../common/ColumnCustomizer";
 import useColumnPreferences from "../common/useColumnPreferences";
+import { formatDate, formatDateTime } from "../../utils/dateUtils";
 
 const EMPLOYEE_LEAD_COLUMNS = [
   { key: "s_no", label: "S.no" },
@@ -1079,7 +1080,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                           )}
                           {isColumnVisible("calling_date") && (
                             <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
-                              {lead.calling_date || lead.actual_date || (lead.createdTime ? moment(lead.createdTime).format("DD MMM YYYY") : "-")}
+                              {formatDate(lead.calling_date || lead.actual_date || lead.createdTime)}
                             </td>
                           )}
                           {isColumnVisible("name") && (
@@ -1128,7 +1129,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
                           )}
                           {isColumnVisible("next_follow_date_time") && (
                             <td className="px-2 sm:px-4 py-2 border-b border-gray-200 text-gray-700 text-xs sm:text-sm font-medium">
-                              {lead.next_follow_date_time || lead.visit_time || "-"}
+                              {formatDateTime(lead.next_follow_date_time || lead.visit_time)}
                             </td>
                           )}
                           {isColumnVisible("remark") && (

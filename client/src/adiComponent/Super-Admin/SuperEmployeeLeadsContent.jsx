@@ -15,6 +15,7 @@ import GenLeadAssignedPopup from "../../pages/superAdmin/popupWindows/GenLeadAss
 import { useNavigate } from "react-router-dom";
 import ColumnCustomizer from "../../components/common/ColumnCustomizer";
 import useColumnPreferences from "../../components/common/useColumnPreferences";
+import { formatDate, formatDateTime } from "../../utils/dateUtils";
 
 const LEAD_COLUMNS = [
   { key: "s_no", label: "S.no" },
@@ -809,7 +810,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
                         )}
                         {isColumnVisible("calling_date") && (
                           <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                            {lead.calling_date || lead.actual_date || lead.createdTime || "-"}
+                            {formatDate(lead.calling_date || lead.actual_date || lead.createdTime)}
                           </td>
                         )}
                         {isColumnVisible("name") && (
@@ -853,7 +854,7 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
                         )}
                         {isColumnVisible("next_follow_date_time") && (
                           <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                            {lead.next_follow_date_time || lead.visit_time || "-"}
+                            {formatDateTime(lead.next_follow_date_time || lead.visit_time)}
                           </td>
                         )}
                         {isColumnVisible("remark") && (
