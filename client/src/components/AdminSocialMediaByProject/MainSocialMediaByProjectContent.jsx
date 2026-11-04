@@ -6,7 +6,6 @@ import { CgWebsite } from "react-icons/cg";
 import { SiGoogleads } from "react-icons/si";
 import SuperLeadsTable from "../../adiComponent/Super-Admin/SocialMediaSectionSuperAdmin/SuperFacebookAPI/SuperLeadsTable";
 import SuperWebsiteLeads from "../../adiComponent/Super-Admin/SocialMediaSectionSuperAdmin/SuperWebsiteLeads";
-import SuperAccrs from "../../adiComponent/Super-Admin/SocialMediaSectionSuperAdmin/SuperAccrsLeads";
 
 function MainSocialMediaByProjectContent({ isSidebarOpen }) {
   const [selectedComponent, setSelectedComponent] = useState("FacebookData");
@@ -137,7 +136,6 @@ function MainSocialMediaByProjectContent({ isSidebarOpen }) {
                 <SuperLeadsTable isSidebarOpen={isSidebarOpen} />
               )}
               {selectedComponent === "WebsiteData" && <SuperWebsiteLeads />}
-              {selectedComponent === "99AcresData" && <SuperAccrs />}
             </div>
           </div>
         </div>

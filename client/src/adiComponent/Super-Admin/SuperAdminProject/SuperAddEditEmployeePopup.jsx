@@ -1,4 +1,4 @@
-﻿import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -118,7 +118,6 @@ const SuperAddEditEmployeePopup = ({
         "Whatsapp",
         "Magic Bricks",
         "Housing.com",
-        "99Acres",
         "Google Business",
         "FaceBook",
         "Instagram",

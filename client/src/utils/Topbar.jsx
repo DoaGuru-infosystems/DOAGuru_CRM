@@ -149,9 +149,7 @@ const Topbar = ({ isSidebarOpen }) => {
           { name: "Employee Management", path: "/employee-management" },
           { name: "Profile", path: "/admin-profile" },
           { name: "Total Leads", path: "/admin-total-leads" },
-          { name: "Total Visits", path: "/admin-total-visit" },
           { name: "Closed Deals", path: "/admin-total-closed" },
-          { name: "Sold Units", path: "/employee-sold-units" },
         ]
       : []),
 
@@ -163,9 +161,7 @@ const Topbar = ({ isSidebarOpen }) => {
           { name: "Data Export", path: "/employee-data-export" },
           { name: "Profile", path: "/employee-profile" },
           { name: "Total Leads", path: "/employees-total-leads" },
-          { name: "Visits", path: "/visit-data" },
           { name: "Closed Deals", path: "/close-data" },
-          { name: "Sold Units", path: "/employee-sold" },
         ]
       : []),
 
@@ -188,7 +184,6 @@ const Topbar = ({ isSidebarOpen }) => {
           { name: "Admin Management", path: "/super-admin-AdminManagement" },
           { name: "Profile", path: "/super-admin-profile" },
           { name: "Total Leads", path: "/super-admin-total-lead" },
-          { name: "Total Visits", path: "/super-admin-total-visit" },
           { name: "Closed Deals", path: "/super-admin-close-data" },
           { name: "Sold Units", path: "/super-admin-Sold-Units" },
         ]

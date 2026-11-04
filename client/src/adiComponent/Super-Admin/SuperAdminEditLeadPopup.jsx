@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { IoCloseSharp } from "react-icons/io5";
-import { formatDateForInput, formatDateTimeForInput } from "../../utils/dateUtils";
+import { formatDateForInput, formatDateTimeForInput, getCurrentDateTimeIST } from "../../utils/dateUtils";
 
 const SuperAdminEditLeadPopup = ({
   isOpen,
@@ -32,7 +32,7 @@ const SuperAdminEditLeadPopup = ({
     lead_org_id: EmpId?.staff_org_id,
     lead_id: "",
     calling_date: today,
-    createdTime: today,
+    createdTime: getCurrentDateTimeIST(),
     name: "",
     office_business_name: "",
     phone: "",
@@ -81,7 +81,7 @@ const SuperAdminEditLeadPopup = ({
               selectedLead.createdTime ||
               today
           ) || today,
-        createdTime: selectedLead.createdTime || today,
+        createdTime: selectedLead.createdTime || getCurrentDateTimeIST(),
         name: selectedLead.name || selectedLead.customer_name || "",
         office_business_name:
           selectedLead.office_business_name ||

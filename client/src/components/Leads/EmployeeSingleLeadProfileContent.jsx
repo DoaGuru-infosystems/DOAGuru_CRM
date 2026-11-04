@@ -4,46 +4,24 @@ import { useNavigate, useParams } from "react-router-dom";
 import img from "../../images/lead_profile.png";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import VisitCreationPopup from "./VisitCreationPopup";
 import FollowUpCreationPopUp from "./FollowUpCreationPopUp";
 import RemarkCreationPopup from "./RemarkCreationPopup";
-import UnitSoldCreationPopup from "./UnitSoldCreationPopup";
 import UpdateLeadStatusPopup from "./UpdateLeadStatusPopup";
 import getFieldValue from "../../utils/getFieldValue";
 import LeadOverview from "./SingleLeadTabs/LeadOverview";
-import BookingDetails from "./SingleLeadTabs/BookingDetails";
-import RegistryDetails from "./SingleLeadTabs/RegistryDetails";
-import UtilityCharges from "./SingleLeadTabs/UtilityCharges";
 import AllReceipts from "./SingleLeadTabs/AllReceipts";
-import Transactions from "./SingleLeadTabs/Transactions";
-import VisitTab from "./SingleLeadTabs/VisitTab";
 import FollowUpTab from "./SingleLeadTabs/FollowUpTab";
 import RemarkTab from "./SingleLeadTabs/RemarkTab";
-import SoldUnitView from "./SingleLeadTabs/SoldUnitView";
-import BookingCreationPopup from "../EmployeePops/BookingCreationPopup";
-import RegistryCreatePopup from "../EmployeePops/RegistryCreatePopup";
-import UtilityCreatePopup from "../EmployeePops/UtilityCreatePopup";
-import FInalSalePopup from "../EmployeePops/FInalSalePopup";
-import PaymentCreatePopup from "../EmployeePops/PaymentCreatePopup";
 
 function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const { type, id } = useParams();
 
   const navigate = useNavigate();
-  const [booking, setBooking] = useState([]);
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [visit, setVisit] = useState([]);
-  const [unitdata, setUnitData] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
-  const [showPopupVisit, setShowPopupVisit] = useState(false);
-  const [showPopupUnitSold, setShowPopupUnitSold] = useState(false);
   const [showPopupFollowUp, setShowPopupFollowUp] = useState(false);
   const [showPopupRemark, setShowPopupRemark] = useState(false);
-  const [showBookPopup, setShowBookPopup] = useState(false);
-  const [showRegistryPopup, setShowRegistryPopup] = useState(false);
-  const [showUtilityPopup, setShowUtilityPopup] = useState(false);
-  const [showFinalSoldPopup, setShowFinalSoldPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [render, setRender] = useState(false);
   const [isOtherReason, setIsOtherReason] = useState(false);
@@ -128,7 +106,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
         "Whatsapp",
         "Magic Bricks",
         "Housing.com",
-        "99Acres",
         "Google Business",
         "FaceBook",
         "Instagram",
@@ -155,7 +132,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
     lead_status: "",
     visit_date: "",
     visit: "",
-    quotation_status: "",
     deal_status: "",
     meeting_status: "",
     booking_amount: "",
@@ -175,16 +151,9 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
     visit_date: "",
   });
 
-  const [quotationCreated, setQuotationCreated] = useState(false);
   const [visitCreated, setVisitCreated] = useState(false);
   const [followCreated, setFollowCreated] = useState([]);
-  const [employeeunitsoldCreated, setemployeeunitsoldCreated] = useState(false);
   const [remarkCreated, setRemarkCreated] = useState(false);
-
-  useEffect(() => {
-    fetchUnitdata();
-    fetchUnitSoldEmployee();
-  }, [leads[0]]);
 
   useEffect(() => {
     if (token && EmpId?.staff_org_id) {
@@ -193,7 +162,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   }, [token, EmpId]);
 
   useEffect(() => {
-    fetchVisit();
     fetchFollowUp();
     fetchRemark();
     if (type === "meta") {
@@ -233,19 +201,8 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       );
 
       setLeads(response.data);
-
-      response.data.forEach((lead) => {
-        console.log("Lead Quotation Status (raw):", lead.quotation);
-      });
-
-      const hasCreatedQuotation = response.data.some(
-        (lead) =>
-          lead.quotation && lead.quotation.trim().toLowerCase() === "created"
-      );
-
-      setQuotationCreated(hasCreatedQuotation);
     } catch (error) {
-      console.error("Error fetching quotations:", error);
+      console.error("Error fetching leads:", error);
     }
   };
 
@@ -374,24 +331,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
     }
   };
 
-  const fetchVisit = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/employe-visit/${type}/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setVisit(data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   const fetchFollowUp = async () => {
     try {
       let apiUrl = "";
@@ -412,29 +351,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       setFollowCreated(data);
     } catch (error) {
       console.error("Error fetching follow up:", error);
-    }
-  };
-
-  const fetchUnitSoldEmployee = async () => {
-    try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeUnitSoldByLeadIdMeta/${leads[0]?.leadgen_id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/unit-sold-lead-id/${leads[0]?.lead_id}`;
-      }
-
-      const response = await axios.get(apiUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setemployeeunitsoldCreated(response.data[0]);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
     }
   };
 
@@ -460,36 +376,8 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
     }
   };
 
-  const fetchUnitdata = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/unit-data/${leads[0]?.unit_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setUnitData(response.data);
-    } catch (error) {
-      console.error("Error fetching Unit Data:", error);
-    }
-  };
   const handleBackClick = () => {
     navigate(-1);
-  };
-
-  const handleQuotation = async (lead) => {
-    const name = lead.name;
-    navigate(`/quotation-by-lead/${lead.lead_id}`, { state: { name } });
-  };
-
-  const handleViewQuotation = (lead) => {
-    console.log("Lead Object:", lead);
-    const name = lead.name;
-    console.log("Lead Name:", name);
-    navigate(`/View_quotations/${lead.lead_id}`);
   };
 
   const handleInputChange = (e) => {
@@ -510,16 +398,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
     console.log(lead);
 
     setShowPopup(true);
-  };
-
-  const handleViewVisit = () => {
-    navigate(`/view_visit/${type}/${leads[0].lead_id || leads[0].leadgen_id}`);
-    console.log(leads[0].lead_id);
-  };
-  const handleViewEmployeeUnitSold = () => {
-    navigate(
-      `/view_unit_sold/${type}/${leads[0].lead_id || leads[0].leadgen_id}`
-    );
   };
 
   const handleViewFollowUp = () => {
@@ -586,28 +464,10 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
     setShowPopup(false);
   };
 
-  const totalVisit = visit.length;
-
   const remainingLeads = leads?.length > 1 ? leads.slice(1) : leads;
 
   console.log(leads);
 
-  const fetchBookingData = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getBookingBYleadId/${id}`
-      );
-      setBooking(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchBookingData();
-  }, []);
-
-  console.log(booking);
   console.log(EmpId?.staff_role);
 
   return (
@@ -1360,12 +1220,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
                   {/* Left Section for Creation Buttons */}
                   <div className="flex flex-wrap gap-2">
                     <button
-                      className="bg-orange-500 text-white px-4 py-2 rounded w-full sm:w-auto"
-                      onClick={() => setShowPopupVisit(true)}
-                    >
-                      + Add Visit
-                    </button>
-                    <button
                       className="bg-yellow-500 text-white px-4 py-2 rounded w-full sm:w-auto"
                       onClick={() => setShowPopupFollowUp(true)}
                     >
@@ -1378,34 +1232,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
                       + Add Remark
                     </button>
 
-                    <button
-                      className="bg-emerald-500 text-white px-4 py-2 rounded w-full sm:w-auto"
-                      onClick={() => setShowBookPopup(true)}
-                    >
-                      + Add Booking
-                    </button>
-                    {booking?.length > 0 && (
-                      <>
-                        <button
-                          className="bg-red-500 text-white px-4 py-2 rounded w-full sm:w-auto"
-                          onClick={() => setShowRegistryPopup(true)}
-                        >
-                          + Add Registry
-                        </button>
-                        <button
-                          className="bg-cyan-700 text-white px-4 py-2 rounded w-full sm:w-auto"
-                          onClick={() => setShowUtilityPopup(true)}
-                        >
-                          + Add Utility Charges
-                        </button>
-                        <button
-                          className="bg-green-700 text-white px-4 py-2 rounded w-full sm:w-auto"
-                          onClick={() => setShowFinalSoldPopup(true)}
-                        >
-                          + Final Sale
-                        </button>
-                      </>
-                    )}
                   </div>
                 </div>
               )}
@@ -1414,15 +1240,9 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
               <div className="flex flex-wrap gap-2 mt-8 bg-white p-2.5 rounded-2xl shadow-xs border border-neutral-200">
                 {[
                   { key: "overview", label: "Lead Overview" },
-                  { key: "booking", label: "Booking Details" },
-                  { key: "registry", label: "Registry Details" },
-                  { key: "utility", label: "Utility Charges" },
                   // { key: "receipts", label: "All Receipts" },
-                  { key: "transactions", label: "Transactions" },
-                  { key: "visit", label: "Visit" },
                   { key: "followup", label: "Follow-Up" },
                   { key: "remark", label: "Remark" },
-                  { key: "unitsold", label: "View Sold Details" },
                 ].map((item) => (
                   <button
                     key={item.key}
@@ -1443,28 +1263,13 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
           </div>
           <div className="pb-20">
             {activeTab === "overview" && <LeadOverview leads={leads} />}
-            {activeTab === "booking" && <BookingDetails />}
-            {activeTab === "registry" && <RegistryDetails />}
-            {activeTab === "utility" && <UtilityCharges />}
             {activeTab === "receipts" && <AllReceipts />}
-            {activeTab === "transactions" && <Transactions booking={booking} />}
-            {activeTab === "visit" && <VisitTab />}
             {activeTab === "followup" && <FollowUpTab />}
             {activeTab === "remark" && <RemarkTab />}
-            {activeTab === "unitsold" && <SoldUnitView booking={booking} />}
           </div>
         </div>
       </div>
 
-      <VisitCreationPopup
-        isOpen={showPopupVisit}
-        onClose={() => setShowPopupVisit(false)}
-        leads={leads}
-        visitLead={visitLead}
-        fetchLeads={fetchLeads}
-        fetchMetaLeads={fetchMetaLeads}
-        fetchVisit={fetchVisit}
-      />
       <FollowUpCreationPopUp
         isOpen={showPopupFollowUp}
         onClose={() => setShowPopupFollowUp(false)}
@@ -1483,53 +1288,12 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
         fetchMetaLeads={fetchMetaLeads}
         fetchRemark={fetchRemark}
       />
-      <UnitSoldCreationPopup
-        isOpen={showPopupUnitSold}
-        onClose={() => setShowPopupUnitSold(false)}
-        leads={leads}
-        fetchLeads={fetchLeads}
-        fetchUnitdata={fetchUnitdata}
-        fetchUnitSoldEmployee={fetchUnitSoldEmployee}
-        fetchMetaLeads={fetchMetaLeads}
-        unitdata={unitdata}
-      />
-      <FInalSalePopup
-        isOpen={showFinalSoldPopup}
-        onClose={() => setShowFinalSoldPopup(false)}
-        leads={leads}
-        booking={booking}
-      />
-      <BookingCreationPopup
-        isOpen={showBookPopup}
-        onClose={() => setShowBookPopup(false)}
-        leads={leads}
-        fetchLeads={fetchLeads}
-        fetchUnitdata={fetchUnitdata}
-        fetchUnitSoldEmployee={fetchUnitSoldEmployee}
-        fetchMetaLeads={fetchMetaLeads}
-        unitdata={unitdata}
-      />
       <UpdateLeadStatusPopup
         isOpen={showPopup}
         onClose={() => setShowPopup(false)}
         leads={leads}
         fetchLeads={fetchLeads}
         fetchMetaLeads={fetchMetaLeads}
-        fetchUnitdata={fetchUnitdata}
-        fetchUnitSoldEmployee={fetchUnitSoldEmployee}
-        unitdata={unitdata}
-      />
-      <RegistryCreatePopup
-        isOpen={showRegistryPopup}
-        onClose={() => setShowRegistryPopup(false)}
-        leads={leads}
-        booking={booking}
-      />
-      <UtilityCreatePopup
-        isOpen={showUtilityPopup}
-        onClose={() => setShowUtilityPopup(false)}
-        leads={leads}
-        booking={booking}
       />
     </>
   );

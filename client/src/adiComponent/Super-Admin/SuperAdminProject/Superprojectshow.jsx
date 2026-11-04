@@ -183,9 +183,6 @@ const Superprojectshow = () => {
                 Total Units
               </th>
               <th className="px-6 py-3 border-b-2 border-gray-300">Action</th>
-              <th className="px-6 py-3 border-b-2 border-gray-300">
-                Unit Profile
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -223,16 +220,6 @@ const Superprojectshow = () => {
                     >
                       <FaTrash />
                     </button>
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
-                    <Link
-                      to={`/super-admin-project-units/${project.project_id}`}
-                      className="inline-block"
-                    >
-                      <button className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700 transition">
-                        Profile
-                      </button>
-                    </Link>
                   </td>
                 </tr>
               ))

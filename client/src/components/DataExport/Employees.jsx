@@ -3,7 +3,6 @@ import axios from "axios";
 import moment from "moment";
 import * as XLSX from "xlsx";
 import ReactPaginate from "react-paginate";
-import Header from "../../pages/Quotation/Header";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 
@@ -74,7 +73,6 @@ function Employees() {
   };
   return (
     <>
-      <Header />
       {/* <Sider /> */}
       <div className="container 2xl:w-[95%]">
         <h1 className="text-2xl text-center mt-[2rem] font-medium">

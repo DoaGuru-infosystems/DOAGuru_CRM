@@ -2,19 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { GiFiles } from "react-icons/gi";
 import { useSelector } from "react-redux";
-import { FaCheckCircle, FaClipboardList } from "react-icons/fa";
 import SuperLeadData from "./SuperDataExport/SuperLeadData";
-import SuperVisitData from "./SuperDataExport/SuperVisitData";
-import SuperCloseData from "./SuperDataExport/SuperCloseDateData";
-import SuperSoldnit from "./SuperDataExport/SuperSolddUnit";
 import SuperMetaLeadData from "./SuperDataExport/SuperMetaLeadData";
 import { FaMeta } from "react-icons/fa6";
 
 const SuperDataExportContent = () => {
   const [leads, setLeads] = useState([]);
   const [metaLeads, setMetaLeads] = useState([]);
-  const [visit, setVisit] = useState([]);
-  const [employeesold, setemployeesold] = useState([]);
   const [employee, setEmployee] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState("LeadData");
   const superadminuser = useSelector((state) => state.auth.user);
@@ -25,8 +19,6 @@ const SuperDataExportContent = () => {
     fetchLeads();
     fetchMetaLeads();
     fetchEmployee();
-    fetchVisit();
-    employeesoldunit();
   }, []);
 
   const fetchLeads = async () => {
@@ -80,46 +72,10 @@ const SuperDataExportContent = () => {
     }
   };
 
-  const employeesoldunit = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getAllUnitSoldByOrg/${superadminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(data);
-      setemployeesold(data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-  const fetchVisit = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/leads-all-visits/${superadminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(data);
-      setVisit(data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   const closedCount = leads.filter(
     (lead) => lead.unit_status === "sold"
   ).length;
 
-  const soldUnits = employeesold.length;
   return (
     <>
       <div className="flex mt-20">
@@ -211,94 +167,12 @@ const SuperDataExportContent = () => {
                 </div>
               </div>
 
-              {/* Visit Data */}
-              <div className="w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/5 my-2 px-2">
-                <div
-                  className={`shadow-lg rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${selectedComponent === "VisitData"
-                    ? "bg-cyan-600 text-white"
-                    : "bg-white"
-                    }`}
-                  onClick={() => setSelectedComponent("VisitData")}
-                >
-                  <div className="p-4 flex flex-col items-center text-center">
-                    <div
-                      className={`text-3xl ${selectedComponent === "VisitData"
-                        ? "text-white"
-                        : "text-gray-700"
-                        }`}
-                    >
-                      <FaClipboardList />
-                    </div>
-                    <div className="mt-2">
-                      <h5
-                        className={`text-base sm:text-lg font-semibold ${selectedComponent === "VisitData"
-                          ? "text-white"
-                          : "text-gray-800"
-                          }`}
-                      >
-                        Site Visits Data
-                      </h5>
-                      <p
-                        className={`${selectedComponent === "VisitData"
-                          ? "text-white"
-                          : "text-gray-600"
-                          }`}
-                      >
-                        {visit?.length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sold Data */}
-              <div className="w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/5 my-2 px-2">
-                <div
-                  className={`shadow-lg rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${selectedComponent === "SoldData"
-                    ? "bg-cyan-600 text-white"
-                    : "bg-white"
-                    }`}
-                  onClick={() => setSelectedComponent("SoldData")}
-                >
-                  <div className="p-4 flex flex-col items-center text-center">
-                    <div
-                      className={`text-3xl ${selectedComponent === "SoldData"
-                        ? "text-white"
-                        : "text-gray-700"
-                        }`}
-                    >
-                      <FaCheckCircle />
-                    </div>
-                    <div className="mt-2">
-                      <h5
-                        className={`text-base sm:text-lg font-semibold ${selectedComponent === "SoldData"
-                          ? "text-white"
-                          : "text-gray-800"
-                          }`}
-                      >
-                        Unit Sold Data
-                      </h5>
-                      <p
-                        className={`${selectedComponent === "SoldData"
-                          ? "text-white"
-                          : "text-gray-600"
-                          }`}
-                      >
-                        {soldUnits}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Conditionally render the selected component */}
             <div className="">
               {selectedComponent === "LeadData" && <SuperLeadData />}
               {selectedComponent === "metaLeadData" && <SuperMetaLeadData />}
-              {selectedComponent === "VisitData" && <SuperVisitData />}
-              {selectedComponent === "ClosedData" && <SuperCloseData />}
-              {selectedComponent === "SoldData" && <SuperSoldnit />}
             </div>
           </div>
         </div>

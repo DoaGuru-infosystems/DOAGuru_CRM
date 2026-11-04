@@ -15,13 +15,11 @@ const GenLeadAssignedPopup = ({
   const user = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState([]);
-  const [units, setUnits] = useState([]);
   const [staff, setStaff] = useState([]);
 
   const [inputField, setInputField] = useState({
     assignedTo: "",
     main_project_id: "",
-    unit_id: "",
   });
 
   console.log("leads", lead);
@@ -55,42 +53,21 @@ const GenLeadAssignedPopup = ({
     }
   };
 
-  const fetchAllUnitsByProject = async () => {
-    if (!inputField?.main_project_id) return;
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getAllUnitsByProjectId/${inputField?.main_project_id}`,
-        {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        }
-      );
-      setUnits(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     fetchAllProjects();
     fetchAllStaff();
   }, []);
 
   useEffect(() => {
-    fetchAllUnitsByProject();
-  }, [inputField?.main_project_id]);
-
-  useEffect(() => {
     if (selectedLeads && selectedLeads.length > 0) {
       setInputField({
         assignedTo: "",
         main_project_id: "",
-        unit_id: "",
       });
     } else {
       setInputField({
         assignedTo: "",
         main_project_id: "",
-        unit_id: "",
       });
     }
   }, [selectedLeads]);
@@ -206,23 +183,6 @@ const GenLeadAssignedPopup = ({
                     {projects?.map((p) => (
                       <option key={p?.project_id} value={p?.project_id}>
                         {p?.project_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-1">Unit</label>
-                  <select
-                    name="unit_id"
-                    value={inputField.unit_id}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
-                  >
-                    <option value="">--select--</option>
-                    {units?.map((u) => (
-                      <option key={u?.unit_id} value={u?.unit_id}>
-                        {u?.unit_number} - {u?.unit_type}
                       </option>
                     ))}
                   </select>

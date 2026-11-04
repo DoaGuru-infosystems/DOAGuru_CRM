@@ -89,11 +89,38 @@ export const formatDateTimeForInput = (value) => {
   return m.tz(TIMEZONE).format("YYYY-MM-DDTHH:mm");
 };
 
+/**
+ * Returns current timestamp in Asia/Kolkata timezone: YYYY-MM-DD HH:mm:ss
+ */
+export const getCurrentDateTimeIST = () => {
+  return moment().tz(TIMEZONE).format("YYYY-MM-DD HH:mm:ss");
+};
+
+/**
+ * Formats Created Date/Time to YYYY-MM-DD HH:mm:ss in Asia/Kolkata timezone.
+ */
+export const formatCreatedDateTime = (value) => {
+  if (value === null || value === undefined) return "-";
+  const str = String(value).trim();
+  if (!str || str === "-" || str === "null" || str === "undefined") return "-";
+
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(str)) {
+    return str;
+  }
+
+  const m = moment(str);
+  if (!m.isValid()) return str;
+
+  return m.tz(TIMEZONE).format("YYYY-MM-DD HH:mm:ss");
+};
+
 const dateUtils = {
   formatDate,
   formatDateTime,
   formatDateForInput,
   formatDateTimeForInput,
+  getCurrentDateTimeIST,
+  formatCreatedDateTime,
 };
 
 export default dateUtils;

@@ -99,7 +99,6 @@ const AddEditEmployeePopup = ({
         "Whatsapp",
         "Magic Bricks",
         "Housing.com",
-        "99Acres",
         "Google Business",
         "FaceBook",
         "Instagram",

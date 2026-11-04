@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { SiGoogleads, SiMoneygram } from "react-icons/si";
 import WebsiteLeads from "../SocialMediaLeads/WebsiteApi/WebsiteLeads";
-import Accrs from "../SocialMediaLeads/AccrsLeads";
 import LeadsTable from "../SocialMediaLeads/FacebookAPI/LeadsTable";
 import { useNavigate } from "react-router-dom";
 import { FaMeta } from "react-icons/fa6";
@@ -140,7 +139,6 @@ function SocialMediaLeadsContent() {
               {selectedComponent === "FacebookData" && <LeadsTable />}
               {selectedComponent === "GoogleData" && <LeadsTable />}
               {selectedComponent === "WebsiteData" && <WebsiteLeads />}
-              {selectedComponent === "99AcresData" && <Accrs />}
             </div>
           </div>
         </div>

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { GiFiles } from "react-icons/gi";
 import SuperWebsiteLeads from "../SocialMediaSectionSuperAdmin/SuperWebsiteLeads";
-import SuperAccrs from "../SocialMediaSectionSuperAdmin/SuperAccrsLeads";
 import SuperLeadsTable from "../SocialMediaSectionSuperAdmin/SuperFacebookAPI/SuperLeadsTable";
 import { useNavigate } from "react-router-dom";
 import { FaMeta } from "react-icons/fa6";
@@ -145,7 +144,6 @@ function SuperSocialMediaLeadsContent({ isSidebarOpen }) {
                 <SuperLeadsTable isSidebarOpen={isSidebarOpen} />
               )}
               {selectedComponent === "WebsiteData" && <SuperWebsiteLeads />}
-              {selectedComponent === "99AcresData" && <SuperAccrs />}
             </div>
           </div>
         </div>

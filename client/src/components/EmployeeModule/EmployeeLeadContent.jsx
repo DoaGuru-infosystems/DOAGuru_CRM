@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import moment from "moment";
+import moment from "moment-timezone";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -9,7 +9,9 @@ import { FaDatabase } from "react-icons/fa";
 import SuperAdminEditLeadPopup from "../../adiComponent/Super-Admin/SuperAdminEditLeadPopup";
 import ColumnCustomizer from "../common/ColumnCustomizer";
 import useColumnPreferences from "../common/useColumnPreferences";
-import { formatDate, formatDateTime } from "../../utils/dateUtils";
+import { formatDate, formatDateTime, formatCreatedDateTime } from "../../utils/dateUtils";
+import * as XLSX from "xlsx";
+import { BiExport } from "react-icons/bi";
 
 const EMPLOYEE_LEAD_COLUMNS = [
   { key: "s_no", label: "S.no" },
@@ -735,6 +737,75 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
     ...new Set([...hardCodedLeadSources, ...dynamicLeadSources]),
   ];
 
+  // ✅ Export filtered leads to Excel
+  const handleExportToExcel = () => {
+    const dataToExport =
+      filteredLeads && filteredLeads.length > 0 ? filteredLeads : leads;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      toast.error("No leads available to export!");
+      return;
+    }
+
+    const exportData = dataToExport.map((lead, index) => {
+      const row = {};
+
+      if (isColumnVisible("s_no")) {
+        row["S.no"] = index + 1;
+      }
+      if (isColumnVisible("lead_id")) {
+        row["Lead ID"] = lead.lead_id;
+      }
+      if (isColumnVisible("calling_date")) {
+        row["Calling Date"] = formatDate(lead.calling_date || lead.actual_date || lead.createdTime) || "-";
+      }
+      if (isColumnVisible("name")) {
+        row["Customer Name"] = lead.name || lead.customer_name || "-";
+      }
+      if (isColumnVisible("office_business_name")) {
+        row["Business Name"] = lead.office_business_name || lead.business_name || "-";
+      }
+      if (isColumnVisible("phone")) {
+        row["Mobile Number"] = lead.phone || "-";
+      }
+      if (isColumnVisible("address")) {
+        row["Address"] = lead.address || "-";
+      }
+      if (isColumnVisible("leadSource")) {
+        row["Lead Source"] = lead.leadSource || "-";
+      }
+      if (isColumnVisible("lead_status")) {
+        row["Lead Status"] = lead.lead_status || "Pending";
+      }
+      if (isColumnVisible("next_follow_date_time")) {
+        row["Next Follow Date Time"] = (lead.next_follow_date_time || lead.visit_time)
+          ? formatDateTime(lead.next_follow_date_time || lead.visit_time)
+          : "-";
+      }
+      if (isColumnVisible("remark")) {
+        row["Remark"] = lead.remark || lead.lead_review || "-";
+      }
+      if (isColumnVisible("interested_follow_up")) {
+        row["Interested Follow-up"] = lead.interested_follow_up || "-";
+      }
+      if (isColumnVisible("assignedTo")) {
+        row["Assigned To"] = lead.staff_name || "-";
+      }
+      row["Created Date"] = formatCreatedDateTime(lead.createdTime);
+
+      return row;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+
+    XLSX.writeFile(
+      workbook,
+      `Employee_Leads_${moment().format("YYYY-MM-DD_HH-mm")}.xlsx`
+    );
+  };
+
   return (
     <>
       <div className="flex mt-20 w-full max-w-full overflow-x-hidden">
@@ -959,6 +1030,12 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
 
                 {/* Dropdown & Columns Customizer */}
                 <div className="flex items-center gap-2 w-auto">
+                  <button
+                    className="bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 flex gap-2 items-center cursor-pointer text-xs sm:text-sm font-medium"
+                    onClick={handleExportToExcel}
+                  >
+                    <BiExport /> Export Leads
+                  </button>
                   <ColumnCustomizer
                     columns={EMPLOYEE_LEAD_COLUMNS}
                     visibleColumns={visibleColumns}

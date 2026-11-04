@@ -23,7 +23,8 @@ const verifyAdminToken = (token) => {
                     return;
                 }
 
-                const user = result[0];
+                const user = { ...result[0] };
+                delete user.staff_password;
                 resolve(user);
             });
         });

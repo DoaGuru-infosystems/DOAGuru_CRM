@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import moment from "moment";
+import moment from "moment-timezone";
 import * as XLSX from "xlsx";
 import ReactPaginate from "react-paginate";
 import { useSelector } from "react-redux";
@@ -143,8 +143,6 @@ function SuperLeadReport() {
       employeeId: "Employee ID",
       follow_up_status: "Follow-up Status",
       payment_mode: "Payment Mode",
-      quotation: "Quotation",
-      quotation_status: "Quotation Status",
       reason: "Reason",
       registry: "Registry",
 
@@ -162,14 +160,17 @@ function SuperLeadReport() {
       selectedColumns.forEach((col) => {
         const newKey = columnMapping[col] || col;
 
-        if (
-          ["actual_date", "createdTime", "visit_date", "d_closeDate"].includes(
-            col
-          )
+        if (col === "createdTime") {
+          formattedLead[newKey] =
+            lead[col] && moment(lead[col]).isValid()
+              ? moment(lead[col]).tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss")
+              : "pending";
+        } else if (
+          ["actual_date", "visit_date", "d_closeDate"].includes(col)
         ) {
           // Check if date exists and is valid
           formattedLead[newKey] =
-            lead[col] && moment(lead[col], moment.ISO_8601, true).isValid()
+            lead[col] && moment(lead[col]).isValid()
               ? moment(lead[col]).format("DD MMM YYYY").toUpperCase()
               : "pending";
         } else if (col === "lead_no") {

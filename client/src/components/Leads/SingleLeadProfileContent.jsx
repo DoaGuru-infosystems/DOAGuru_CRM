@@ -8,12 +8,8 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
-  const [visit, setVisit] = useState([]);
-  const [quotationCreated, setQuotationCreated] = useState(false);
-  const [visitCreated, setVisitCreated] = useState(false);
   const [followCreated, setFollowCreated] = useState(false);
   const [remarksCreated, setRemarksCreated] = useState(false);
-  const [employeeunitsoldCreated, setemployeeunitsoldCreated] = useState(false);
 
   const adminuser = useSelector((state) => state.auth.user);
   const token = adminuser.token;
@@ -30,18 +26,8 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
         }
       );
       setLeads(response.data);
-      response.data.forEach((lead) => {
-        console.log("Lead Quotation Status (raw):", lead.quotation);
-      });
-
-      const hasCreatedQuotation = response.data.some(
-        (lead) =>
-          lead.quotation && lead.quotation.trim().toLowerCase() === "created"
-      );
-
-      setQuotationCreated(hasCreatedQuotation);
     } catch (error) {
-      console.error("Error fetching quotations:", error);
+      console.error("Error fetching leads:", error);
     }
   };
 
@@ -62,24 +48,6 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
       console.error("Error fetching quotations:", error);
     }
   };
-  const fetchUnitSoldEmployee = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/admin-unit-sold-lead-id/${leads[0].lead_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setemployeeunitsoldCreated(response.data[0]);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   const fetchRemark = async () => {
     try {
       const response = await axios.get(
@@ -102,60 +70,17 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
     navigate(-1);
   };
 
-  const fetchVisit = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/employe-visit-admin/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setVisit(response.data);
-      const hasCreatedvisit = response.data.some(
-        (lead) =>
-          (lead.visit && lead.visit.trim().toLowerCase() === "fresh") ||
-          "repeated"
-      );
-      setVisitCreated(hasCreatedvisit);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
-  const handleViewQuotation = (lead) => {
-    const name = lead.name;
-    navigate(`/admin_view_quotations/${lead.lead_id}`);
-  };
-  const handleViewVisit = () => {
-    navigate(`/admin_view_visit/${leads[0].lead_id}`);
-  };
   const handleViewFollowUp = () => {
     navigate(`/admin_view_follow_up/${leads[0].lead_id}`);
   };
   const handleViewRemark = () => {
     navigate(`/admin_view_remark/${leads[0].lead_id}`);
   };
-  const handleViewEmployeeUnitSold = () => {
-    // navigate(`/admin_view_unit_sold/${leads[0].lead_id}`);
-    navigate(`/view_unit_sold/general/${leads[0].lead_id}`)
-  };
-
   useEffect(() => {
     fetchLeads();
     fetchFollowUp();
-    fetchVisit();
     fetchRemark();
   }, [id]);
-
-  useEffect(() => {
-    if (leads.length > 0) {
-      fetchUnitSoldEmployee();
-    }
-  }, [leads]);
 
   return (
     <>
@@ -252,20 +177,6 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
             <div className=" mt-2">
               <div className="">
                 <div className="flex flex-wrap gap-2">
-                  {/* Conditionally render the View Quotation button */}
-                  {visitCreated ? (
-                    <button
-                      onClick={handleViewVisit}
-                      className="bg-green-500 text-white px-4 py-2 w-full sm:w-auto rounded"
-                    >
-                      View Visit
-                    </button>
-                  ) : (
-                    <p className="text-white bg-red-400 text-center px-4 py-2 w-full sm:w-auto rounded">
-                      Visit not yet created
-                    </p>
-                  )}
-
                   {followCreated ? (
                     <button
                       onClick={handleViewFollowUp}
@@ -288,18 +199,6 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
                   ) : (
                     <p className="text-white bg-red-400 text-center px-4 py-2 rounded w-full sm:w-auto">
                       Remark not yet created
-                    </p>
-                  )}
-                  {employeeunitsoldCreated ? (
-                    <button
-                      onClick={handleViewEmployeeUnitSold}
-                      className="bg-cyan-600 text-white px-4 py-2 rounded w-full sm:w-auto "
-                    >
-                      View Unit Sold
-                    </button>
-                  ) : (
-                    <p className="text-white bg-red-400 text-center px-4 py-2 rounded w-full sm:w-auto">
-                      Unit not yet sold
                     </p>
                   )}
                 </div>

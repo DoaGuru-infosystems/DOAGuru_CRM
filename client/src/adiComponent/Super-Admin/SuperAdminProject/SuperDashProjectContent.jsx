@@ -146,13 +146,8 @@ const SuperDashProjectContent = () => {
                       <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                         {index + 1 + currentPage * projectsPerPage}
                       </td>
-                      <td className="px-6 py-4 border-b border-gray-200 text-gray-800 hover:text-cyan-700 font-bold capitalize ">
-                        <Link
-                          to={`/super-admin-project-units/${project.project_id}`}
-                          className="flex items-center gap-1"
-                        >
-                          {project.project_name} <FaExternalLinkAlt />
-                        </Link>
+                      <td className="px-6 py-4 border-b border-gray-200 text-gray-800 font-bold capitalize ">
+                        {project.project_name}
                       </td>
                       <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                         {project.project_id}

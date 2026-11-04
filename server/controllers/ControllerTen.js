@@ -7,6 +7,7 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 const { sendEmail } = require("../utils/emailService");
 const { sendWhatsAppLeadAssignedAlert } = require("../utils/whatsappUtils");
+const { normalizePhone } = require("../utils/leadVisibility");
 
 const metaLeadFetchByPageId = async (req, res) => {
   const { pageId, accessToken, meta_org_id } = req.body;
@@ -293,26 +294,10 @@ CRMGuru Team`;
   }
 };
 
-const getAllUnitsByProjectId = (req, res) => {
-  try {
-    const projectId = req.params.projectId;
-    const selectQuery = `select * from units where unit_project_id = ?`;
-    db.query(selectQuery, projectId, (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-      return res.status(200).send(result);
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-
 const getMetaLeadsByStaffId = (req, res) => {
   const staffId = req.params.staffId;
   try {
-    const selectQuery = `select * from meta_leads join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo join projects on projects.project_id = meta_leads.meta_project_id join units on units.unit_id = meta_leads.meta_unit_id where meta_leads.meta_assignedTo = ? order by meta_leads.meta_id desc`;
+    const selectQuery = `select * from meta_leads join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo join projects on projects.project_id = meta_leads.meta_project_id where meta_leads.meta_assignedTo = ? order by meta_leads.meta_id desc`;
     db.query(selectQuery, staffId, (err, result) => {
       if (err) {
         res.status(400).json({ success: false, message: err.message });
@@ -327,7 +312,7 @@ const getMetaLeadsByStaffId = (req, res) => {
 const getMetaLeadsByLeadId = (req, res) => {
   const metaId = req.params.metaId;
   try {
-    const selectQuery = `select * from meta_leads left join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo left join projects on projects.project_id = meta_leads.meta_project_id left join units on units.unit_id = meta_leads.meta_unit_id where meta_leads.leadgen_id = ?`;
+    const selectQuery = `select * from meta_leads left join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo left join projects on projects.project_id = meta_leads.meta_project_id where meta_leads.leadgen_id = ?`;
     db.query(selectQuery, metaId, (err, result) => {
       if (err) {
         res.status(400).json({ success: false, message: err.message });
@@ -373,698 +358,7 @@ const updateOnlyMetaLeadStatusEmployeeEnd = (req, res) => {
   });
 };
 
-const createFinanceCompany = async (req, res) => {
-  try {
-    const {
-      fc_org_id,
-      fc_name,
-      fc_contact_person,
-      fc_contact_phone,
-      interest_rate,
-    } = req.body;
 
-    const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-    if (!fc_org_id || !fc_name) {
-      return res.status(400).json({
-        success: false,
-        message: "Organization ID and name are required",
-      });
-    }
-
-    db.query(
-      `SELECT * FROM finance_companies WHERE fc_name = ?`,
-      fc_name,
-      (err, result) => {
-        if (err) {
-          return res.status(400).json({ success: false, message: err.message });
-        }
-
-        if (result && result.length > 0) {
-          return res.status(400).json({
-            success: false,
-            message: "Finance company name already exists",
-          });
-        } else {
-          db.query(
-            `INSERT INTO finance_companies 
-       (fc_org_id, fc_name, fc_contact_person, fc_contact_phone, interest_rate, fc_created_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-              fc_org_id,
-              fc_name,
-              fc_contact_person,
-              fc_contact_phone,
-              interest_rate,
-              dateTime,
-            ],
-            (insertErr, insertResult) => {
-              if (insertErr) {
-                return res.status(400).json({
-                  success: false,
-                  message: insertErr.message,
-                });
-              }
-              return res.status(201).json({
-                success: true,
-                message: "Finance Company Added Successfully",
-                finance_company_id: result.insertId,
-              });
-            }
-          );
-        }
-      }
-    );
-  } catch (error) {
-    if (error.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({
-        success: false,
-        message: "Finance company name already exists",
-      });
-    }
-
-    return res.status(500).json({
-      success: false,
-      message: "Error adding finance company",
-      error: error.message,
-    });
-  }
-};
-
-
-// const createOwnerPayments = (req, res) => {
-//   try {
-//     const {
-//       op_sale_id,
-//       op_owner_id,
-//       op_org_id,
-//       op_amount,
-//       op_paid_date,
-//       op_reference_no,
-//       op_payment_method,
-//       op_remark,
-//       op_remaining_amount
-//     } = req.body;
-
-//     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-//     // Insert payment record
-//     const insertQuery = `
-//       INSERT INTO owner_payments (
-//         op_sale_id,
-//         op_owner_id,
-//         op_org_id,
-//         op_amount,
-//         op_paid_date,
-//         op_reference_no,
-//         op_payment_method,
-//         op_remark,
-//         op_remaining_amount,
-//         op_created_at
-//       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
-//     `;
-
-//     const insertParams = [
-//       op_sale_id,
-//       op_owner_id,
-//       op_org_id,
-//       op_amount,
-//       op_paid_date,
-//       op_reference_no,
-//       op_payment_method,
-//       op_remark,
-//       op_remaining_amount,
-//       dateTime,
-//     ];
-
-//     db.query(insertQuery, insertParams, (err, result) => {
-//       if (err) {
-//         return res.status(400).json({ success: false, message: err.message });
-//       }
-
-//       // Update remaining_amount in employee_sold_units table
-//       const updateQuery = `
-//         UPDATE employee_sold_units 
-//         SET remaining_amount = remaining_amount - ?,
-//             esu_updated_at = ?
-//         WHERE esu_id = ?
-//       `;
-
-//       const updateParams = [op_amount, dateTime, op_sale_id];
-
-//       db.query(updateQuery, updateParams, (updateErr, updateResult) => {
-//         if (updateErr) {
-//           return res
-//             .status(400)
-//             .json({ success: false, message: updateErr.message });
-//         }
-
-//         return res.status(200).json({
-//           success: true,
-//           message: "Owner payment details added and remaining amount updated successfully",
-//         });
-//       });
-//     });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-const createOwnerPayments = (req, res) => {
-  try {
-    const {
-      op_sale_id,
-      op_owner_id,
-      op_org_id,
-      op_amount,
-      op_paid_date,
-      op_reference_no,
-      op_payment_method,
-      op_remark,
-      op_remaining_amount
-    } = req.body;
-
-    const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-    // Insert payment record
-    const insertQuery = `
-      INSERT INTO owner_payments (
-        op_sale_id,
-        op_owner_id,
-        op_org_id,
-        op_amount,
-        op_paid_date,
-        op_reference_no,
-        op_payment_method,
-        op_remark,
-        op_remaining_amount,
-        op_created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const insertParams = [
-      op_sale_id,
-      op_owner_id,
-      op_org_id,
-      op_amount,
-      op_paid_date,
-      op_reference_no,
-      op_payment_method,
-      op_remark,
-      op_remaining_amount,
-      dateTime,
-    ];
-
-    db.query(insertQuery, insertParams, (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-
-      return res.status(200).json({
-        success: true,
-        message: "Owner payment details added successfully",
-      });
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-
-const getOwnerPaymentsByMultiIds = (req, res) => {
-  try {
-    const { saleId, ownerId, orgId } = req.params;
-    const selectQuery = `select * from owner_payments join employee_sold_units on employee_sold_units.esu_id = owner_payments.op_sale_id join owner on owner.owner_id = owner_payments.op_owner_id join company_profile on company_profile.org_id = owner_payments.op_org_id where owner_payments.op_sale_id = ? and owner_payments.op_owner_id = ? and owner_payments.op_org_id = ?`;
-    db.query(selectQuery, [saleId, ownerId, orgId], (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-      return res.status(200).send(result);
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-
-const createOwnerLoan = (req, res) => {
-  try {
-    const {
-      loan_org_id,
-      loan_owner_id,
-      loan_sale_id,
-      loan_finance_company_id,
-      loan_principal,
-      loan_down_payment,
-      loan_interest_rate,
-      loan_tenure_months,
-      loan_emi_amount,
-      loan_start_date,
-      loan_status,
-      loan_ref,
-    } = req.body;
-
-    const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-    // Validate required fields
-    if (
-      !loan_org_id ||
-      !loan_sale_id ||
-      !loan_principal ||
-      !loan_interest_rate ||
-      !loan_tenure_months ||
-      !loan_start_date ||
-      !loan_emi_amount
-    ) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    const insertLoanQuery = `
-      INSERT INTO owner_loans 
-      (loan_org_id, loan_owner_id, loan_sale_id, loan_finance_company_id, loan_principal, loan_down_payment, loan_interest_rate, loan_tenure_months, loan_emi_amount, loan_start_date, loan_status, loan_ref, loan_created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const insertParams = [
-      loan_org_id,
-      loan_owner_id,
-      loan_sale_id,
-      loan_finance_company_id,
-      loan_principal,
-      loan_down_payment,
-      loan_interest_rate,
-      loan_tenure_months,
-      loan_emi_amount,
-      loan_start_date,
-      loan_status || "active",
-      loan_ref,
-      dateTime,
-    ];
-
-    // Insert main loan record
-    db.query(insertLoanQuery, insertParams, (err, loanResult) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-
-      const loanId = loanResult.insertId;
-      const months = parseInt(loan_tenure_months);
-      const emiAmount = parseFloat(loan_emi_amount);
-
-      // Generate EMI schedule only
-      let installments = [];
-
-      for (let i = 1; i <= months; i++) {
-        const dueDate = moment(loan_start_date)
-          .add(i - 1, "months")
-          .format("YYYY-MM-DD");
-
-        installments.push([
-          loan_org_id,
-          loanId,
-          i,
-          dueDate,
-          0,
-          0,
-          emiAmount,
-          0,
-          null,
-          "pending",
-          dateTime,
-          null,
-        ]);
-      }
-
-      const insertInstallmentsQuery = `
-        INSERT INTO loan_installments 
-        (inst_org_id, inst_loan_id, installment_number, inst_due_date, principal_component, interest_component, inst_amount, inst_paid_amount, inst_paid_on, inst_paid_status, inst_created_at, inst_updated_at)
-        VALUES ?
-      `;
-
-      // Insert schedule
-      db.query(insertInstallmentsQuery, [installments], (err2) => {
-        if (err2) {
-          return res.status(400).json({
-            success: false,
-            message:
-              "Loan created but installment schedule failed: " + err2.message,
-          });
-        }
-
-        return res.status(200).json({
-          success: true,
-          message: "Owner loan created successfully with provided EMI schedule",
-          data: {
-            loanId,
-            totalInstallments: months,
-            emiAmount: emiAmount.toFixed(2),
-          },
-        });
-      });
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-
-const getFinanceCompanyByOrg = (req, res) => {
-  try {
-    const orgId = req.params.orgId;
-    const selectQuery = `select * from finance_companies where fc_org_id = ?`;
-    db.query(selectQuery, orgId, (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-      return res.status(200).send(result);
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const deleteFinanceCompany = (req, res) => {
-  try {
-    const fcId = req.params.fcId;
-    const checkQuery = `select * from finance_companies where finance_company_id = ?`;
-    db.query(checkQuery, fcId, (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-
-      if (result && result.length > 0) {
-        const deleteQuery = `delete from finance_companies where finance_company_id = ?`;
-        db.query(deleteQuery, fcId, (deleteErr, deleteResult) => {
-          if (deleteErr) {
-            return res
-              .status(400)
-              .json({ success: false, message: deleteErr.message });
-          }
-          return res.status(200).json({
-            success: true,
-            message: "finance company data deleted successfully",
-          });
-        });
-      } else {
-        return res
-          .status(400)
-          .json({ success: false, message: "invalid finance company ID" });
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const updateFinanceCompany = (req, res) => {
-  try {
-    const { fcId } = req.params;
-    const { fc_name, fc_contact_person, fc_contact_phone, interest_rate } =
-      req.body;
-
-    if (!fcId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Finance Company ID is required" });
-    }
-
-    const checkQuery = `select * from finance_companies where finance_company_id = ?`;
-    db.query(checkQuery, fcId, (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-
-      if (result && result.length === 0) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Finance company ID not found" });
-      }
-
-      const fields = [];
-      const values = [];
-
-      if (fc_name) {
-        fields.push("fc_name = ?");
-        values.push(fc_name);
-      }
-      if (fc_contact_person) {
-        fields.push("fc_contact_person = ?");
-        values.push(fc_contact_person);
-      }
-      if (fc_contact_phone) {
-        fields.push("fc_contact_phone = ?");
-        values.push(fc_contact_phone);
-      }
-      if (interest_rate !== undefined) {
-        fields.push("interest_rate = ?");
-        values.push(interest_rate);
-      }
-
-      if (fields.length === 0) {
-        return res
-          .status(400)
-          .json({ success: false, message: "No fields provided to updated" });
-      }
-
-      const dateTime = moment()
-        .tz("Asia/Kolkata")
-        .format("YYYY-MM-DD HH:mm:ss");
-
-      fields.push("fc_updated_at = ?");
-      values.push(dateTime);
-
-      values.push(fcId);
-
-      const updateQuery = `update finance_companies set ${fields.join(
-        ", "
-      )} where finance_company_id = ?`;
-
-      db.query(updateQuery, values, (updateErr, updateResult) => {
-        if (updateErr) {
-          if (updateErr.code === "ER_DUP_ENTRY") {
-            return res.status(400).json({
-              success: false,
-              message: "finance company name already exists",
-            });
-          }
-          return req
-            .status(400)
-            .json({ success: false, message: updateErr.message });
-        }
-
-        return res.status(200).json({
-          success: true,
-          message: "Finance company details updated successfully",
-        });
-      });
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const getLoanEmiDetailsByLoanID = (req, res) => {
-  try {
-    const { ownId, orgId, saleId } = req.params;
-    const selectQuery = `select * from owner_loans join loan_installments on loan_installments.inst_loan_id = owner_loans.own_loan_id join finance_companies on finance_companies.finance_company_id = owner_loans.loan_finance_company_id where owner_loans.loan_owner_id = ? and owner_loans.loan_org_id = ? and owner_loans.loan_sale_id = ?`;
-    db.query(selectQuery, [ownId, orgId, saleId], (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-      return res.status(200).send(result);
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const updateInstallments = (req, res) => {
-  try {
-    const { instId } = req.params;
-    const { inst_paid_amount, inst_paid_on, inst_paid_status } = req.body;
-
-    if (!instId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Installment ID is requirement" });
-    }
-
-    const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-    const updateQuery = `update loan_installments set inst_paid_amount = ?, inst_paid_on = ?, inst_paid_status = ?, inst_updated_at = ? where installment_id  = ?`;
-
-    const insertParams = [
-      inst_paid_amount,
-      inst_paid_on,
-      inst_paid_status,
-      dateTime,
-      instId,
-    ];
-
-    db.query(updateQuery, insertParams, (err, result) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-
-      if (result.affectedRows === 0) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Installment not found" });
-      }
-
-      return res
-        .status(200)
-        .json({ success: true, message: "Installment updated successfully" });
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const updateEmployeeUnitSoldUpdate = (req, res) => {
-  try {
-    const esu_id = req.params.esu_id;
-    const {
-      esu_lead_id,
-      esu_staff_id,
-      esu_unit_id,
-      esu_project_id,
-      esu_owner_id,
-      esu_sold_date,
-      esu_notes,
-      esu_sale_price,
-      esu_token_amount,
-      esu_token_paid_status,
-      esu_booking_date,
-      esu_final_date,
-      registry_name,
-      registry_date,
-      esu_payment_method,
-      remaining_amount,
-    } = req.body;
-
-    if (!esu_id) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required parameter: esu_id",
-      });
-    }
-
-    const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-    const fieldsToUpdate = [];
-    const values = [];
-
-    if (esu_lead_id !== undefined) {
-      fieldsToUpdate.push("esu_lead_id = ?");
-      values.push(esu_lead_id);
-    }
-    if (esu_staff_id !== undefined) {
-      fieldsToUpdate.push("esu_staff_id = ?");
-      values.push(esu_staff_id);
-    }
-    if (esu_unit_id !== undefined) {
-      fieldsToUpdate.push("esu_unit_id = ?");
-      values.push(esu_unit_id);
-    }
-    if (esu_project_id !== undefined) {
-      fieldsToUpdate.push("esu_project_id = ?");
-      values.push(esu_project_id);
-    }
-    if (esu_owner_id !== undefined) {
-      fieldsToUpdate.push("esu_owner_id = ?");
-      values.push(esu_owner_id);
-    }
-    if (esu_sold_date !== undefined) {
-      fieldsToUpdate.push("esu_sold_date = ?");
-      values.push(esu_sold_date);
-    }
-    if (esu_notes !== undefined) {
-      fieldsToUpdate.push("esu_notes = ?");
-      values.push(esu_notes);
-    }
-    if (esu_sale_price !== undefined) {
-      fieldsToUpdate.push("esu_sale_price = ?");
-      values.push(esu_sale_price);
-    }
-    if (esu_token_amount !== undefined) {
-      fieldsToUpdate.push("esu_token_amount = ?");
-      values.push(esu_token_amount);
-    }
-    if (esu_token_paid_status !== undefined) {
-      fieldsToUpdate.push("esu_token_paid_status = ?");
-      values.push(esu_token_paid_status);
-    }
-    if (esu_booking_date !== undefined) {
-      fieldsToUpdate.push("esu_booking_date = ?");
-      values.push(esu_booking_date);
-    }
-    if (esu_final_date !== undefined) {
-      fieldsToUpdate.push("esu_final_date = ?");
-      values.push(esu_final_date);
-    }
-    if (registry_name !== undefined) {
-      fieldsToUpdate.push("registry_name = ?");
-      values.push(registry_name);
-    }
-    if (registry_date !== undefined) {
-      fieldsToUpdate.push("registry_date = ?");
-      values.push(registry_date);
-    }
-    if (esu_payment_method !== undefined) {
-      fieldsToUpdate.push("esu_payment_method = ?");
-      values.push(esu_payment_method);
-    }
-    if (remaining_amount !== undefined) {
-      fieldsToUpdate.push("remaining_amount = ?");
-      values.push(remaining_amount);
-    }
-
-    fieldsToUpdate.push("esu_updated_at = ?");
-    values.push(dateTime);
-
-    if (fieldsToUpdate.length === 1) {
-      return res.status(400).json({
-        success: false,
-        message: "No fields provided for update",
-      });
-    }
-
-    const updateSql = `
-      UPDATE employee_sold_units 
-      SET ${fieldsToUpdate.join(", ")} 
-      WHERE esu_id = ?
-    `;
-    values.push(esu_id);
-
-    db.query(updateSql, values, (err, result) => {
-      if (err) {
-        return res.status(400).json({
-          success: false,
-          message: err.message,
-        });
-      }
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "No record found with the given esu_id",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Employee sold unit updated successfully",
-      });
-    });
-  } catch (error) {
-    console.error("updateEmployeeUnitSold Error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
 
 
@@ -1139,9 +433,26 @@ const updateEmployeeUnitSoldUpdate = (req, res) => {
 //   }
 // };
 
-const bulkUploadLeads = (req, res) => {
+const bulkUploadLeads = async (req, res) => {
+  let filePath = null;
   try {
-    const { lead_org_id, assignedTo, main_project_id, unit_id } = req.body;
+    const { lead_org_id, assignedTo, assigneeIds, staffIds, shareWith, main_project_id, unit_id } = req.body;
+
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
+
+    if (!currentUser || !["superadmin", "admin", "employee"].includes(currentRole)) {
+      if (req.file?.path) fs.unlinkSync(req.file.path);
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Valid user role required.",
+      });
+    }
+
+    let effectiveOrgId = currentUser.staff_org_id;
+    if (currentRole === "superadmin") {
+      effectiveOrgId = lead_org_id || currentUser.staff_org_id;
+    }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
 
@@ -1152,45 +463,112 @@ const bulkUploadLeads = (req, res) => {
       });
     }
 
-    if (!lead_org_id) {
+    filePath = req.file.path;
+
+    if (!effectiveOrgId) {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       return res.status(400).json({
         success: false,
         message: "lead_org_id is required",
       });
     }
 
-    const filePath = req.file.path;
+    // 1. Process assignees / share-with staff IDs
+    let targetStaffIds = [];
+    const rawAssignees = assignedTo || assigneeIds || staffIds || shareWith;
+    if (Array.isArray(rawAssignees)) {
+      targetStaffIds = rawAssignees.map((id) => Number(id)).filter(Boolean);
+    } else if (typeof rawAssignees === "string") {
+      try {
+        const parsed = JSON.parse(rawAssignees);
+        if (Array.isArray(parsed)) {
+          targetStaffIds = parsed.map((id) => Number(id)).filter(Boolean);
+        } else if (rawAssignees.trim()) {
+          targetStaffIds = rawAssignees
+            .split(",")
+            .map((id) => Number(id.trim()))
+            .filter(Boolean);
+        }
+      } catch (e) {
+        if (rawAssignees.trim()) {
+          targetStaffIds = rawAssignees
+            .split(",")
+            .map((id) => Number(id.trim()))
+            .filter(Boolean);
+        }
+      }
+    } else if (typeof rawAssignees === "number") {
+      targetStaffIds = [rawAssignees];
+    }
 
+    // Validate that assignee staff belong to effectiveOrgId
+    let validAssigneeIds = [];
+    if (targetStaffIds.length > 0) {
+      const staffRows = await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT staff_id FROM company_staff WHERE staff_org_id = ? AND staff_id IN (?)",
+          [effectiveOrgId, targetStaffIds],
+          (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+          }
+        );
+      });
+      validAssigneeIds = staffRows.map((r) => r.staff_id);
+    }
+
+    // Determine access_type and sanitize assignee list:
+    // If employee: access_type = 'shared', exclude self (do NOT create self entry in lead_assignees)
+    // If admin/superadmin: access_type = 'assigned'
+    let accessType = "assigned";
+    if (currentRole === "employee") {
+      accessType = "shared";
+      validAssigneeIds = validAssigneeIds.filter(
+        (id) => Number(id) !== Number(currentUser.staff_id)
+      );
+    }
+
+    // First assignee for legacy compat (leads.assignedTo)
+    const firstAssignee = validAssigneeIds.length > 0 ? validAssigneeIds[0] : null;
+
+    // 2. Read excel file
     const workbook = xlsx.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
     const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
     if (!sheetData.length) {
-      fs.unlinkSync(filePath);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       return res.status(400).json({
         success: false,
         message: "Excel file is empty",
       });
     }
 
-    const values = sheetData.map((row) => [
-      lead_org_id,
-      assignedTo || null,
-      row.name || null,
-      row.phone || null,
-      row.lead_email || null,
-      row.leadSource || null,
-      main_project_id || null,
-      row.unit_type || null,
-      unit_id || null,
-      row.address || null,
-      dateTime,
-      row.actual_date || null,
-    ]);
+    // 3. Pre-fetch existing normalized phones for effectiveOrgId
+    const existingRows = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT phone FROM leads WHERE lead_org_id = ?",
+        [effectiveOrgId],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
+        }
+      );
+    });
+    const existingPhoneSet = new Set(
+      existingRows.map((r) => normalizePhone(r.phone)).filter(Boolean)
+    );
+    const batchSeenPhones = new Set();
 
-    const sql = `
+    let inserted = 0;
+    let skipped = 0;
+    const skipped_phones = [];
+
+    const insertSql = `
       INSERT INTO leads (
         lead_org_id,
+        created_by,
+        created_by_role,
         assignedTo,
         name,
         phone,
@@ -1202,60 +580,308 @@ const bulkUploadLeads = (req, res) => {
         address,
         createdTime,
         actual_date
-      ) VALUES ?
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [values], (err, result) => {
-      fs.unlinkSync(filePath);
+    for (const row of sheetData) {
+      const rawPhone =
+        row.phone ||
+        row.Phone ||
+        row.mobile ||
+        row["Mobile Number"] ||
+        row["Phone Number"] ||
+        "";
+      const normPhone = normalizePhone(rawPhone);
 
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          message: err.message,
-        });
+      // Rule: empty or invalid phone is skipped
+      if (!normPhone || normPhone.length < 10) {
+        skipped++;
+        skipped_phones.push(rawPhone ? String(rawPhone) : "EMPTY");
+        continue;
       }
 
-      res.status(201).json({
-        success: true,
-        message: `${result.affectedRows} leads added successfully.`,
-      });
+      // Rule: duplicate phone within org or duplicate inside this file is skipped
+      if (existingPhoneSet.has(normPhone) || batchSeenPhones.has(normPhone)) {
+        skipped++;
+        skipped_phones.push(normPhone);
+        continue;
+      }
+
+      batchSeenPhones.add(normPhone);
+
+      const leadValues = [
+        effectiveOrgId,
+        currentUser.staff_id,
+        currentUser.staff_role,
+        firstAssignee,
+        row.name || row.Name || row.customer_name || null,
+        normPhone,
+        row.lead_email || row.email || row.Email || null,
+        row.leadSource || row["Lead Source"] || "others",
+        main_project_id || null,
+        row.unit_type || row["Unit Type"] || null,
+        unit_id || null,
+        row.address || row.Address || null,
+        dateTime,
+        row.actual_date || row["Actual Date"] || null,
+      ];
+
+      try {
+        const insertRes = await new Promise((resolve, reject) => {
+          db.query(insertSql, leadValues, (err, res) => {
+            if (err) return reject(err);
+            resolve(res);
+          });
+        });
+
+        const newLeadId = insertRes.insertId;
+        inserted++;
+        existingPhoneSet.add(normPhone);
+
+        // Insert into lead_assignees if assignees were provided
+        if (validAssigneeIds.length > 0 && newLeadId) {
+          const laValues = validAssigneeIds.map((sid) => [
+            newLeadId,
+            sid,
+            accessType,
+            currentUser.staff_id,
+            dateTime,
+          ]);
+          await new Promise((resolve) => {
+            db.query(
+              "INSERT IGNORE INTO lead_assignees (lead_id, staff_id, access_type, granted_by, created_at) VALUES ?",
+              [laValues],
+              () => resolve()
+            );
+          });
+        }
+      } catch (rowErr) {
+        // Catch duplicate entry (e.g. from unique constraint) or DB error
+        if (rowErr.code === "ER_DUP_ENTRY" || rowErr.errno === 1062) {
+          skipped++;
+          skipped_phones.push(normPhone);
+        } else {
+          console.error("Bulk upload row error:", rowErr.message);
+          skipped++;
+          skipped_phones.push(normPhone);
+        }
+      }
+    }
+
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+    return res.status(201).json({
+      success: true,
+      message: `${inserted} leads added, ${skipped} skipped.`,
+      inserted,
+      skipped,
+      skipped_phones,
     });
   } catch (error) {
-    if (req.file?.path) fs.unlinkSync(req.file.path);
-
-    res.status(500).json({
+    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    console.error("Error in bulkUploadLeads:", error);
+    return res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message: error.message || "Something went wrong",
     });
   }
 };
 
 
 
+const notifyNewlyAssignedStaff = async (staffIds, leadName = "Lead") => {
+  if (!staffIds || staffIds.length === 0) return;
+  try {
+    const staffRows = await new Promise((resolve) => {
+      db.query(
+        "SELECT staff_id, staff_name, staff_email, staff_phone FROM company_staff WHERE staff_id IN (?)",
+        [staffIds],
+        (err, rows) => resolve(rows || [])
+      );
+    });
+
+    for (const staff of staffRows) {
+      if (staff.staff_email) {
+        const subject = "CRMGuru - New Lead Assigned";
+        const text = `Dear ${staff.staff_name},\nA new lead (${leadName}) has been assigned to you in CRMGuru.\nPlease log in to your dashboard to view details.\nBest regards,\nCRMGuru Team`;
+        const html = `
+          <p>Dear <strong>${staff.staff_name}</strong>,</p>
+          <p>A new lead (<strong>${leadName}</strong>) has been <strong>assigned to you</strong> in <b>CRMGuru</b>.</p>
+          <p>Please log in to your dashboard to check the details.</p>
+          <br/>
+          <p>Best regards,<br/>CRMGuru Team</p>
+        `;
+        sendEmail(staff.staff_email, subject, text, html).catch((err) =>
+          console.error("Assignment email error:", err.message)
+        );
+      }
+
+      if (staff.staff_phone && typeof sendWhatsAppLeadAssignedAlert === "function") {
+        sendWhatsAppLeadAssignedAlert(staff.staff_phone, staff.staff_name).catch((err) =>
+          console.error("WhatsApp alert error:", err.message)
+        );
+      }
+    }
+  } catch (err) {
+    console.error("Error notifying assigned staff:", err.message);
+  }
+};
+
 const updateLeadAssignment = async (req, res) => {
   try {
     const { leadId } = req.params;
-    const { assignedTo, main_project_id, unit_id } = req.body;
+    const { assignedTo, staffIds, assigneeIds, main_project_id, unit_id } = req.body;
 
-    if (!leadId) {
-      return res.status(400).json({ message: "leadId is required" });
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
+
+    // 1. Role check: Admin / SuperAdmin only
+    if (!currentUser || (currentRole !== "admin" && currentRole !== "superadmin")) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only Admin and SuperAdmin can assign leads.",
+      });
     }
 
-    if (!assignedTo && !main_project_id && !unit_id) {
+    if (!leadId) {
+      return res.status(400).json({ success: false, message: "leadId is required" });
+    }
+
+    // 2. Fetch lead
+    const leadRows = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT lead_id, lead_org_id, name, assignedTo FROM leads WHERE lead_id = ?",
+        [leadId],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
+        }
+      );
+    });
+
+    if (!leadRows.length) {
+      return res.status(404).json({ success: false, message: "Lead not found" });
+    }
+    const lead = leadRows[0];
+
+    // Admin can only assign leads belonging to their own organization
+    if (currentRole === "admin" && lead.lead_org_id !== currentUser.staff_org_id) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You can only assign leads within your organization.",
+      });
+    }
+
+    // 3. Process staffIds array (accepts staffIds, assigneeIds, or legacy assignedTo)
+    let targetStaffIds = [];
+    const rawStaff = staffIds || assigneeIds || assignedTo;
+    if (Array.isArray(rawStaff)) {
+      targetStaffIds = rawStaff.map(Number).filter(Boolean);
+    } else if (typeof rawStaff === "string") {
+      try {
+        const parsed = JSON.parse(rawStaff);
+        if (Array.isArray(parsed)) targetStaffIds = parsed.map(Number).filter(Boolean);
+        else if (rawStaff.trim())
+          targetStaffIds = rawStaff
+            .split(",")
+            .map((id) => Number(id.trim()))
+            .filter(Boolean);
+      } catch (e) {
+        if (rawStaff.trim())
+          targetStaffIds = rawStaff
+            .split(",")
+            .map((id) => Number(id.trim()))
+            .filter(Boolean);
+      }
+    } else if (typeof rawStaff === "number") {
+      targetStaffIds = [rawStaff];
+    }
+
+    if (targetStaffIds.length === 0 && !main_project_id && !unit_id) {
       return res.status(400).json({
+        success: false,
         message:
-          "At least one field (assignedTo, main_project_id, unit_id) is required",
+          "At least one field (staffIds / assignedTo, main_project_id, unit_id) is required",
       });
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
 
+    // 4. Validate all target staff belong to the lead's organization
+    let newlyAssignedStaffIds = [];
+    let firstAssignee = null;
+
+    if (targetStaffIds.length > 0) {
+      const staffRows = await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT staff_id FROM company_staff WHERE staff_org_id = ? AND staff_id IN (?)",
+          [lead.lead_org_id, targetStaffIds],
+          (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+          }
+        );
+      });
+      const validStaffIdSet = new Set(staffRows.map((r) => r.staff_id));
+
+      for (const sid of targetStaffIds) {
+        if (!validStaffIdSet.has(sid)) {
+          return res.status(403).json({
+            success: false,
+            message: `Access denied. Staff ID ${sid} does not belong to the lead's organization.`,
+          });
+        }
+      }
+
+      // 5. Check existing assignments for this lead to send notifications ONLY to new ones
+      const existingAssigneeRows = await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT staff_id FROM lead_assignees WHERE lead_id = ?",
+          [leadId],
+          (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+          }
+        );
+      });
+      const existingStaffSet = new Set(existingAssigneeRows.map((r) => r.staff_id));
+      newlyAssignedStaffIds = targetStaffIds.filter((id) => !existingStaffSet.has(id));
+
+      // 6. Insert into lead_assignees (access_type='assigned', granted_by=currentUser.staff_id)
+      const laValues = targetStaffIds.map((sid) => [
+        leadId,
+        sid,
+        "assigned",
+        currentUser.staff_id,
+        dateTime,
+      ]);
+
+      await new Promise((resolve, reject) => {
+        db.query(
+          "INSERT IGNORE INTO lead_assignees (lead_id, staff_id, access_type, granted_by, created_at) VALUES ?",
+          [laValues],
+          (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+          }
+        );
+      });
+
+      firstAssignee = targetStaffIds[0];
+    }
+
+    // 7. Update leads table (sync assignedTo, assignedBy, lead_updated_at)
     const fields = [];
     const values = [];
 
-    if (assignedTo !== undefined) {
+    if (firstAssignee !== null) {
       fields.push("assignedTo = ?");
-      values.push(assignedTo);
+      values.push(firstAssignee);
+      fields.push("assignedBy = ?");
+      values.push(
+        currentUser.staff_name ||
+          (currentRole === "superadmin" ? "SuperAdmin" : "Admin")
+      );
     }
     if (main_project_id !== undefined) {
       fields.push("main_project_id = ?");
@@ -1272,139 +898,326 @@ const updateLeadAssignment = async (req, res) => {
     values.push(leadId);
 
     const sql = `UPDATE leads SET ${fields.join(", ")} WHERE lead_id = ?`;
-
     await new Promise((resolve, reject) => {
       db.query(sql, values, (err, result) => {
-        if (err) reject(err);
-        else resolve(result);
+        if (err) return reject(err);
+        resolve(result);
       });
     });
 
-    if (assignedTo) {
-      const staffQuery = `
-        SELECT staff_name, staff_email 
-        FROM company_staff 
-        WHERE staff_id = ?`;
-
-      db.query(staffQuery, [assignedTo], async (err, staffResult) => {
-        if (err) {
-          console.error("Error fetching staff details:", err.message);
-        } else if (staffResult.length > 0) {
-          const staff = staffResult[0];
-
-          const subject = "CRMGuru - New Lead Assigned";
-          const text = `Dear ${staff.staff_name}, 
-A new lead has been assigned to you in CRMGuru.
-Please log in to your dashboard to view details.
-Best regards,
-CRMGuru Team`;
-
-          const html = `
-            <p>Dear <strong>${staff.staff_name}</strong>,</p>
-            <p>A new lead has been <strong>assigned to you</strong> in <b>CRMGuru</b>.</p>
-            <p>Please log in to your dashboard to check the details.</p>
-            <br/>
-            <p>Best regards,<br/>CRMGuru Team</p>
-          `;
-
-          try {
-            await sendEmail(staff.staff_email, subject, text, html);
-            console.log("Assignment email sent to:", staff.staff_email);
-          } catch (emailErr) {
-            console.error("Email sending failed:", emailErr.message);
-          }
-        }
-      });
+    // 8. Notification: ONLY to newly inserted assignees
+    if (newlyAssignedStaffIds.length > 0) {
+      notifyNewlyAssignedStaff(newlyAssignedStaffIds, lead.name || "Lead");
     }
 
-    res.status(200).json({ message: "Lead assignment updated successfully" });
+    return res.status(200).json({
+      success: true,
+      message: "Lead assignment updated successfully",
+      newlyAssignedCount: newlyAssignedStaffIds.length,
+      totalAssignees: targetStaffIds.length,
+    });
   } catch (error) {
     console.error("Error updating lead assignment:", error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-
-const addUnitsBulk = async (req, res) => {
+const bulkAssignLeads = async (req, res) => {
   try {
-    const { unit_org_id, unit_project_id } = req.body;
+    const { leadIds, staffIds } = req.body;
 
-    // Validate org and project IDs
-    if (!unit_org_id || !unit_project_id) {
-      return res.status(400).json({
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
+
+    // 1. Role check: Admin / SuperAdmin only
+    if (!currentUser || (currentRole !== "admin" && currentRole !== "superadmin")) {
+      return res.status(403).json({
         success: false,
-        message: "unit_org_id and unit_project_id are required",
+        message: "Access denied. Only Admin and SuperAdmin can bulk assign leads.",
       });
     }
 
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No Excel file uploaded" });
+    if (
+      !Array.isArray(leadIds) ||
+      leadIds.length === 0 ||
+      !Array.isArray(staffIds) ||
+      staffIds.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "leadIds and staffIds must be non-empty arrays",
+      });
     }
 
-    // Read Excel
-    const workbook = xlsx.readFile(req.file.path);
-    const sheetName = workbook.SheetNames[0];
-    const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    const cleanLeadIds = leadIds.map(Number).filter(Boolean);
+    const cleanStaffIds = staffIds.map(Number).filter(Boolean);
 
-    if (!sheetData.length) {
+    if (cleanLeadIds.length === 0 || cleanStaffIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid leadIds and staffIds are required",
+      });
+    }
+
+    if (cleanLeadIds.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum 500 leads can be assigned in a single bulk operation.",
+      });
+    }
+
+    if (cleanStaffIds.length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum 50 assignees can be selected at a time.",
+      });
+    }
+
+    // 2. Org check for Admin
+    if (currentRole === "admin") {
+      const leadOrgRows = await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT lead_id FROM leads WHERE lead_id IN (?) AND lead_org_id = ?",
+          [cleanLeadIds, currentUser.staff_org_id],
+          (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+          }
+        );
+      });
+      if (leadOrgRows.length !== cleanLeadIds.length) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Access denied. One or more leads do not belong to your organization.",
+        });
+      }
+
+      const staffOrgRows = await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT staff_id FROM company_staff WHERE staff_id IN (?) AND staff_org_id = ?",
+          [cleanStaffIds, currentUser.staff_org_id],
+          (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+          }
+        );
+      });
+      if (staffOrgRows.length !== cleanStaffIds.length) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Access denied. One or more employees do not belong to your organization.",
+        });
+      }
+    }
+
+    const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
+    const assignedByName =
+      currentUser.staff_name ||
+      (currentRole === "superadmin" ? "SuperAdmin" : "Admin");
+    const firstStaffId = cleanStaffIds[0];
+
+    // 3. Execute in Transaction
+    const connection = await new Promise((resolve, reject) => {
+      db.getConnection((err, conn) => {
+        if (err) return reject(err);
+        resolve(conn);
+      });
+    });
+
+    const connQuery = (sql, params) => {
+      return new Promise((resolve, reject) => {
+        connection.query(sql, params, (err, res) => {
+          if (err) return reject(err);
+          resolve(res);
+        });
+      });
+    };
+
+    let assignedCount = 0;
+    let skippedCount = 0;
+    const newlyAssignedStaffSet = new Set();
+
+    try {
+      await connQuery("START TRANSACTION");
+
+      // Check existing pairs
+      const existingPairs = await connQuery(
+        "SELECT lead_id, staff_id FROM lead_assignees WHERE lead_id IN (?) AND staff_id IN (?)",
+        [cleanLeadIds, cleanStaffIds]
+      );
+      const pairSet = new Set(
+        existingPairs.map((r) => `${r.lead_id}_${r.staff_id}`)
+      );
+
+      const toInsert = [];
+      for (const lId of cleanLeadIds) {
+        for (const sId of cleanStaffIds) {
+          const key = `${lId}_${sId}`;
+          if (pairSet.has(key)) {
+            skippedCount++;
+          } else {
+            toInsert.push([
+              lId,
+              sId,
+              "assigned",
+              currentUser.staff_id,
+              dateTime,
+            ]);
+            pairSet.add(key);
+            assignedCount++;
+            newlyAssignedStaffSet.add(sId);
+          }
+        }
+      }
+
+      if (toInsert.length > 0) {
+        await connQuery(
+          "INSERT IGNORE INTO lead_assignees (lead_id, staff_id, access_type, granted_by, created_at) VALUES ?",
+          [toInsert]
+        );
+      }
+
+      // Re-sync leads.assignedTo if NULL, and update assignedBy
+      await connQuery(
+        `UPDATE leads 
+         SET assignedTo = COALESCE(assignedTo, ?),
+             assignedBy = ?,
+             lead_updated_at = ?
+         WHERE lead_id IN (?)`,
+        [firstStaffId, assignedByName, dateTime, cleanLeadIds]
+      );
+
+      await connQuery("COMMIT");
+      connection.release();
+
+      // 4. Notifications to newly assigned staff
+      if (newlyAssignedStaffSet.size > 0) {
+        notifyNewlyAssignedStaff(
+          Array.from(newlyAssignedStaffSet),
+          `${cleanLeadIds.length} Leads`
+        );
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Successfully assigned ${assignedCount} lead-assignee pairs. ${skippedCount} were already assigned.`,
+        assignedCount,
+        skippedCount,
+      });
+    } catch (txErr) {
+      await connQuery("ROLLBACK");
+      connection.release();
+      throw txErr;
+    }
+  } catch (error) {
+    console.error("Error in bulkAssignLeads:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const removeLeadAssignee = async (req, res) => {
+  try {
+    const { leadId, staffId } = req.params;
+
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
+
+    // 1. Role check: Admin / SuperAdmin only
+    if (!currentUser || (currentRole !== "admin" && currentRole !== "superadmin")) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only Admin and SuperAdmin can remove assignees.",
+      });
+    }
+
+    if (!leadId || !staffId) {
       return res
         .status(400)
-        .json({ success: false, message: "Excel file is empty" });
+        .json({ success: false, message: "leadId and staffId are required" });
+    }
+
+    // 2. Lead existence and org check
+    const leadRows = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT lead_id, lead_org_id, assignedTo FROM leads WHERE lead_id = ?",
+        [leadId],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
+        }
+      );
+    });
+
+    if (!leadRows.length) {
+      return res.status(404).json({ success: false, message: "Lead not found" });
+    }
+    const lead = leadRows[0];
+
+    if (currentRole === "admin" && lead.lead_org_id !== currentUser.staff_org_id) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Access denied. You can only manage leads within your organization.",
+      });
+    }
+
+    // 3. Delete from lead_assignees (only assigned access type)
+    const deleteRes = await new Promise((resolve, reject) => {
+      db.query(
+        "DELETE FROM lead_assignees WHERE lead_id = ? AND staff_id = ? AND access_type = 'assigned'",
+        [leadId, staffId],
+        (err, res) => {
+          if (err) return reject(err);
+          resolve(res);
+        }
+      );
+    });
+
+    if (deleteRes.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Assigned entry not found for this lead and employee",
+      });
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
 
-    // Prepare data
-    const unitsData = sheetData
-      .map((row, index) => {
-        if (!row.unit_number || !row.unit_area || !row.unit_type) {
-          console.warn(`Row ${index + 2} skipped — missing required fields`);
-          return null;
+    // 4. Re-sync leads.assignedTo: pick next remaining assigned assignee or NULL
+    const remainingAssignees = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT staff_id FROM lead_assignees WHERE lead_id = ? AND access_type = 'assigned' ORDER BY id ASC LIMIT 1",
+        [leadId],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
         }
+      );
+    });
 
-        return [
-          unit_org_id,
-          unit_project_id,
-          row.unit_number,
-          row.unit_area,
-          row.unit_type,
-          row.custom_unit_type || null,
-          row.base_price || null,
-          row.unit_status || "available",
-          dateTime,
-          dateTime,
-        ];
-      })
-      .filter(Boolean);
+    const nextAssignee =
+      remainingAssignees.length > 0 ? remainingAssignees[0].staff_id : null;
 
-    if (!unitsData.length) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No valid rows found in Excel file" });
-    }
+    await new Promise((resolve, reject) => {
+      db.query(
+        "UPDATE leads SET assignedTo = ?, lead_updated_at = ? WHERE lead_id = ?",
+        [nextAssignee, dateTime, leadId],
+        (err, res) => {
+          if (err) return reject(err);
+          resolve(res);
+        }
+      );
+    });
 
-    const insertQuery = `
-      INSERT INTO units 
-      (unit_org_id, unit_project_id, unit_number, unit_area, unit_type, custom_unit_type, base_price, unit_status, unit_created_at, unit_updated_at)
-      VALUES ?
-    `;
-
-    db.query(insertQuery, [unitsData], (err, result) => {
-      if (err) {
-        console.error("DB Insert Error:", err);
-        return res.status(500).json({ success: false, message: err.message });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: `${result.affectedRows} units added successfully`,
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Assignee removed successfully",
+      nextAssignee: nextAssignee,
     });
   } catch (error) {
-    console.error("Bulk Upload Error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error removing assignee:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -1413,21 +1226,11 @@ module.exports = {
   metaLeadFetchByPageId,
   getMetaLeadsByOrgId,
   updateAndAssignedMetaLeads,
-  getAllUnitsByProjectId,
   getMetaLeadsByStaffId,
   getMetaLeadsByLeadId,
   updateOnlyMetaLeadStatusEmployeeEnd,
-  createFinanceCompany,
-  createOwnerPayments,
-  getOwnerPaymentsByMultiIds,
-  createOwnerLoan,
-  getFinanceCompanyByOrg,
-  deleteFinanceCompany,
-  updateFinanceCompany,
-  getLoanEmiDetailsByLoanID,
-  updateInstallments,
-  updateEmployeeUnitSoldUpdate,
   bulkUploadLeads,
   updateLeadAssignment,
-  addUnitsBulk,
+  bulkAssignLeads,
+  removeLeadAssignee,
 };

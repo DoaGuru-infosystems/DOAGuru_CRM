@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import AdminOverviewDash from "./AdminOverviewDash";
 import DealClosedGraph from "./DealClosedGraph";
-import LeadVisitChart from "./AdminComp/LeadVisitChart";
 import SuperLeadGraph from "./Super-Admin/SuperLeadGraph";
 import SuperLeadsToday from "./Super-Admin/SuperLeadsToday";
 
@@ -24,10 +23,9 @@ const AdminDashboardContent = () => {
               <div>
                 <AdminOverviewDash />
               </div>
-              <div className="grid grid-cols-1 gap-2 mt-6 sm:mx-7 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 mt-6 sm:mx-7 md:grid-cols-2">
                 {/* <LeadsGraph /> */}
                 <SuperLeadGraph />
-                <LeadVisitChart />
                 <DealClosedGraph />
               </div>
               {/* <LeadsReport /> */}

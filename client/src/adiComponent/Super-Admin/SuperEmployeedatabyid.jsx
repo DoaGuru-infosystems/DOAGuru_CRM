@@ -11,12 +11,8 @@ function SuperEmployeedatabyid() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
-  const [visit, setVisit] = useState([]);
-  const [quotationCreated, setQuotationCreated] = useState(false);
-  const [visitCreated, setVisitCreated] = useState(false);
   const [followCreated, setFollowCreated] = useState(false);
   const [remarksCreated, setRemarksCreated] = useState(false);
-  const [employeeunitsoldCreated, setemployeeunitsoldCreated] = useState(false);
 
   const superadminuser = useSelector((state) => state.auth.user);
   const token = superadminuser.token;
@@ -34,17 +30,8 @@ function SuperEmployeedatabyid() {
       );
 
       setLeads(response.data);
-      response.data.forEach((lead) => {
-        console.log("Lead Quotation Status (raw):", lead.quotation);
-      });
-
-      const hasCreatedQuotation = response.data.some(
-        (lead) =>
-          lead.quotation && lead.quotation.trim().toLowerCase() === "created"
-      );
-      setQuotationCreated(hasCreatedQuotation);
     } catch (error) {
-      console.error("Error fetching quotations:", error);
+      console.error("Error fetching leads:", error);
     }
   };
 
@@ -84,80 +71,21 @@ function SuperEmployeedatabyid() {
     }
   };
 
-  const fetchUnitSoldEmployee = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/super-admin-unit-sold-lead-id/${leads[0].lead_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setemployeeunitsoldCreated(response.data[0]);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   const handleBackClick = () => {
     navigate(-1);
   };
-  const fetchVisit = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/employe-visit-super-admin/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
 
-      setVisit(response.data);
-      const hasCreatedvisit = response.data.some(
-        (lead) =>
-          (lead.visit && lead.visit.trim().toLowerCase() === "fresh") ||
-          "repeated"
-      );
-      setVisitCreated(hasCreatedvisit);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
-  const handleViewQuotation = (lead) => {
-    const name = lead.name;
-    navigate(`/admin_view_quotations/${lead.lead_id}`);
-  };
-  const handleViewVisit = () => {
-    navigate(`/super_view_visit/${leads[0].lead_id}`);
-  };
   const handleViewFollowUp = () => {
     navigate(`/super_view_follow_up/${leads[0].lead_id}`);
   };
   const handleViewRemark = () => {
     navigate(`/super_view_remark/${leads[0].lead_id}`);
   };
-  const handleClickUnitSold = () => {
-    navigate(`/super_view_employee_unit/${leads[0].lead_id}`);
-  };
-
   useEffect(() => {
     fetchLeads();
     fetchFollowUp();
-    fetchVisit();
     fetchRemark();
   }, [id]);
-  useEffect(() => {
-    if (leads.length > 0) {
-      fetchUnitSoldEmployee();
-    }
-  }, [leads]);
-
   return (
     <>
       <MainHeader />
@@ -243,35 +171,7 @@ function SuperEmployeedatabyid() {
         </div>
         <div className="2xl:ml-44 mt-2">
           <div className="">
-            {/* Conditionally render the View Quotation button */}
             <div className="flex gap-2">
-              {/* {quotationCreated ? (
-                  <button
-                    onClick={() => handleViewQuotation(leads[0])}
-                    className="bg-blue-500 text-white px-4 py-2 mx-1 rounded"
-                  >
-                    View Quotation
-                  </button>
-                ) : (
-                  <p className="text-white bg-red-400 text-center px-4 py-2 mx-1 rounded">
-                    Quotation not yet created
-                  </p>
-                )} */}
-
-              {/* Conditionally render the View Quotation button */}
-              {visitCreated ? (
-                <button
-                  onClick={handleViewVisit}
-                  className="bg-green-500 text-white px-4 py-2  rounded"
-                >
-                  View Visit
-                </button>
-              ) : (
-                <p className="text-white bg-red-400 text-center px-4 py-2 rounded">
-                  Visit not yet created
-                </p>
-              )}
-
               {followCreated ? (
                 <button
                   onClick={handleViewFollowUp}
@@ -294,18 +194,6 @@ function SuperEmployeedatabyid() {
               ) : (
                 <p className="text-white bg-red-400 text-center px-4 py-2 rounded w-full sm:w-auto">
                   Remark not yet created
-                </p>
-              )}
-              {employeeunitsoldCreated ? (
-                <button
-                  onClick={handleClickUnitSold}
-                  className="bg-blue-500 text-white px-4 py-2 rounded w-full sm:w-auto"
-                >
-                  View Unit Sold
-                </button>
-              ) : (
-                <p className="text-white bg-red-400 text-center px-4 py-2 rounded w-full sm:w-auto ">
-                  Unit not yet sold
                 </p>
               )}
             </div>
@@ -360,8 +248,6 @@ function SuperEmployeedatabyid() {
                 <th className="px-6 py-3 border-b-2 border-gray-300">
                   Payment Mode
                 </th>
-                {/* <th className="px-6 py-3 border-b-2 border-gray-300">Quotation</th>
-      <th className="px-6 py-3 border-b-2 border-gray-300">Quotation Status</th> */}
                 <th className="px-6 py-3 border-b-2 border-gray-300">Reason</th>
                 <th className="px-6 py-3 border-b-2 border-gray-300">
                   Registry
@@ -436,8 +322,6 @@ function SuperEmployeedatabyid() {
                   <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                     {lead.payment_mode}
                   </td>
-                  {/* <td className="px-6 py-4 border-b border-gray-200 text-gray-800">{lead.quotation}</td>
-    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">{lead.quotation_status}</td> */}
                   <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                     {lead.reason}
                   </td>

@@ -18,41 +18,8 @@ const BulkLeadUploadPopup = ({
   const EmpId = useSelector((state) => state.auth.user);
   const token = EmpId?.token;
   const lead_org_id = EmpId?.staff_org_id;
-  const [projectUnit, setProjectUnit] = useState([]);
   const [main_project_id, setMainProjectId] = useState("");
-  const [unit_id, setUnitId] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
-
-  const fetchUnits = async (projectId) => {
-    if (!projectId) {
-      setProjectUnit([]);
-      return;
-    }
-
-    try {
-      const res = await axios.get(
-        `http://localhost:9000/api/super-admin-project-unit/${projectId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (Array.isArray(res.data)) {
-        setProjectUnit(res.data);
-      } else {
-        setProjectUnit([]);
-      }
-    } catch (error) {
-      console.log("Error fetching units:", error);
-      setProjectUnit([]);
-    }
-  };
-
-  useEffect(() => {
-    if (main_project_id) {
-      fetchUnits(main_project_id);
-    }
-  }, [main_project_id]);
 
   // Close popup when clicking outside or pressing ESC
   useEffect(() => {
@@ -76,7 +43,6 @@ const BulkLeadUploadPopup = ({
     setFile(null);
     setAssignedTo("");
     setMainProjectId("");
-    setUnitId("");
     onClose();
   };
 
@@ -141,14 +107,12 @@ const BulkLeadUploadPopup = ({
     if (!file) return toast.error("Please select an Excel file");
     if (!assignedTo) return toast.error("Please select Assigned To");
     if (!main_project_id) return toast.error("Please select Project");
-    if (!unit_id) return toast.error("Please select Unit Type");
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("lead_org_id", lead_org_id);
     formData.append("assignedTo", assignedTo);
     formData.append("main_project_id", main_project_id);
-    formData.append("unit_id", unit_id);
 
     try {
       setLoading(true);
@@ -239,25 +203,6 @@ const BulkLeadUploadPopup = ({
                   {projects.map((proj) => (
                     <option key={proj.project_id} value={proj.project_id}>
                       {proj.project_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Unit Type */}
-              <div>
-                <label className="text-sm font-medium text-gray-600">
-                  Unit Type
-                </label>
-                <select
-                  value={unit_id}
-                  onChange={(e) => setUnitId(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded-lg border-gray-300"
-                >
-                  <option value="">Select Unit Type</option>
-                  {projectUnit.map((u) => (
-                    <option key={u.unit_id} value={u.unit_id}>
-                      {`${u.unit_number} - ${u.unit_type} - ₹${u.base_price}`}
                     </option>
                   ))}
                 </select>

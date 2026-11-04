@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 const SuperLeadsTable = ({ isSidebarOpen, type }) => {
   const [metaLeads, setMetaLeads] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [newLoading, setNewLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -27,7 +26,6 @@ const SuperLeadsTable = ({ isSidebarOpen, type }) => {
 
   const [selectedLead, setSelectedLead] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [orgData, setOrgData] = useState(null);
   const [selectedForm, setSelectedForm] = useState("");
   const [modalAssign, setModalAssign] = useState(false);
   const [isModalOpenLeadProfile, setIsModalOpenLeadProfile] = useState(false);
@@ -60,27 +58,6 @@ const SuperLeadsTable = ({ isSidebarOpen, type }) => {
     setModalAssign(true);
   };
 
-  const getOrgDataById = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getOrgDetailsById/${superadminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setOrgData(data[0]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getOrgDataById();
-  }, []);
-
   const fetchAllMetaLeads = async () => {
     try {
       setLoading(true);
@@ -103,33 +80,6 @@ const SuperLeadsTable = ({ isSidebarOpen, type }) => {
   useEffect(() => {
     fetchAllMetaLeads();
   }, []);
-
-  const generateNewMetaLeads = async () => {
-    setNewLoading(true);
-    try {
-      await axios.post(
-        `http://localhost:9000/api/metaLeadFetchByPageId`,
-        {
-          pageId: orgData?.org_page_id,
-          accessToken: orgData?.org_page_access_token,
-          meta_org_id: superadminuser.staff_org_id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      toast.success("New Meta Leads Fetched Successfully");
-      fetchAllMetaLeads();
-    } catch (error) {
-      console.log(error);
-      toast.error("Error Fetching New Meta Leads");
-    } finally {
-      setNewLoading(false);
-    }
-  };
 
   const parseLeadFields = (lead) => {
     try {
@@ -251,13 +201,6 @@ const SuperLeadsTable = ({ isSidebarOpen, type }) => {
             Meta Leads Table
           </h2>
           <div className="gap-2 flex">
-            <button
-              className="bg-orange-500 p-2 px-2 sm:px-4 rounded hover:bg-orange-600 font-semibold text-white text-sm sm:text-lg"
-              onClick={generateNewMetaLeads}
-              disabled={newLoading}
-            >
-              {newLoading ? "Generating..." : "Fetch New Meta Leads"}
-            </button>
             <button
               className="bg-green-600 p-2 px-2 sm:px-4 rounded hover:bg-green-700 font-semibold text-white text-sm sm:text-lg"
               onClick={exportToExcel}

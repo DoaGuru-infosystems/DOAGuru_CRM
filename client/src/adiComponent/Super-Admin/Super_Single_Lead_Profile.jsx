@@ -1,13 +1,10 @@
 import axios from "axios";
-import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import img from "../../images/lead_profile.png";
 import Super_view_remarks from "./Super_view_remaks";
 import Super_view_followup from "./Super_view_followup";
-import Super_view_visit from "./Super_view_visit";
 import { useSelector } from "react-redux";
-import Super_view_unit_sold from "./Super_view_unit_sold";
 import getFieldValue from "../../utils/getFieldValue";
 
 function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
@@ -18,15 +15,10 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
 
   const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
-  const [visit, setVisit] = useState([]);
-  const [visitCreated, setVisitCreated] = useState(false);
   const [followCreated, setFollowCreated] = useState(false);
   const [remarksCreated, setRemarksCreated] = useState(false);
-  const [employeeunitsoldCreated, setemployeeunitsoldCreated] = useState(false);
   const [isModalOpenRemarks, setIsModalOpenRemarks] = useState(false);
   const [isModalOpenFollowUp, setIsModalOpenFollowUp] = useState(false);
-  const [isModalOpenVisit, setIsModalOpenVisit] = useState(false);
-  const [isModalOpenUnitSold, setIsModalOpenUnitSold] = useState(false);
 
   const superadminuser = useSelector((state) => state.auth.user);
   const token = superadminuser.token;
@@ -114,59 +106,8 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
     }
   };
 
-  const fetchUnitSoldEmployee = async () => {
-    try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeUnitSoldByLeadIdMeta/${selectedLeadId.leadgen_id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/unit-sold-lead-id/${selectedLeadId.lead_id}`;
-      }
-
-      const response = await axios.get(apiUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setemployeeunitsoldCreated(response.data[0]);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   const handleBackClick = () => {
     navigate(-1);
-  };
-  const fetchVisit = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/employe-visit/${type}/${selectedLeadId?.lead_id || selectedLeadId?.leadgen_id
-        }`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(data);
-      setVisit(data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-  const handleViewQuotation = (lead) => {
-    console.log("Lead Object:", lead);
-    const name = lead.name;
-    console.log("Lead Name:", name);
-    navigate(`/super_view_quotations/${lead.lead_id}`);
-  };
-
-  const handleViewVisit = () => {
-    navigate(`/super_view_visit/${leads[0].lead_id}`);
   };
 
   const handleClickRemark = () => {
@@ -174,15 +115,6 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
   };
   const handleClickFollowUp = () => {
     setIsModalOpenFollowUp(true);
-  };
-  const handleClickVisit = () => {
-    setIsModalOpenVisit(true);
-  };
-
-
-  const handleClickUnitSold = () => {
-    // setIsModalOpenUnitSold(true);
-    navigate(`/view_unit_sold/${type}/${type === "meta" ? selectedLeadId?.leadgen_id : selectedLeadId?.lead_id}`)
   };
 
   // Function to close the modal
@@ -193,12 +125,6 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
     setIsModalOpenFollowUp(false);
   };
 
-  const closeModalVisit = () => {
-    setIsModalOpenVisit(false);
-  };
-  const closeModalUnitSold = () => {
-    setIsModalOpenUnitSold(false);
-  };
   useEffect(() => {
     if (type === "meta") {
       fetchMetaLeads();
@@ -206,18 +132,10 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
       fetchLeads();
     }
     fetchFollowUp();
-    fetchVisit();
     fetchRemark();
   }, [id]);
 
-  useEffect(() => {
-    if (leads.length > 0) {
-      fetchUnitSoldEmployee();
-    }
-  }, [leads]);
-
   console.log(leads);
-  console.log(visit);
 
   return (
     <>
@@ -312,18 +230,6 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
         <div className="mt-2">
           <div className="">
             <div className="flex flex-wrap gap-2">
-              {visit?.length > 0 ? (
-                <button
-                  onClick={handleClickVisit}
-                  className="bg-green-500 text-white px-4 py-2 w-full sm:w-auto   rounded"
-                >
-                  View Visit
-                </button>
-              ) : (
-                <p className="text-white bg-red-400 text-center px-4 py-2 rounded w-full sm:w-auto">
-                  Visit not yet created
-                </p>
-              )}
               {followCreated ? (
                 <button
                   onClick={handleClickFollowUp}
@@ -347,18 +253,6 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
               ) : (
                 <p className="text-white bg-red-400 text-center px-4 py-2 rounded w-full sm:w-auto">
                   Remark not yet created
-                </p>
-              )}
-              {employeeunitsoldCreated ? (
-                <button
-                  onClick={handleClickUnitSold}
-                  className="bg-blue-500 text-white px-4 py-2 rounded w-full sm:w-auto"
-                >
-                  View Unit Sold
-                </button>
-              ) : (
-                <p className="text-white bg-red-400 text-center px-4 py-2 rounded w-full sm:w-auto ">
-                  Unit not yet sold
                 </p>
               )}
             </div>
@@ -508,28 +402,6 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
               <Super_view_followup
                 selectedLeadId={selectedLeadId}
                 closeModalFollowUp={closeModalFollowUp}
-                type={type}
-              />
-            </div>
-          </div>
-        )}
-        {isModalOpenVisit && (
-          <div className=" fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 mx-2">
-            <div className="w-full bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-auto mx-4 my-5">
-              <Super_view_visit
-                selectedLeadId={selectedLeadId}
-                closeModalVisit={closeModalVisit}
-                type={type}
-              />
-            </div>
-          </div>
-        )}
-        {isModalOpenUnitSold && (
-          <div className=" fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 mx-2">
-            <div className="w-full bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-auto mx-4 my-5">
-              <Super_view_unit_sold
-                selectedLeadId={selectedLeadId}
-                closeModalUnitSold={closeModalUnitSold}
                 type={type}
               />
             </div>

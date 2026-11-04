@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 const UpdateLeadStatusPopup = ({
   isOpen,
   onClose,
-  fetchVisit,
   fetchLeads,
   leads,
   fetchMetaLeads,

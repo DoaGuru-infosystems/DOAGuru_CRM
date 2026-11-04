@@ -13,42 +13,13 @@ const Reporting = () => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState("All");
   const [filteredLeads, setFilteredLeads] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("quotation");
+  const [selectedCategory, setSelectedCategory] = useState("leads");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState(data);
   const [rowPerPage, setRowPerPage] = useState(5);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [dataFields, setDataFields] = useState({
-    quotation: {
-      heading: ["Id", "Quotation Name", "Employee Name", "Date"],
-      columns: [
-        "quotation_id",
-        "quotation_name",
-        "employee_name",
-        "created_date",
-      ],
-      quotation: [],
-    },
-    invoice: {
-      heading: [
-        "id ",
-        "Invoice Name",
-        "Employee Name",
-        "Amount",
-        "Payment Mode",
-        "Date",
-      ],
-      columns: [
-        "invoice_id",
-        "invoice_name",
-        "employee_name",
-        "offer_price",
-        "payment_mode",
-        "created_date",
-      ],
-      invoice: [],
-    },
     employee: {
       heading: ["Id", "Name", "Email", "Position", "date"],
       columns: ["employeeId", "name", "email", "position", "createdTime"],
@@ -62,8 +33,6 @@ const Reporting = () => {
         "Phone Number",
         "Date",
         "Lead Source",
-        "Quotation Status",
-        "Invoice Status",
         "Deal Status",
         "FollowUp Status",
       ],
@@ -74,8 +43,6 @@ const Reporting = () => {
         "phone",
         "createdTime",
         "leadSource",
-        "quotation_status",
-        "invoice_status",
         "deal_status",
         "follow_up_status",
       ],
@@ -193,14 +160,6 @@ const Reporting = () => {
     );
   };
 
-  const quotationAxios = axios.create({
-    baseURL: "http://localhost:9000/api",
-  });
-
-  const invoiceAxios = axios.create({
-    baseURL: "http://localhost:9000/api",
-  });
-
   const employeeAxios = axios.create({
     baseURL: "http://localhost:9000/api",
   });
@@ -217,18 +176,14 @@ const Reporting = () => {
     }));
   };
 
-  const getQuotationData = async () => {
+  const getReportData = async () => {
     try {
       const results = await Promise.allSettled([
-        quotationAxios.get("/get-quotation-data"),
-        invoiceAxios.get("/get-invoice-data"),
         employeeAxios.get("/employee"),
         leadsAxios.get("/leads"),
       ]);
 
       // Initialize empty response objects
-      let quotationData = [];
-      let invoiceData = [];
       let employeeData = [];
       let leadsData = [];
 
@@ -237,15 +192,9 @@ const Reporting = () => {
         if (result.status === "fulfilled") {
           switch (index) {
             case 0:
-              quotationData = formatData(result.value.data.data);
-              break;
-            case 1:
-              invoiceData = formatData(result.value.data.data);
-              break;
-            case 2:
               employeeData = formatData(result.value.data);
               break;
-            case 3:
+            case 1:
               leadsData = formatData(result.value.data);
               break;
             default:
@@ -260,22 +209,12 @@ const Reporting = () => {
       });
 
       const combinedData = {
-        quotation: quotationData,
-        invoice: invoiceData,
         employee: employeeData,
         leads: leadsData,
       };
 
       const updatedDataFields = {
         ...dataFields,
-        quotation: {
-          ...dataFields.quotation,
-          quotation: combinedData.quotation,
-        },
-        invoice: {
-          ...dataFields.invoice,
-          invoice: combinedData.invoice,
-        },
         employee: {
           ...dataFields.employee,
           employee: combinedData.employee,
@@ -295,7 +234,7 @@ const Reporting = () => {
   };
 
   useEffect(() => {
-    getQuotationData();
+    getReportData();
   }, []);
 
   const downloadExcel = () => {
@@ -320,7 +259,7 @@ const Reporting = () => {
             <div className="flex flex-col space-y-4 lg:space-y-0 md:flex-row justify-between  mb-8">
               <div className="flex flex-wrap justify-center max-sm:justify-center">
                 <div className="flex flex-wrap justify-center items-center p-2   rounded-lg mt-0">
-                  {["quotation", "invoice", "employee", "leads"].map(
+                  {["leads", "employee"].map(
                     (category) => (
                       <button
                         key={category}

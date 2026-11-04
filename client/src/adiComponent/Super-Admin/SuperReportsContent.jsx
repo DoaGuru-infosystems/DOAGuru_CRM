@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import SuperLeadReport from "./SuperAdminReport/SuperLeadReport";
-import SuperVisitReport from "./SuperAdminReport/SuperVisitReport";
 import SuperClosedDealReport from "./SuperAdminReport/SuperClosedDealReport";
-import SoldAdminSoldUnitReport from "./SuperAdminReport/SuperAdminSoldUnitReport";
 import { SiGoogleads } from "react-icons/si";
 import { FaHouseChimney, FaMeta } from "react-icons/fa6";
-import { RiCommunityFill } from "react-icons/ri";
 import SuperMetaLeadReport from "./SuperAdminReport/SuperMetaLeadReport";
 
 const SuperReportsContent = () => {
@@ -70,60 +67,13 @@ const SuperReportsContent = () => {
                 </div>
               </div>
 
-              {/* Site Visit */}
-              <div
-                className={`transition-all duration-300 transform hover:scale-105 shadow-md rounded-2xl cursor-pointer w-full sm:w-[48%] md:w-[30%] lg:w-[22%] max-w-[200px] ${
-                  selectedComponent === "VisitData"
-                    ? "bg-cyan-600 text-white shadow-lg shadow-cyan-300/50"
-                    : "bg-white text-gray-800 hover:bg-gray-100"
-                }`}
-                onClick={() => setSelectedComponent("VisitData")}
-              >
-                <div className="p-4 sm:p-6 flex flex-col items-center text-center">
-                  <div
-                    className={`text-3xl sm:text-4xl mb-2 ${
-                      selectedComponent === "VisitData"
-                        ? "text-white"
-                        : "text-cyan-600"
-                    }`}
-                  >
-                    <FaHouseChimney />
-                  </div>
-                  <h5 className="text-base sm:text-lg font-semibold">Site Visit</h5>
-                </div>
-              </div>
-
-              {/* Sold Units */}
-              <div
-                className={`transition-all duration-300 transform hover:scale-105 shadow-md rounded-2xl cursor-pointer w-full sm:w-[48%] md:w-[30%] lg:w-[22%] max-w-[200px] ${
-                  selectedComponent === "SoldUnits"
-                    ? "bg-cyan-600 text-white shadow-lg shadow-cyan-300/50"
-                    : "bg-white text-gray-800 hover:bg-gray-100"
-                }`}
-                onClick={() => setSelectedComponent("SoldUnits")}
-              >
-                <div className="p-4 sm:p-6 flex flex-col items-center text-center">
-                  <div
-                    className={`text-3xl sm:text-4xl mb-2 ${
-                      selectedComponent === "SoldUnits"
-                        ? "text-white"
-                        : "text-cyan-600"
-                    }`}
-                  >
-                    <RiCommunityFill />
-                  </div>
-                  <h5 className="text-base sm:text-lg font-semibold">Sold Units</h5>
-                </div>
-              </div>
             </div>
 
             {/* Render Selected Component */}
             <div className="w-full h-[calc(100vh-12rem)] overflow-y-auto mt-6 bg-white shadow-inner rounded-xl p-2 sm:p-4">
               {selectedComponent === "LeadData" && <SuperLeadReport />}
               {selectedComponent === "metaLeadData" && <SuperMetaLeadReport />}
-              {selectedComponent === "VisitData" && <SuperVisitReport />}
               {selectedComponent === "ClosedData" && <SuperClosedDealReport />}
-              {selectedComponent === "SoldUnits" && <SoldAdminSoldUnitReport />}
             </div>
           </div>
         </div>

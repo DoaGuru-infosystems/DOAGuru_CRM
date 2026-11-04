@@ -4,7 +4,7 @@ import axios from "axios";
 import { MdOutlineNextWeek } from "react-icons/md";
 import { AiOutlineProject } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
-import { FaCheckCircle, FaFolderOpen, FaHistory } from "react-icons/fa";
+import { FaFolderOpen, FaHistory } from "react-icons/fa";
 import { logoutUser } from "../store/UserSlice";
 import toast from "react-hot-toast";
 import { SiGoogleads } from "react-icons/si";
@@ -15,7 +15,6 @@ const AdminOverviewDash = () => {
   const [employee, setEmployee] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState("LeadData");
   const [project, setProjects] = useState([]);
-  const [employeesold, setemployeesold] = useState([]);
   const [metaLeads, setMetaLeads] = useState([]);
   const [untouchedLeads, setUntouchedLeads] = useState(0);
   const [averageFollowUps, setAverageFollowUps] = useState(0);
@@ -23,7 +22,6 @@ const AdminOverviewDash = () => {
   const adminuser = useSelector((state) => state.auth.user);
   const token = adminuser.token;
   const userId = adminuser.user_id;
-  const [visit, setVisit] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -82,23 +80,6 @@ const AdminOverviewDash = () => {
     }
   };
 
-  const fetchVisit = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/leads-all-visits/${adminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setVisit(response.data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   const fetchEmployee = async () => {
     try {
       const response = await axios.get(
@@ -133,35 +114,15 @@ const AdminOverviewDash = () => {
     }
   };
 
-  const employeesoldunit = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/getAllUnitSoldByOrg/${adminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setemployeesold(response.data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   useEffect(() => {
     fetchProjects();
     fetchLeads();
     fetchEmployee();
-    fetchVisit();
-    employeesoldunit();
     fetchAllMetaLeads();
     fetchDashboardAnalytics();
   }, []);
 
   const leadCount = leads.length;
-  const soldunit = employeesold.length;
   const projectCount = project.length;
 
   return (
@@ -201,23 +162,6 @@ const AdminOverviewDash = () => {
           </div>
         </Link>
 
-        {/* Card 3: Total Site Visit */}
-        <Link to="/admin-total-visit" className="block w-full">
-          <div className="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 flex flex-col items-start cursor-pointer h-full">
-            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 text-xl flex items-center justify-center mb-3">
-              <MdOutlineNextWeek />
-            </div>
-            <div>
-              <h5 className="text-gray-500 text-[10px] font-bold uppercase tracking-wider">
-                Total Site Visit
-              </h5>
-              <p className="text-gray-900 text-2xl font-extrabold mt-1">
-                {visit?.length}
-              </p>
-            </div>
-          </div>
-        </Link>
-
         {/* Card 4: Total Meta Leads */}
         <Link to="/main-social-media-leads" className="block w-full">
           <div
@@ -251,44 +195,6 @@ const AdminOverviewDash = () => {
                 }`}
               >
                 {metaLeads?.length}
-              </p>
-            </div>
-          </div>
-        </Link>
-
-        {/* Card 5: Employee Sold Units */}
-        <Link to="/employee-sold-units" className="block w-full">
-          <div
-            className={`border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 flex flex-col items-start cursor-pointer h-full ${
-              selectedComponent === "solddata"
-                ? "bg-amber-600 border-amber-650 text-white"
-                : "bg-white border-slate-150 text-gray-800"
-            }`}
-            onClick={() => setSelectedComponent("solddata")}
-          >
-            <div
-              className={`p-2.5 rounded-xl text-xl flex items-center justify-center mb-3 ${
-                selectedComponent === "solddata"
-                  ? "bg-amber-500 text-white"
-                  : "bg-amber-50 text-amber-600"
-              }`}
-            >
-              <FaCheckCircle />
-            </div>
-            <div>
-              <h5
-                className={`text-[10px] font-bold uppercase tracking-wider ${
-                  selectedComponent === "solddata" ? "text-amber-100" : "text-gray-500"
-                }`}
-              >
-                Employee Sold Units
-              </h5>
-              <p
-                className={`text-2xl font-extrabold mt-1 ${
-                  selectedComponent === "solddata" ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {soldunit}
               </p>
             </div>
           </div>

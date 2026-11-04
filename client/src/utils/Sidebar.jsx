@@ -20,9 +20,8 @@ import { RiAdminFill } from "react-icons/ri";
 import { logoutUser } from "../store/UserSlice";
 import logoTwo from "../assets/favicon_one.png";
 import logoOne from "../assets/CRMGuruLogo.png";
-import { IoSettings } from "react-icons/io5";
 import { path } from "framer-motion/client";
-import { FaMeta, FaMoneyBills } from "react-icons/fa6";
+import { FaMeta } from "react-icons/fa6";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const user = useSelector((state) => state.auth.user);
@@ -70,16 +69,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           name: "Employees Management",
           path: "/super-admin-employee-management",
           icon: <IoIosPeople />,
-        },
-        {
-          name: "Settings",
-          path: "/super-admin-settings",
-          icon: <IoSettings />,
-        },
-        {
-          name: "Finance Company Settings",
-          path: "/finance-company-settings",
-          icon: <FaMoneyBills />,
         },
       ]
       : []),

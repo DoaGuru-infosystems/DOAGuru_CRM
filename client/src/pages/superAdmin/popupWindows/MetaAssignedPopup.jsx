@@ -9,14 +9,12 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
   const user = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState([]);
-  const [units, setUnits] = useState([]);
   const [staff, setStaff] = useState([]);
 
   const [inputField, setInputField] = useState({
     meta_assignedTo: "",
     meta_assignedBy: user?.staff_id,
     meta_project_id: "",
-    meta_unit_id: "",
     meta_lead_status: "",
   });
 
@@ -50,29 +48,10 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
     }
   };
 
-  const fetchAllUnitsByProject = async () => {
-    if (!inputField?.meta_project_id) return;
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getAllUnitsByProjectId/${inputField?.meta_project_id}`,
-        {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        }
-      );
-      setUnits(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     fetchAllProjects();
     fetchAllStaff();
   }, []);
-
-  useEffect(() => {
-    fetchAllUnitsByProject();
-  }, [inputField?.meta_project_id]);
 
   useEffect(() => {
     if (!isBulk && lead) {
@@ -80,7 +59,6 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
         meta_assignedTo: lead?.meta_assignedTo || "",
         meta_assignedBy: user?.staff_id,
         meta_project_id: lead?.meta_project_id || "",
-        meta_unit_id: lead?.meta_unit_id || "",
         meta_lead_status: lead?.meta_lead_status || "",
       });
     } else {
@@ -88,7 +66,6 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
         meta_assignedTo: "",
         meta_assignedBy: user?.staff_id,
         meta_project_id: "",
-        meta_unit_id: "",
         meta_lead_status: "",
       });
     }
@@ -210,23 +187,6 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
                     {projects?.map((p) => (
                       <option key={p?.project_id} value={p?.project_id}>
                         {p?.project_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-1">Unit</label>
-                  <select
-                    name="meta_unit_id"
-                    value={inputField.meta_unit_id}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
-                  >
-                    <option value="">--select--</option>
-                    {units?.map((u) => (
-                      <option key={u?.unit_id} value={u?.unit_id}>
-                        {u?.unit_number} - {u?.unit_type}
                       </option>
                     ))}
                   </select>

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import EmployeeLeadsGraph from "./DashboardCompo/EmployeeLeadGraph";
 import EmployeeOverview from "./DashboardCompo/EmployeDashboardOverview";
 import EmployeeLeadsReport from "./DashboardCompo/EmployeeLeadsReport";
-import EmployeeVisitGraph from "./DashboardCompo/EmployeeVisitGraph";
 import EmployeeCloseGraph from "./DashboardCompo/EmployeeCloseGraph";
 import EmployeeLeadsDash from "./DashboardCompo/EmployeeLeadsDash";
 
@@ -26,9 +25,8 @@ function EmployeeDashboardContent() {
               <div>
                 <EmployeeOverview />
               </div>
-              <div className="grid grid-cols-1 gap-2 mt-6 mx-2 sm:mx-8 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 mt-6 mx-2 sm:mx-8 md:grid-cols-2">
                 <EmployeeLeadsGraph />
-                <EmployeeVisitGraph />
                 <EmployeeCloseGraph />
               </div>
               <EmployeeLeadsDash />

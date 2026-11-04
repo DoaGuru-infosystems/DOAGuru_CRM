@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import moment from "moment";
+import moment from "moment-timezone";
 import * as XLSX from "xlsx";
 import ReactPaginate from "react-paginate";
 import { useSelector } from "react-redux";
@@ -16,27 +16,17 @@ function LeadData() {
   const leadsPerPage = 6;
   const [selectedColumns, setSelectedColumns] = useState([
     "lead_no",
-    "assignedTo",
     "name",
+    "office_business_name",
     "phone",
+    "address",
     "leadSource",
+    "lead_status",
     "remark_status",
     "answer_remark",
-    "meeting_status",
-    "assignedBy",
-    "lead_status",
-    "address",
-    "booking_amount",
-    "deal_status",
-    "employeeId",
-    "follow_up_status",
-    "payment_mode",
-    "reason",
-    "registry",
-    "project_name",
-    "visit",
-    "visit_date",
-    "d_closeDate",
+    "next_follow_date_time",
+    "interested_follow_up",
+    "assignedTo",
     "createdTime",
     "actual_date",
   ]);
@@ -91,7 +81,7 @@ function LeadData() {
 
     if (startDate && endDate) {
       filtered = filtered.filter((lead) => {
-        const createdTime = moment(lead.createdTime, "YYYY-MM-DD");
+        const createdTime = moment(lead.createdTime);
         return createdTime.isBetween(startDate, endDate, undefined, "[]");
       });
     }
@@ -108,29 +98,20 @@ function LeadData() {
 
   const downloadExcel = () => {
     const columnMapping = {
-      assignedTo: "Assigned To",
-      name: "Name",
-      phone: "Phone",
-      leadSource: "Lead Source",
-      remark_status: "Remark Status",
-      answer_remark: "Answer Remark",
-      meeting_status: "Meeting Status",
-      assignedBy: "Assigned By",
-      lead_status: "Lead Status",
+      lead_no: "Lead ID",
+      name: "Customer Name",
+      office_business_name: "Business Name",
+      phone: "Mobile Number",
       address: "Address",
-      booking_amount: "Booking Amount",
-      deal_status: "Deal Status",
-      employeeId: "Employee ID",
-      follow_up_status: "Follow-up Status",
-      payment_mode: "Payment Mode",
-      reason: "Reason",
-      registry: "Registry",
-      project_name: "Project",
-      visit: "Visit",
-      visit_date: "Visit Date",
-      d_closeDate: "Close Date",
-      createdTime: "Assigned Date",
-      actual_date: "Actual Date",
+      leadSource: "Lead Source",
+      lead_status: "Lead Status",
+      remark_status: "Remark",
+      answer_remark: "Answer Remark",
+      next_follow_date_time: "Next Follow Date Time",
+      interested_follow_up: "Interested Follow-up",
+      assignedTo: "Assigned To",
+      createdTime: "Created Date",
+      actual_date: "Calling Date",
     };
 
     // Filter and format data for the Excel report
@@ -141,19 +122,22 @@ function LeadData() {
         const newKey = columnMapping[col] || col;
 
         if (
-          ["actual_date", "createdTime", "visit_date", "d_closeDate"].includes(
-            col
-          )
+          ["actual_date", "createdTime", "next_follow_date_time"].includes(col)
         ) {
-          // Check if date exists and is valid
           formattedLead[newKey] =
-            lead[col] && moment(lead[col], moment.ISO_8601, true).isValid()
-              ? moment(lead[col]).format("DD MMM YYYY").toUpperCase()
-              : "pending";
+            lead[col] && moment(lead[col]).isValid()
+              ? moment(lead[col]).tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss")
+              : "-";
         } else if (col === "lead_no") {
           formattedLead[newKey] = lead.lead_no || lead.lead_id;
+        } else if (col === "name") {
+          formattedLead[newKey] = lead.name || lead.customer_name || "-";
+        } else if (col === "office_business_name") {
+          formattedLead[newKey] = lead.office_business_name || lead.business_name || "-";
+        } else if (col === "assignedTo") {
+          formattedLead[newKey] = lead.staff_name || lead.assignedTo || "-";
         } else {
-          formattedLead[newKey] = lead[col];
+          formattedLead[newKey] = lead[col] || "-";
         }
       });
 
