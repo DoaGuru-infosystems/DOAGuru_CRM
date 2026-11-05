@@ -31,6 +31,7 @@ const LEAD_COLUMNS = [
   { key: "remark", label: "Remark" },
   { key: "interested_follow_up", label: "Interested Follow-up" },
   { key: "assignedTo", label: "Assigned To" },
+  { key: "created_by_name", label: "Created By" },
   { key: "action", label: "Action", locked: true },
 ];
 
@@ -481,7 +482,17 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
         row["Interested Follow-up"] = lead.interested_follow_up || "-";
       }
       if (isColumnVisible("assignedTo")) {
-        row["Assigned To"] = lead.staff_name || "-";
+        row["Assigned To"] =
+          lead.assignees && lead.assignees.length > 0
+            ? lead.assignees
+                .map((a) => `${a.staff_name} (${a.access_type})`)
+                .join(", ")
+            : lead.staff_name || "-";
+      }
+      if (isColumnVisible("created_by_name")) {
+        row["Created By"] = lead.created_by_name
+          ? `${lead.created_by_name} (${lead.created_by_role || "staff"})`
+          : "-";
       }
       row["Created Date"] = formatCreatedDateTime(lead.createdTime);
 
@@ -815,6 +826,11 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
                         Assigned To
                       </th>
                     )}
+                    {isColumnVisible("created_by_name") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-cyan-700">
+                        Created By
+                      </th>
+                    )}
                     {isColumnVisible("action") && (
                       <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left text-cyan-700">
                         Action
@@ -921,7 +937,40 @@ function SuperEmployeeLeadsContent({ isSidebarOpen }) {
                         )}
                         {isColumnVisible("assignedTo") && (
                           <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                            {lead.staff_name || "-"}
+                            {lead.assignees && lead.assignees.length > 0 ? (
+                              <div className="flex flex-wrap gap-1 max-w-xs">
+                                {lead.assignees.map((a) => (
+                                  <span
+                                    key={a.staff_id}
+                                    className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${
+                                      a.access_type === "shared"
+                                        ? "bg-purple-100 text-purple-800 border border-purple-200"
+                                        : "bg-cyan-100 text-cyan-800 border border-cyan-200"
+                                    }`}
+                                    title={`${a.staff_name} (${a.access_type})`}
+                                  >
+                                    {a.access_type === "shared" ? "🔗" : "👤"}{" "}
+                                    {a.staff_name}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              lead.staff_name || "-"
+                            )}
+                          </td>
+                        )}
+                        {isColumnVisible("created_by_name") && (
+                          <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                            {lead.created_by_name ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                👤 {lead.created_by_name}
+                                <span className="ml-1 text-[10px] text-gray-500">
+                                  ({lead.created_by_role || "staff"})
+                                </span>
+                              </span>
+                            ) : (
+                              "-"
+                            )}
                           </td>
                         )}
                         {isColumnVisible("action") && (

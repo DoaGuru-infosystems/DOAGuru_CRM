@@ -7,6 +7,11 @@ const axios = require("axios");
 const moment = require("moment-timezone");
 const crypto = require("crypto");
 const { sendEmail } = require("../utils/emailService");
+const {
+  buildVisibilityWhere,
+  canAccessLead,
+  attachAssigneesAndCreator,
+} = require("../utils/leadVisibility");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -768,7 +773,7 @@ const updateEmployeeDetails = async (req, res) => {
 const getEmployeeByOrg = (req, res) => {
   try {
     const orgId = req.params.orgId;
-    const selectQuery = `select * from company_staff where staff_org_id = ?`;
+    const selectQuery = `SELECT staff_id, staff_name, staff_role, staff_org_id, staff_status, staff_phone, staff_email FROM company_staff WHERE staff_org_id = ?`;
     db.query(selectQuery, orgId, (err, result) => {
       if (err) {
         return res.status(400).json({ success: false, message: err.message });
@@ -793,7 +798,7 @@ const getAllEmployeeData = (req, res) => {
   });
 };
 
-const updateOnlyLeadStatusEmployeeEnd = (req, res) => {
+const updateOnlyLeadStatusEmployeeEnd = async (req, res) => {
   const { id } = req.params;
   const { lead_status } = req.body;
 
@@ -803,6 +808,11 @@ const updateOnlyLeadStatusEmployeeEnd = (req, res) => {
 
   if (!lead_status) {
     return res.status(400).json({ message: "Lead status is required" });
+  }
+
+  const access = await canAccessLead(req.user, id);
+  if (!access.allowed) {
+    return res.status(403).json({ message: access.reason || "Access denied" });
   }
 
   const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
@@ -827,68 +837,96 @@ const updateOnlyLeadStatusEmployeeEnd = (req, res) => {
   });
 };
 
-const getLeadsByOrg = (req, res) => {
-  const { orgId } = req.params;
-  const { search, filterDate, leadSource, unitStatus, visitStatus, activeTab } =
-    req.query;
+const getLeadsByOrg = async (req, res) => {
+  try {
+    const { orgId } = req.params;
+    const { search, filterDate, leadSource, unitStatus, visitStatus, activeTab } =
+      req.query;
 
-  let sql = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name FROM leads left join company_staff on company_staff.staff_id = leads.assignedTo left join projects on projects.project_id = leads.main_project_id WHERE leads.lead_org_id = ?`;
-  const params = [orgId];
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
 
-  if (search && search.trim() !== "") {
-    const s = `%${search.trim()}%`;
-    sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
-    params.push(s, s, s, s, s, s);
-  }
-
-  if (filterDate && filterDate.trim() !== "") {
-    sql += ` AND DATE(leads.createdTime) = ?`;
-    params.push(filterDate.trim());
-  }
-
-  if (leadSource && leadSource.trim() !== "") {
-    sql += ` AND leads.leadSource = ?`;
-    params.push(leadSource.trim());
-  }
-
-  if (unitStatus && unitStatus.trim() !== "") {
-    sql += ` AND units.unit_status = ?`;
-    params.push(unitStatus.trim());
-  }
-
-  if (visitStatus && visitStatus.trim() !== "") {
-    sql += ` AND LOWER(TRIM(leads.primary_status)) = LOWER(TRIM(?))`;
-    params.push(visitStatus.trim());
-  }
-
-  if (activeTab && activeTab.trim() !== "") {
-    const tab = activeTab.trim();
-    if (tab === "today") {
-      sql += ` AND DATE(leads.createdTime) = CURRENT_DATE()`;
-    } else if (tab === "past") {
-      sql += ` AND DATE(leads.createdTime) < CURRENT_DATE()`;
-    } else if (tab === "upcoming") {
-      sql += ` AND DATE(leads.createdTime) > CURRENT_DATE()`;
-    } else if (tab === "completed") {
-      sql += ` AND (leads.deal_status = 'close' OR LOWER(TRIM(leads.primary_status)) IN ('deal close', 'visit done'))`;
-    } else if (tab === "visitScheduled") {
-      sql += ` AND LOWER(TRIM(leads.primary_status)) = 'site visit schedule'`;
-    } else if (tab === "visitDone") {
-      sql += ` AND LOWER(TRIM(leads.primary_status)) = 'visit done'`;
-    } else if (tab === "visitPending") {
-      sql += ` AND (leads.primary_status IS NULL OR LOWER(TRIM(leads.primary_status)) IN ('new leads', 'intrested', 'pending'))`;
+    // Admin & Employee cross-org protection
+    if ((currentRole === "admin" || currentRole === "employee") && Number(orgId) !== Number(currentUser.staff_org_id)) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Organization mismatch.",
+      });
     }
-  }
 
-  sql += ` ORDER BY leads.lead_id DESC`;
+    // Build visibility filter
+    const vis = buildVisibilityWhere(currentUser, {
+      orgId: orgId,
+      leadAlias: "leads",
+    });
 
-  db.query(sql, params, (err, results) => {
-    if (err) {
-      res.status(500).json({ success: false, message: err.message });
-    } else {
-      res.status(200).send(results);
+    let sql = `SELECT DISTINCT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name,
+               (SELECT GROUP_CONCAT(cs2.staff_name ORDER BY la2.id SEPARATOR ', ')
+                FROM lead_assignees la2 JOIN company_staff cs2 ON cs2.staff_id = la2.staff_id
+                WHERE la2.lead_id = leads.lead_id AND la2.access_type = 'assigned') AS assignee_names
+               FROM leads 
+               LEFT JOIN company_staff ON company_staff.staff_id = leads.assignedTo 
+               LEFT JOIN projects ON projects.project_id = leads.main_project_id 
+               WHERE ${vis.whereClause}`;
+    const params = [...vis.params];
+
+    if (search && search.trim() !== "") {
+      const s = `%${search.trim()}%`;
+      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
+      params.push(s, s, s, s, s, s);
     }
-  });
+
+    if (filterDate && filterDate.trim() !== "") {
+      sql += ` AND DATE(leads.createdTime) = ?`;
+      params.push(filterDate.trim());
+    }
+
+    if (leadSource && leadSource.trim() !== "") {
+      sql += ` AND leads.leadSource = ?`;
+      params.push(leadSource.trim());
+    }
+
+    if (unitStatus && unitStatus.trim() !== "") {
+      sql += ` AND units.unit_status = ?`;
+      params.push(unitStatus.trim());
+    }
+
+    if (visitStatus && visitStatus.trim() !== "") {
+      sql += ` AND LOWER(TRIM(leads.primary_status)) = LOWER(TRIM(?))`;
+      params.push(visitStatus.trim());
+    }
+
+    if (activeTab && activeTab.trim() !== "") {
+      const tab = activeTab.trim();
+      if (tab === "today") {
+        sql += ` AND DATE(leads.createdTime) = CURRENT_DATE()`;
+      } else if (tab === "past") {
+        sql += ` AND DATE(leads.createdTime) < CURRENT_DATE()`;
+      } else if (tab === "upcoming") {
+        sql += ` AND DATE(leads.createdTime) > CURRENT_DATE()`;
+      } else if (tab === "completed") {
+        sql += ` AND (leads.deal_status = 'close' OR LOWER(TRIM(leads.primary_status)) IN ('deal close', 'visit done'))`;
+      } else if (tab === "visitScheduled") {
+        sql += ` AND LOWER(TRIM(leads.primary_status)) = 'site visit schedule'`;
+      } else if (tab === "visitDone") {
+        sql += ` AND LOWER(TRIM(leads.primary_status)) = 'visit done'`;
+      } else if (tab === "visitPending") {
+        sql += ` AND (leads.primary_status IS NULL OR LOWER(TRIM(leads.primary_status)) IN ('new leads', 'intrested', 'pending'))`;
+      }
+    }
+
+    sql += ` ORDER BY leads.lead_id DESC`;
+
+    db.query(sql, params, async (err, results) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: err.message });
+      }
+      await attachAssigneesAndCreator(results);
+      return res.status(200).send(results);
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 const getDashboardAnalytics = async (req, res) => {
@@ -899,6 +937,7 @@ const getDashboardAnalytics = async (req, res) => {
     const untouchedSql = `
       SELECT COUNT(*) as untouched_count FROM leads 
       WHERE lead_org_id = ? 
+        AND hidden_by_employee = 0
         AND lead_id NOT IN (SELECT DISTINCT fu_lead_id FROM follow_up_leads WHERE fu_lead_id IS NOT NULL)
         AND lead_id NOT IN (SELECT DISTINCT vis_lead_id FROM visit WHERE vis_lead_id IS NOT NULL)
         AND lead_id NOT IN (SELECT DISTINCT remark_lead_id FROM remark WHERE remark_lead_id IS NOT NULL)
@@ -909,12 +948,14 @@ const getDashboardAnalytics = async (req, res) => {
       SELECT COUNT(*) as total_follow_ups FROM follow_up_leads 
       JOIN leads ON leads.lead_id = follow_up_leads.fu_lead_id 
       WHERE leads.lead_org_id = ?
+        AND leads.hidden_by_employee = 0
     `;
 
-    // 3. Total Leads in this organization
+    // 3. Total Leads in this organization (exclude hidden-by-employee)
     const totalLeadsSql = `
       SELECT COUNT(*) as total_leads FROM leads 
       WHERE leads.lead_org_id = ?
+        AND leads.hidden_by_employee = 0
     `;
 
     db.query(untouchedSql, [orgId], (err, untouchedRes) => {
@@ -959,6 +1000,38 @@ const getDashboardAnalytics = async (req, res) => {
   }
 };
 
+const getSuperAdminRevenueHistory = async (req, res) => {
+  try {
+    const role = (req.user?.staff_role || "").toLowerCase();
+    if (role !== "superadmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Super Admin only.",
+      });
+    }
+
+    const response = await axios.get(
+      "https://dmcalculator.siarasystems.com/auth/api/re_calculator/revenue/history",
+      {
+        timeout: 10000,
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "DOAGuru_CRM_Server",
+        },
+      }
+    );
+
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error fetching revenue history:", error.message);
+    return res.status(502).json({
+      success: false,
+      message: "Failed to fetch revenue history from external service",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewCompanyStaff,
   OneOnlylogin,
@@ -971,4 +1044,5 @@ module.exports = {
   updateOnlyLeadStatusEmployeeEnd,
   getLeadsByOrg,
   getDashboardAnalytics,
+  getSuperAdminRevenueHistory,
 };

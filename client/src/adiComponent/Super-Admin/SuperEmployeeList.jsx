@@ -239,8 +239,9 @@ const SuperEmployeeList = () => {
                   <th className="px-4 py-3 sm:px-6">Employee Id</th>
                   <th className="px-4 py-3 sm:px-6">Employee Name</th>
                   <th className="px-4 py-3 sm:px-6">Employee Email</th>
-                  <th className="px-4 py-3 sm:px-6">Total Leads</th>{" "}
-                  {/* Add Total Leads Column */}
+                  <th className="px-4 py-3 sm:px-6">Assigned</th>
+                  <th className="px-4 py-3 sm:px-6">Shared</th>
+                  <th className="px-4 py-3 sm:px-6">Total Leads</th>
                 </tr>
               </thead>
               <tbody>
@@ -258,10 +259,11 @@ const SuperEmployeeList = () => {
                         </td>
                         <td className="px-4 py-4 sm:px-6">{employee.name}</td>
                         <td className="px-4 py-4 sm:px-6">{employee.email}</td>
+                        <td className="px-4 py-4 sm:px-6">{employee.assigned_count ?? 0}</td>
+                        <td className="px-4 py-4 sm:px-6">{employee.shared_count ?? 0}</td>
                         <td className="px-4 py-4 sm:px-6">
                           {employee.total_leads}
-                        </td>{" "}
-                        {/* Display Total Leads */}
+                        </td>
                       </tr>
                     ))
                 ) : (

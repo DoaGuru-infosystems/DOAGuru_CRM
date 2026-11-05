@@ -102,6 +102,7 @@ const {
   updateOnlyLeadStatusEmployeeEnd,
   getLeadsByOrg,
   getDashboardAnalytics,
+  getSuperAdminRevenueHistory,
 } = require("../controllers/ControllerNine");
 
 const {
@@ -115,6 +116,9 @@ const {
   updateLeadAssignment,
   bulkAssignLeads,
   removeLeadAssignee,
+  shareLeads,
+  revokeLeadShare,
+  getSharedByMe,
 } = require("../controllers/ControllerTen");
 
 
@@ -140,30 +144,31 @@ router.delete(
 router.put("/servicelist", authenticate, httpLogger, updateServiceList);
 
 router.post("/leads", authenticate, httpLogger, createLead);
+router.get("/leads/shared-by-me", authenticate, httpLogger, getSharedByMe);
 router.get("/leads/:id", authenticate, httpLogger, getleadbyid);
 router.get("/leads-data-user-id/:userId", authenticate, httpLogger, getLeads);
 router.put("/leads/:leadId", authenticate, httpLogger, updateLead);
 router.delete("/leads/:leadId", authenticate, httpLogger, deleteLead);
 
-// Lead transfer requests
-router.post(
-  "/leads/transfer-request",
-  authenticate,
-  httpLogger,
-  createLeadTransferRequest,
-);
-router.get(
-  "/leads/transfer-requests/pending",
-  authenticate,
-  httpLogger,
-  getPendingTransferRequests,
-);
-router.post(
-  "/leads/transfer-request/respond",
-  authenticate,
-  httpLogger,
-  respondToTransferRequest,
-);
+// Lead transfer requests (Disabled - Replaced by Share system)
+// router.post(
+//   "/leads/transfer-request",
+//   authenticate,
+//   httpLogger,
+//   createLeadTransferRequest,
+// );
+// router.get(
+//   "/leads/transfer-requests/pending",
+//   authenticate,
+//   httpLogger,
+//   getPendingTransferRequests,
+// );
+// router.post(
+//   "/leads/transfer-request/respond",
+//   authenticate,
+//   httpLogger,
+//   respondToTransferRequest,
+// );
 
 router.use((err, req, res, next) => {
   console.error(err.stack);
@@ -240,6 +245,13 @@ router.get(
   authenticate,
   httpLogger,
   getAllProjects,
+);
+
+router.get(
+  "/super-admin-revenue-history",
+  authenticate,
+  httpLogger,
+  getSuperAdminRevenueHistory,
 );
 
 //WebsiteController routes
@@ -421,5 +433,21 @@ router.delete(
   httpLogger,
   removeLeadAssignee,
 );
+
+router.post(
+  "/leads/share",
+  authenticate,
+  httpLogger,
+  shareLeads,
+);
+
+router.delete(
+  "/leads/share/:leadId/:staffId",
+  authenticate,
+  httpLogger,
+  revokeLeadShare,
+);
+
+
 
 module.exports = router;

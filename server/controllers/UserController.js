@@ -5,7 +5,13 @@ const JWT = require("jsonwebtoken");
 const moment = require("moment-timezone");
 const { sendEmail } = require("../utils/emailService");
 const { sendWhatsAppLeadAssignedAlert } = require("../utils/whatsappUtils");
-const { normalizePhone } = require("../utils/leadVisibility");
+const {
+  normalizePhone,
+  buildVisibilityWhere,
+  canAccessLead,
+  canDeleteLead,
+  attachAssigneesAndCreator,
+} = require("../utils/leadVisibility");
 
 const createLead = async (req, res) => {
   const {
@@ -265,63 +271,33 @@ const createLead = async (req, res) => {
         );
       }
 
-      if (firstAssignee) {
+      // Phase 8: Notify ALL newly inserted assignees (not just first one)
+      if (validAssigneeIds.length > 0) {
         const staffQuery =
-          "SELECT staff_name, staff_email, staff_phone FROM company_staff WHERE staff_id = ?";
-
-        db.query(staffQuery, [firstAssignee], async (err, staffResult) => {
+          "SELECT staff_name, staff_email, staff_phone FROM company_staff WHERE staff_id IN (?)";
+        db.query(staffQuery, [validAssigneeIds], async (err, staffResults) => {
           if (err) {
             console.error("Error fetching staff details:", err.message);
-          } else if (staffResult.length > 0) {
-            const staff = staffResult[0];
-
+            return;
+          }
+          for (const staff of (staffResults || [])) {
             const subject = "CRMGuru - New General Lead Assigned";
-
-            const text = `Dear ${staff.staff_name},
-
-A new lead has been assigned to you in CRMGuru.
-
-Please log in to your dashboard to view the lead details.
-
-Best regards,
-CRMGuru Team`;
-
-            const html = `
-              <p>Dear <strong>${staff.staff_name}</strong>,</p>
-              <p>A new lead has been <strong>assigned to you</strong> in <b>CRMGuru</b>.</p>
-              <p>Please log in to your dashboard to check the details.</p>
-              <br/>
-              <p>Best regards,<br/>CRMGuru Team</p>
-            `;
-
-            // -----------------------------
-            // ✔ Send Email
-            // -----------------------------
+            const text = `Dear ${staff.staff_name},\n\nA new lead has been assigned to you in CRMGuru.\n\nPlease log in to your dashboard to view the lead details.\n\nBest regards,\nCRMGuru Team`;
+            const html = `<p>Dear <strong>${staff.staff_name}</strong>,</p><p>A new lead has been <strong>assigned to you</strong> in <b>CRMGuru</b>.</p><p>Please log in to your dashboard to check the details.</p><br/><p>Best regards,<br/>CRMGuru Team</p>`;
             try {
               await sendEmail(staff.staff_email, subject, text, html);
               console.log("Lead assignment email sent to:", staff.staff_email);
             } catch (emailErr) {
               console.error("Email sending failed:", emailErr.message);
             }
-
-            // -----------------------------
-            // ✔ Send WhatsApp Alert
-            // -----------------------------
             if (staff.staff_phone) {
               try {
-                await sendWhatsAppLeadAssignedAlert(
-                  staff.staff_phone,
-                  staff.staff_name
-                );
+                await sendWhatsAppLeadAssignedAlert(staff.staff_phone, staff.staff_name);
                 console.log("WhatsApp lead alert sent to:", staff.staff_phone);
               } catch (waErr) {
                 console.error("WhatsApp sending failed:", waErr);
               }
-            } else {
-              console.warn("No phone number found for staff:", assignedTo);
             }
-          } else {
-            console.warn("No staff found with ID:", assignedTo);
           }
         });
       }
@@ -334,19 +310,27 @@ CRMGuru Team`;
 };
 
 
-const getleadbyid = (req, res) => {
+const getleadbyid = async (req, res) => {
   try {
     const { id } = req.params;
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ error: access.reason || "Access denied" });
+    }
+
     const getQuery = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name FROM leads left join company_staff on company_staff.staff_id = leads.assignedTo left join projects on projects.project_id = leads.main_project_id WHERE leads.lead_id = ?`;
-    db.query(getQuery, [id], (error, result) => {
+    db.query(getQuery, [id], async (error, result) => {
       if (error) {
-        res.status(500).json({ error: "Internal Server Error" });
-      } else {
-        res.status(200).json(result);
+        return res.status(500).json({ error: "Internal Server Error" });
       }
+      if (!result || result.length === 0) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      await attachAssigneesAndCreator(result);
+      return res.status(200).json(result);
     });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -366,73 +350,102 @@ const getvisit = (req, res) => {
   }
 };
 
-const getLeads = (req, res) => {
-  const { userId } = req.params;
-  const { search, filterDate, leadSource, unitStatus, visitStatus, activeTab } = req.query;
+const getLeads = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { search, filterDate, leadSource, unitStatus, visitStatus, activeTab } = req.query;
 
-  let sql = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name FROM leads left join company_staff on company_staff.staff_id = leads.assignedTo left join projects on projects.project_id = leads.main_project_id WHERE leads.assignedTo = ?`;
-  const params = [userId];
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
 
-  if (search && search.trim() !== "") {
-    const s = `%${search.trim()}%`;
-    sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
-    params.push(s, s, s, s, s, s);
-  }
+    // Enforce visibility using buildVisibilityWhere
+    const vis = buildVisibilityWhere(currentUser, {
+      orgId: req.query.orgId || req.query.lead_org_id,
+      leadAlias: "leads",
+    });
 
-  if (filterDate && filterDate.trim() !== "") {
-    sql += ` AND DATE(leads.createdTime) = ?`;
-    params.push(filterDate.trim());
-  }
+    let sql = `SELECT DISTINCT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name,
+               (SELECT GROUP_CONCAT(cs2.staff_name ORDER BY la2.id SEPARATOR ', ')
+                FROM lead_assignees la2 JOIN company_staff cs2 ON cs2.staff_id = la2.staff_id
+                WHERE la2.lead_id = leads.lead_id AND la2.access_type = 'assigned') AS assignee_names
+               FROM leads 
+               LEFT JOIN company_staff ON company_staff.staff_id = leads.assignedTo 
+               LEFT JOIN projects ON projects.project_id = leads.main_project_id 
+               WHERE ${vis.whereClause}`;
+    const params = [...vis.params];
 
-  if (leadSource && leadSource.trim() !== "") {
-    sql += ` AND leads.leadSource = ?`;
-    params.push(leadSource.trim());
-  }
-
-  if (unitStatus && unitStatus.trim() !== "") {
-    sql += ` AND units.unit_status = ?`;
-    params.push(unitStatus.trim());
-  }
-
-  if (visitStatus && visitStatus.trim() !== "") {
-    sql += ` AND LOWER(TRIM(leads.primary_status)) = LOWER(TRIM(?))`;
-    params.push(visitStatus.trim());
-  }
-
-  if (activeTab && activeTab.trim() !== "") {
-    const tab = activeTab.trim();
-    if (tab === "today") {
-      sql += ` AND DATE(leads.createdTime) = CURRENT_DATE()`;
-    } else if (tab === "past") {
-      sql += ` AND DATE(leads.createdTime) < CURRENT_DATE()`;
-    } else if (tab === "upcoming") {
-      sql += ` AND DATE(leads.createdTime) > CURRENT_DATE()`;
-    } else if (tab === "completed") {
-      sql += ` AND (leads.deal_status = 'close' OR LOWER(TRIM(leads.primary_status)) IN ('deal close', 'visit done'))`;
-    } else if (tab === "visitScheduled") {
-      sql += ` AND LOWER(TRIM(leads.primary_status)) = 'site visit schedule'`;
-    } else if (tab === "visitDone") {
-      sql += ` AND LOWER(TRIM(leads.primary_status)) = 'visit done'`;
-    } else if (tab === "visitPending") {
-      sql += ` AND (leads.primary_status IS NULL OR LOWER(TRIM(leads.primary_status)) IN ('new leads', 'intrested', 'pending'))`;
+    if (search && search.trim() !== "") {
+      const s = `%${search.trim()}%`;
+      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
+      params.push(s, s, s, s, s, s);
     }
-  }
 
-  sql += ` ORDER BY leads.lead_id DESC`;
-
-  db.query(sql, params, (err, results) => {
-    if (err) {
-      res.status(500).json({ success: false, message: err.message });
-    } else {
-      res.status(200).send(results);
+    if (filterDate && filterDate.trim() !== "") {
+      sql += ` AND DATE(leads.createdTime) = ?`;
+      params.push(filterDate.trim());
     }
-  });
+
+    if (leadSource && leadSource.trim() !== "") {
+      sql += ` AND leads.leadSource = ?`;
+      params.push(leadSource.trim());
+    }
+
+    if (unitStatus && unitStatus.trim() !== "") {
+      sql += ` AND units.unit_status = ?`;
+      params.push(unitStatus.trim());
+    }
+
+    if (visitStatus && visitStatus.trim() !== "") {
+      sql += ` AND LOWER(TRIM(leads.primary_status)) = LOWER(TRIM(?))`;
+      params.push(visitStatus.trim());
+    }
+
+    if (activeTab && activeTab.trim() !== "") {
+      const tab = activeTab.trim();
+      if (tab === "today") {
+        sql += ` AND DATE(leads.createdTime) = CURRENT_DATE()`;
+      } else if (tab === "past") {
+        sql += ` AND DATE(leads.createdTime) < CURRENT_DATE()`;
+      } else if (tab === "upcoming") {
+        sql += ` AND DATE(leads.createdTime) > CURRENT_DATE()`;
+      } else if (tab === "completed") {
+        sql += ` AND (leads.deal_status = 'close' OR LOWER(TRIM(leads.primary_status)) IN ('deal close', 'visit done'))`;
+      } else if (tab === "visitScheduled") {
+        sql += ` AND LOWER(TRIM(leads.primary_status)) = 'site visit schedule'`;
+      } else if (tab === "visitDone") {
+        sql += ` AND LOWER(TRIM(leads.primary_status)) = 'visit done'`;
+      } else if (tab === "visitPending") {
+        sql += ` AND (leads.primary_status IS NULL OR LOWER(TRIM(leads.primary_status)) IN ('new leads', 'intrested', 'pending'))`;
+      }
+    }
+
+    sql += ` ORDER BY leads.lead_id DESC`;
+
+    db.query(sql, params, async (err, results) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: err.message });
+      }
+      await attachAssigneesAndCreator(results);
+      return res.status(200).send(results);
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 
 const updateLead = async (req, res) => {
   try {
     const { leadId } = req.params;
+
+    const access = await canAccessLead(req.user, leadId);
+    if (!access.allowed) {
+      return res.status(403).json({
+        success: false,
+        message: access.reason || "Access denied",
+      });
+    }
+
     const {
       name: rawName,
       customer_name,
@@ -484,6 +497,14 @@ const updateLead = async (req, res) => {
     const next_follow_date_time = rawNextFollowDateTime || visit_time || "";
     const remark = rawRemark || lead_review || "";
 
+    // Employees cannot reassign leads via lead update form
+    const isEmployee = req.user && req.user.staff_role === "employee";
+    let effectiveAssignedTo = assignedTo;
+    if (Array.isArray(req.body.staffIds) && req.body.staffIds.length > 0) {
+      effectiveAssignedTo = req.body.staffIds[0];
+    }
+    const finalAssignedTo = isEmployee ? access.lead.assignedTo : (effectiveAssignedTo || access.lead.assignedTo || null);
+
     if (!name || !leadSource) {
       return res.status(400).json({
         success: false,
@@ -521,7 +542,7 @@ const updateLead = async (req, res) => {
         [
           name,
           phone || "",
-          assignedTo || null,
+          finalAssignedTo,
           leadSource,
           actual_date || "",
           main_project_id || null,
@@ -566,15 +587,43 @@ const updateLead = async (req, res) => {
       );
     });
 
-    if (assignedTo) {
-      const staffQuery =
-        "SELECT staff_name, staff_email FROM company_staff WHERE staff_id = ?";
-      db.query(staffQuery, [assignedTo], async (err, staffResult) => {
-        if (err) {
-          console.error("Error fetching staff details:", err.message);
-        } else if (staffResult.length > 0) {
-          const staff = staffResult[0];
+    let targetAssignees = [];
+    if (!isEmployee) {
+      if (Array.isArray(req.body.staffIds) && req.body.staffIds.length > 0) {
+        targetAssignees = req.body.staffIds.map((id) => Number(id)).filter(Boolean);
+      } else if (finalAssignedTo && finalAssignedTo !== access.lead.assignedTo) {
+        targetAssignees = [Number(finalAssignedTo)];
+      }
+    }
 
+    if (targetAssignees.length > 0) {
+      // Un-hide if previously hidden
+      await new Promise((resolve) => {
+        db.query(
+          "UPDATE leads SET hidden_by_employee = 0 WHERE lead_id = ?",
+          [leadId],
+          () => resolve()
+        );
+      });
+
+      const staffRows = await new Promise((resolve) => {
+        db.query(
+          "SELECT staff_id, staff_name, staff_email FROM company_staff WHERE staff_org_id = ? AND staff_id IN (?)",
+          [access.lead.lead_org_id, targetAssignees],
+          (err, rows) => resolve(rows || [])
+        );
+      });
+
+      for (const staff of staffRows) {
+        const insertRes = await new Promise((resolve) => {
+          db.query(
+            "INSERT IGNORE INTO lead_assignees (lead_id, staff_id, access_type, granted_by, created_at) VALUES (?, ?, 'assigned', ?, ?)",
+            [leadId, staff.staff_id, req.user.staff_id, updatedTimeIST],
+            (err, res) => resolve(res)
+          );
+        });
+
+        if (insertRes && insertRes.affectedRows > 0) {
           const subject = "CRMGuru - New General Lead Assigned";
           const text = `Dear ${staff.staff_name},
 
@@ -599,10 +648,8 @@ CRMGuru Team`;
           } catch (emailErr) {
             console.error("Email sending failed:", emailErr.message);
           }
-        } else {
-          console.warn("No staff found with ID:", assignedTo);
         }
-      });
+      }
     }
 
     res.status(200).json({ message: "Lead updated successfully" });
@@ -611,35 +658,44 @@ CRMGuru Team`;
   }
 };
 
-const deleteLead = (req, res) => {
-  const { leadId } = req.params;
+const deleteLead = async (req, res) => {
+  try {
+    const { leadId } = req.params;
 
-  if (!leadId) {
-    return res.status(400).json({ success: false, error: "Lead ID is required" });
-  }
+    if (!leadId) {
+      return res.status(400).json({ success: false, error: "Lead ID is required" });
+    }
 
-  const isEmployee = req.user && req.user.staff_role === "employee";
-  const sqlLeads = isEmployee
-    ? `UPDATE leads SET hidden_by_employee = 1 WHERE lead_id = ?`
-    : `DELETE FROM leads WHERE lead_id = ?`;
+    const access = await canDeleteLead(req.user, leadId);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, error: access.reason || "Access denied" });
+    }
 
-  db.query(sqlLeads, [leadId], (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        error: err.message
+    const isEmployee = req.user && req.user.staff_role === "employee";
+    const sqlLeads = isEmployee
+      ? `UPDATE leads SET hidden_by_employee = 1 WHERE lead_id = ?`
+      : `DELETE FROM leads WHERE lead_id = ?`;
+
+    db.query(sqlLeads, [leadId], (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          error: err.message
+        });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, error: "Lead not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: isEmployee ? "Lead successfully hidden for employee" : "Lead successfully deleted"
       });
-    }
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, error: "Lead not found" });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: isEmployee ? "Lead successfully hidden for employee" : "Lead successfully deleted"
     });
-  });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
 };
 
 const addProject = (req, res) => {

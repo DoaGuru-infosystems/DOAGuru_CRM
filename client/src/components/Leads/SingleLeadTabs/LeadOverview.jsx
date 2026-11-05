@@ -48,7 +48,24 @@ const LeadOverview = ({ leads }) => {
                 className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition-colors`}
               >
                 <td className="px-3 py-2.5 border-b border-gray-200 text-xs sm:text-sm text-gray-600 font-semibold whitespace-nowrap">
-                  {lead.staff_name}
+                  {lead.assignees && lead.assignees.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {lead.assignees.map((a) => (
+                        <span
+                          key={a.staff_id}
+                          className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${
+                            a.access_type === "shared"
+                              ? "bg-purple-100 text-purple-800 border border-purple-200"
+                              : "bg-blue-100 text-blue-800 border border-blue-200"
+                          }`}
+                        >
+                          {a.access_type === "shared" ? "🔗" : "👤"} {a.staff_name}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    lead.staff_name || "-"
+                  )}
                 </td>
 
                 <td className="px-3 py-2.5 border-b border-gray-200 text-xs sm:text-sm text-gray-600 font-semibold whitespace-nowrap">

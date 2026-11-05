@@ -27,6 +27,7 @@ const ADMIN_LEAD_COLUMNS = [
   { key: "remark", label: "Remark" },
   { key: "interested_follow_up", label: "Interested Follow-up" },
   { key: "assignedTo", label: "Assigned To" },
+  { key: "created_by_name", label: "Created By" },
   { key: "action", label: "Action", locked: true },
 ];
 
@@ -44,7 +45,6 @@ function AdminLeadsContent({ isSidebarOpen }) {
     isColumnVisible,
   } = useColumnPreferences("admin_leads", ADMIN_LEAD_COLUMNS, adminuser);
   const [employees, setEmployees] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState([]);
 
   const [filterDate, setFilterDate] = useState("");
   const [showPopup, setShowPopup] = useState(false);
@@ -87,57 +87,9 @@ function AdminLeadsContent({ isSidebarOpen }) {
 
   useEffect(() => {
     fetchLeads();
-    if (token) {
-      fetchPendingRequests();
-    }
   }, [token]);
 
   console.log(projects);
-
-  const fetchPendingRequests = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:9000/api/leads/transfer-requests/pending",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setPendingRequests(response.data);
-    } catch (error) {
-      console.error("Error fetching pending requests:", error);
-    }
-  };
-
-  const handleRespondToRequest = async (request_id, action) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:9000/api/leads/transfer-request/respond",
-        {
-          request_id,
-          action
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.data.success) {
-        toast.success(`Transfer request ${action} successfully`);
-        fetchPendingRequests();
-        fetchLeads();
-      } else {
-        toast.error(response.data.message || "Failed to respond to request");
-      }
-    } catch (error) {
-      console.error("Error responding to request:", error);
-      toast.error(error.response?.data?.message || "Failed to respond to request");
-    }
-  };
 
   const fetchLeads = async () => {
     try {
@@ -463,7 +415,17 @@ function AdminLeadsContent({ isSidebarOpen }) {
         row["Interested Follow-up"] = lead.interested_follow_up || "-";
       }
       if (isColumnVisible("assignedTo")) {
-        row["Assigned To"] = lead.staff_name || "-";
+        row["Assigned To"] =
+          lead.assignees && lead.assignees.length > 0
+            ? lead.assignees
+                .map((a) => `${a.staff_name} (${a.access_type})`)
+                .join(", ")
+            : lead.staff_name || "-";
+      }
+      if (isColumnVisible("created_by_name")) {
+        row["Created By"] = lead.created_by_name
+          ? `${lead.created_by_name} (${lead.created_by_role || "staff"})`
+          : "-";
       }
       row["Created Date"] = formatCreatedDateTime(lead.createdTime);
 
@@ -490,39 +452,6 @@ function AdminLeadsContent({ isSidebarOpen }) {
                 Leads Management
               </h2>
               <div className="mx-auto h-[3px] w-16 bg-cyan-600 my-3"></div>
-
-              {pendingRequests.length > 0 && (
-                <div className="mb-6 bg-white border border-gray-200 rounded-lg p-4 shadow-sm max-w-6xl mx-auto">
-                  <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    📬 Pending Lead Transfer Requests ({pendingRequests.length})
-                  </h3>
-                  <div className="space-y-3">
-                    {pendingRequests.map((req) => (
-                      <div key={req.request_id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-md border border-gray-100 gap-3">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs sm:text-sm text-gray-700 whitespace-normal break-words">
-                            <span className="font-semibold">{req.sender_name}</span> wants to transfer lead <span className="font-semibold text-cyan-600">{req.lead_name}</span> (Phone: {req.lead_phone}) to you.
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleRespondToRequest(req.request_id, "accepted")}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded transition"
-                          >
-                            Accept
-                          </button>
-                          <button
-                            onClick={() => handleRespondToRequest(req.request_id, "rejected")}
-                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded transition"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Button to create a new lead */}
               <div className="mb-4">
@@ -773,6 +702,11 @@ function AdminLeadsContent({ isSidebarOpen }) {
                         Assigned To
                       </th>
                     )}
+                    {isColumnVisible("created_by_name") && (
+                      <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
+                        Created By
+                      </th>
+                    )}
                     {isColumnVisible("action") && (
                       <th className="px-4 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm border-y-2 border-gray-300 text-left">
                         Action
@@ -873,7 +807,40 @@ function AdminLeadsContent({ isSidebarOpen }) {
                           )}
                           {isColumnVisible("assignedTo") && (
                             <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
-                              {lead.staff_name || "-"}
+                              {lead.assignees && lead.assignees.length > 0 ? (
+                                <div className="flex flex-wrap gap-1 max-w-xs">
+                                  {lead.assignees.map((a) => (
+                                    <span
+                                      key={a.staff_id}
+                                      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${
+                                        a.access_type === "shared"
+                                          ? "bg-purple-100 text-purple-800 border border-purple-200"
+                                          : "bg-cyan-100 text-cyan-800 border border-cyan-200"
+                                      }`}
+                                      title={`${a.staff_name} (${a.access_type})`}
+                                    >
+                                      {a.access_type === "shared" ? "🔗" : "👤"}{" "}
+                                      {a.staff_name}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                lead.staff_name || "-"
+                              )}
+                            </td>
+                          )}
+                          {isColumnVisible("created_by_name") && (
+                            <td className="px-4 py-3 border-b border-gray-200 text-gray-700 font-medium">
+                              {lead.created_by_name ? (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                  👤 {lead.created_by_name}
+                                  <span className="ml-1 text-[10px] text-gray-500">
+                                    ({lead.created_by_role || "staff"})
+                                  </span>
+                                </span>
+                              ) : (
+                                "-"
+                              )}
                             </td>
                           )}
                           {isColumnVisible("action") && (

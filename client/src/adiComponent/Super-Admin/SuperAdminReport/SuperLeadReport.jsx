@@ -295,7 +295,7 @@ function SuperLeadReport() {
                       {lead.name}
                     </td>
                     <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
-                      {lead.staff_name}
+                      {lead.assignee_names || lead.staff_name}
                     </td>
 
                     <td className="px-6 py-4 border-b border-gray-200 text-gray-800">

@@ -40,15 +40,13 @@ const buildVisibilityWhere = (user, options = {}) => {
     };
   }
 
-  // SuperAdmin
-  // TODO: SuperAdmin scope decision pending (org-wide vs system-wide).
-  // Currently defaults to org-scoped if options.orgId provided, else user's org.
+  // SuperAdmin: Option A: Global visibility across all orgs by default, with optional org filter
   if (role === "superadmin") {
-    const effectiveOrgId = options.orgId || orgId;
-    if (effectiveOrgId) {
+    const filterOrgId = options.orgId || options.lead_org_id;
+    if (filterOrgId && filterOrgId !== "all") {
       return {
         whereClause: `${leadAlias}.lead_org_id = ?`,
-        params: [effectiveOrgId],
+        params: [filterOrgId],
         joinClause: "",
       };
     }
@@ -76,10 +74,9 @@ const buildVisibilityWhere = (user, options = {}) => {
   // Note: NULL created_by rows are NOT visible to employees unless explicitly assigned.
   if (role === "employee") {
     return {
-      whereClause: `${leadAlias}.lead_org_id = ? AND (${leadAlias}.created_by = ? OR ${laAlias}.staff_id = ?)`,
+      whereClause: `${leadAlias}.lead_org_id = ? AND (${leadAlias}.created_by = ? OR EXISTS (SELECT 1 FROM lead_assignees ${laAlias} WHERE ${laAlias}.lead_id = ${leadAlias}.lead_id AND ${laAlias}.staff_id = ?))`,
       params: [orgId, staffId, staffId],
-      joinClause: `LEFT JOIN lead_assignees ${laAlias} ON ${laAlias}.lead_id = ${leadAlias}.lead_id AND ${laAlias}.staff_id = ?`,
-      joinParams: [staffId],
+      joinClause: "",
     };
   }
 
@@ -137,6 +134,10 @@ const canAccessLead = async (user, leadOrId) => {
 
   // Employee check: creator OR assigned in lead_assignees
   if (role === "employee") {
+    if (lead.hidden_by_employee == 1) {
+      return { allowed: false, reason: "Lead has been deleted", lead };
+    }
+
     if (lead.created_by && Number(lead.created_by) === Number(staffId)) {
       return { allowed: true, lead };
     }
@@ -219,6 +220,10 @@ const canShare = async (user, leadOrId) => {
 
   if (!lead) return { allowed: false, reason: "Lead not found" };
 
+  if (lead.hidden_by_employee == 1) {
+    return { allowed: false, reason: "Cannot share a deleted lead", lead };
+  }
+
   if (role !== "employee") {
     return { allowed: false, reason: "Only employees can share leads (Admin uses assign)", lead };
   }
@@ -234,6 +239,91 @@ const canShare = async (user, leadOrId) => {
   return { allowed: true, lead };
 };
 
+/**
+ * Attaches multi-assignees list and created_by_name to a single lead or array of leads.
+ * Preserves backward compatibility fields (assignedTo, staff_name).
+ * Performs at most 2 batch queries for the whole set.
+ *
+ * @param {Object|Array} leads - A single lead object or array of lead objects
+ * @returns {Promise<Object|Array>} The enriched lead(s)
+ */
+const attachAssigneesAndCreator = async (leads) => {
+  if (!leads) return leads;
+  const isArray = Array.isArray(leads);
+  const leadList = isArray ? leads : [leads];
+  if (leadList.length === 0) return leads;
+
+  const leadIds = leadList.map((l) => l.lead_id).filter(Boolean);
+  if (leadIds.length === 0) return leads;
+
+  // 1. Fetch all assignees for these leads
+  const assigneeRows = await new Promise((resolve, reject) => {
+    db.query(
+      `SELECT la.lead_id, la.staff_id, la.access_type, cs.staff_name, cs.staff_email, cs.staff_phone 
+       FROM lead_assignees la 
+       JOIN company_staff cs ON cs.staff_id = la.staff_id 
+       WHERE la.lead_id IN (?) 
+       ORDER BY la.id ASC`,
+      [leadIds],
+      (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      }
+    );
+  });
+
+  const assigneesByLeadId = {};
+  for (const row of assigneeRows) {
+    if (!assigneesByLeadId[row.lead_id]) {
+      assigneesByLeadId[row.lead_id] = [];
+    }
+    assigneesByLeadId[row.lead_id].push({
+      staff_id: row.staff_id,
+      staff_name: row.staff_name,
+      staff_email: row.staff_email,
+      staff_phone: row.staff_phone,
+      access_type: row.access_type,
+    });
+  }
+
+  // 2. Fetch creator names
+  const creatorIds = Array.from(
+    new Set(leadList.map((l) => l.created_by).filter(Boolean))
+  );
+  let creatorMap = {};
+  if (creatorIds.length > 0) {
+    const creatorRows = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT staff_id, staff_name FROM company_staff WHERE staff_id IN (?)",
+        [creatorIds],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
+        }
+      );
+    });
+    for (const r of creatorRows) {
+      creatorMap[r.staff_id] = r.staff_name;
+    }
+  }
+
+  // 3. Attach properties to lead objects
+  for (const lead of leadList) {
+    lead.assignees = assigneesByLeadId[lead.lead_id] || [];
+    lead.created_by_name = lead.created_by
+      ? creatorMap[lead.created_by] || null
+      : null;
+
+    // For backwards compatibility:
+    // If staff_name is not set, take it from first assignee
+    if (!lead.staff_name && lead.assignees.length > 0) {
+      lead.staff_name = lead.assignees[0].staff_name;
+    }
+  }
+
+  return leads;
+};
+
 module.exports = {
   normalizePhone,
   buildVisibilityWhere,
@@ -241,5 +331,6 @@ module.exports = {
   canDeleteLead,
   canShare,
   fetchLeadById,
+  attachAssigneesAndCreator,
 };
 

@@ -7,7 +7,7 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 const { sendEmail } = require("../utils/emailService");
 const { sendWhatsAppLeadAssignedAlert } = require("../utils/whatsappUtils");
-const { normalizePhone } = require("../utils/leadVisibility");
+const { normalizePhone, canShare, fetchLeadById } = require("../utils/leadVisibility");
 
 const metaLeadFetchByPageId = async (req, res) => {
   const { pageId, accessToken, meta_org_id } = req.body;
@@ -892,6 +892,7 @@ const updateLeadAssignment = async (req, res) => {
       values.push(unit_id);
     }
 
+    fields.push("hidden_by_employee = 0");
     fields.push("lead_updated_at = ?");
     values.push(dateTime);
 
@@ -1079,11 +1080,12 @@ const bulkAssignLeads = async (req, res) => {
         );
       }
 
-      // Re-sync leads.assignedTo if NULL, and update assignedBy
+      // Re-sync leads.assignedTo if NULL, update assignedBy, and reset hidden_by_employee for new assignment
       await connQuery(
         `UPDATE leads 
          SET assignedTo = COALESCE(assignedTo, ?),
              assignedBy = ?,
+             hidden_by_employee = 0,
              lead_updated_at = ?
          WHERE lead_id IN (?)`,
         [firstStaffId, assignedByName, dateTime, cleanLeadIds]
@@ -1221,6 +1223,325 @@ const removeLeadAssignee = async (req, res) => {
   }
 };
 
+const notifySharedStaff = async (staffIds, leadCount) => {
+  try {
+    if (!staffIds || staffIds.length === 0) return;
+    const staffRows = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT staff_id, staff_name, staff_email, staff_phone FROM company_staff WHERE staff_id IN (?)",
+        [staffIds],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
+        }
+      );
+    });
+
+    for (const staff of staffRows) {
+      if (staff.staff_email) {
+        const subject = "CRMGuru - Lead(s) Shared With You";
+        const text = `Dear ${staff.staff_name},\n\n${leadCount} lead(s) have been shared with you in CRMGuru.\n\nPlease log in to view the lead details.\n\nBest regards,\nCRMGuru Team`;
+        const html = `<p>Dear <strong>${staff.staff_name}</strong>,</p><p><strong>${leadCount}</strong> lead(s) have been shared with you in <b>CRMGuru</b>.</p><br/><p>Best regards,<br/>CRMGuru Team</p>`;
+        sendEmail(staff.staff_email, subject, text, html).catch((e) =>
+          console.warn("Share email error:", e.message)
+        );
+      }
+    }
+  } catch (err) {
+    console.warn("notifySharedStaff error:", err.message);
+  }
+};
+
+const shareLeads = async (req, res) => {
+  try {
+    const { leadIds, staffIds } = req.body;
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
+
+    // 1. Role check: Employee only (Admin uses assign)
+    if (!currentUser || currentRole !== "employee") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only employees can share leads (Admin uses assign).",
+      });
+    }
+
+    // 2. Validate input arrays
+    if (
+      !Array.isArray(leadIds) ||
+      leadIds.length === 0 ||
+      !Array.isArray(staffIds) ||
+      staffIds.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "leadIds and staffIds must be non-empty arrays",
+      });
+    }
+
+    // Max 200 leads
+    if (leadIds.length > 200) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot share more than 200 leads at a time",
+      });
+    }
+
+    const cleanLeadIds = Array.from(new Set(leadIds.map(Number))).filter(Boolean);
+    const cleanStaffIds = Array.from(new Set(staffIds.map(Number))).filter(
+      (id) => Boolean(id) && id !== currentUser.staff_id
+    );
+
+    if (cleanLeadIds.length === 0 || cleanStaffIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid leadIds or staffIds (cannot share with self)",
+      });
+    }
+
+    // 3. Check canShare for every lead
+    for (const lId of cleanLeadIds) {
+      const shareCheck = await canShare(currentUser, lId);
+      if (!shareCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          message: `Cannot share lead ID ${lId}: ${shareCheck.reason}`,
+        });
+      }
+    }
+
+    // 4. Validate all target staff: must be same org AND employee role (not admin/superadmin)
+    const staffRows = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT staff_id, staff_role, staff_org_id FROM company_staff WHERE staff_id IN (?)",
+        [cleanStaffIds],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
+        }
+      );
+    });
+
+    if (staffRows.length !== cleanStaffIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: "One or more target employees not found",
+      });
+    }
+
+    for (const staff of staffRows) {
+      if (staff.staff_org_id !== currentUser.staff_org_id) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. Target employee does not belong to your organization.",
+        });
+      }
+      if ((staff.staff_role || "").toLowerCase() !== "employee") {
+        return res.status(403).json({
+          success: false,
+          message: "Can only share with employees, not admin or superadmin",
+        });
+      }
+    }
+
+    // 5. Transaction: Insert into lead_assignees with access_type='shared'
+    const connection = await new Promise((resolve, reject) => {
+      db.getConnection((err, conn) => {
+        if (err) return reject(err);
+        resolve(conn);
+      });
+    });
+
+    const connQuery = (sql, params = []) => {
+      return new Promise((resolve, reject) => {
+        connection.query(sql, params, (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
+      });
+    };
+
+    const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
+
+    try {
+      await connQuery("START TRANSACTION");
+
+      // Check existing pairs
+      const existingPairs = await connQuery(
+        "SELECT lead_id, staff_id FROM lead_assignees WHERE lead_id IN (?) AND staff_id IN (?)",
+        [cleanLeadIds, cleanStaffIds]
+      );
+      const pairSet = new Set(existingPairs.map((r) => `${r.lead_id}_${r.staff_id}`));
+
+      let sharedCount = 0;
+      let skippedCount = 0;
+      const toInsert = [];
+      const newlySharedStaffSet = new Set();
+
+      for (const lId of cleanLeadIds) {
+        for (const sId of cleanStaffIds) {
+          const key = `${lId}_${sId}`;
+          if (pairSet.has(key)) {
+            skippedCount++;
+          } else {
+            toInsert.push([lId, sId, "shared", currentUser.staff_id, dateTime]);
+            pairSet.add(key);
+            sharedCount++;
+            newlySharedStaffSet.add(sId);
+          }
+        }
+      }
+
+      if (toInsert.length > 0) {
+        await connQuery(
+          "INSERT IGNORE INTO lead_assignees (lead_id, staff_id, access_type, granted_by, created_at) VALUES ?",
+          [toInsert]
+        );
+      }
+
+      await connQuery("COMMIT");
+      connection.release();
+
+      // Notifications (mocked/safe)
+      if (newlySharedStaffSet.size > 0 && process.env.NODE_ENV !== "test") {
+        notifySharedStaff(Array.from(newlySharedStaffSet), cleanLeadIds.length);
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Successfully shared ${sharedCount} lead-employee pairs. ${skippedCount} were already shared.`,
+        sharedCount,
+        skippedCount,
+      });
+    } catch (txErr) {
+      await connQuery("ROLLBACK");
+      connection.release();
+      throw txErr;
+    }
+  } catch (error) {
+    console.error("Error in shareLeads:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const revokeLeadShare = async (req, res) => {
+  try {
+    const { leadId, staffId } = req.params;
+    const currentUser = req.user;
+    const currentRole = (currentUser?.staff_role || "").toLowerCase();
+
+    if (!currentUser) {
+      return res.status(401).json({ success: false, message: "Unauthenticated" });
+    }
+
+    if (!leadId || !staffId) {
+      return res.status(400).json({ success: false, message: "leadId and staffId are required" });
+    }
+
+    // 1. Fetch the shared entry from lead_assignees
+    const shareRows = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT la.*, l.lead_org_id FROM lead_assignees la JOIN leads l ON l.lead_id = la.lead_id WHERE la.lead_id = ? AND la.staff_id = ? AND la.access_type = 'shared'",
+        [leadId, staffId],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows || []);
+        }
+      );
+    });
+
+    if (shareRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Shared entry not found for this lead and employee",
+      });
+    }
+
+    const shareEntry = shareRows[0];
+
+    // 2. Permission check:
+    // Can be revoked by:
+    // - The employee who granted it (granted_by === currentUser.staff_id)
+    // - Admin of the same org
+    // - SuperAdmin
+    const isGranter = Number(shareEntry.granted_by) === Number(currentUser.staff_id);
+    const isAdmin = currentRole === "admin" && Number(shareEntry.lead_org_id) === Number(currentUser.staff_org_id);
+    const isSuperAdmin = currentRole === "superadmin";
+
+    if (!isGranter && !isAdmin && !isSuperAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only the employee who shared this lead, or an Admin/SuperAdmin, can revoke it.",
+      });
+    }
+
+    // 3. Delete from lead_assignees (strictly shared rows only)
+    await new Promise((resolve, reject) => {
+      db.query(
+        "DELETE FROM lead_assignees WHERE lead_id = ? AND staff_id = ? AND access_type = 'shared'",
+        [leadId, staffId],
+        (err, result) => {
+          if (err) return reject(err);
+          resolve(result);
+        }
+      );
+    });
+
+    // Do NOT touch leads.assignedTo (shared rows never affect leads.assignedTo)
+
+    return res.status(200).json({
+      success: true,
+      message: "Share access revoked successfully",
+    });
+  } catch (error) {
+    console.error("Error revoking lead share:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getSharedByMe = async (req, res) => {
+  try {
+    const currentUser = req.user;
+    if (!currentUser) {
+      return res.status(401).json({ success: false, message: "Unauthenticated" });
+    }
+
+    const sql = `
+      SELECT 
+        la.id AS share_id,
+        la.lead_id,
+        la.staff_id AS shared_with_staff_id,
+        la.created_at AS shared_at,
+        cs.staff_name AS shared_with_name,
+        cs.staff_email AS shared_with_email,
+        cs.staff_phone AS shared_with_phone,
+        l.name AS lead_name,
+        l.phone AS lead_phone,
+        l.lead_status,
+        l.createdTime
+      FROM lead_assignees la
+      JOIN leads l ON l.lead_id = la.lead_id
+      JOIN company_staff cs ON cs.staff_id = la.staff_id
+      WHERE la.granted_by = ? 
+        AND la.access_type = 'shared'
+      ORDER BY la.id DESC
+    `;
+
+    db.query(sql, [currentUser.staff_id], (err, rows) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: err.message });
+      }
+      return res.status(200).json({
+        success: true,
+        sharedLeads: rows || [],
+      });
+    });
+  } catch (error) {
+    console.error("Error fetching shared leads:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 module.exports = {
   metaLeadFetchByPageId,
@@ -1233,4 +1554,7 @@ module.exports = {
   updateLeadAssignment,
   bulkAssignLeads,
   removeLeadAssignee,
+  shareLeads,
+  revokeLeadShare,
+  getSharedByMe,
 };

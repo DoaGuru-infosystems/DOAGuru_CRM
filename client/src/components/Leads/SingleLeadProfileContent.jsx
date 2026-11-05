@@ -118,7 +118,25 @@ function SingleLeadProfileContent({ isSidebarOpen }) {
                         Assigned To
                       </label>
                       <div className="p-2 bg-gray-100 rounded">
-                        <p className="m-0">{lead.staff_name}</p>
+                        {lead.assignees && lead.assignees.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {lead.assignees.map((a) => (
+                              <span
+                                key={a.staff_id}
+                                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                  a.access_type === "shared"
+                                    ? "bg-purple-100 text-purple-800"
+                                    : "bg-blue-100 text-blue-800"
+                                }`}
+                              >
+                                {a.access_type === "shared" ? "🔗" : "👤"}{" "}
+                                {a.staff_name} ({a.access_type})
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="m-0">{lead.staff_name || "-"}</p>
+                        )}
                       </div>
                     </div>
 

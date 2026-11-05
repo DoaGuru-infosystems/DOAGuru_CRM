@@ -2,6 +2,12 @@ const { db } = require("../db");
 const moment = require("moment-timezone");
 const { sendEmail } = require("../utils/emailService");
 const { sendWhatsAppSoldAlert } = require("../utils/whatsappUtils");
+const {
+  buildVisibilityWhere,
+  canAccessLead,
+  canDeleteLead,
+  attachAssigneesAndCreator,
+} = require("../utils/leadVisibility");
 
 const getEmployeeLeads = async (req, res) => {
   try {
@@ -12,11 +18,14 @@ const getEmployeeLeads = async (req, res) => {
     const currentRole = (currentUser?.staff_role || "").toLowerCase();
 
     let targetStaffId = id;
+    let effectiveOrgId = currentUser.staff_org_id;
+
     if (currentRole === "employee") {
       // Employees are strictly restricted to their own leads
       targetStaffId = currentUser.staff_id;
-    } else if (currentRole === "admin") {
-      // Admins can only view leads of employees belonging to their own organization
+      effectiveOrgId = currentUser.staff_org_id;
+    } else {
+      // Admins and SuperAdmins checking an employee's leads
       const staffCheck = await new Promise((resolve, reject) => {
         db.query(
           "SELECT staff_id, staff_org_id FROM company_staff WHERE staff_id = ?",
@@ -27,19 +36,37 @@ const getEmployeeLeads = async (req, res) => {
           }
         );
       });
-      if (!staffCheck.length || staffCheck[0].staff_org_id !== currentUser.staff_org_id) {
+
+      if (!staffCheck.length) {
+        return res.status(404).json({
+          success: false,
+          message: "Target employee not found.",
+        });
+      }
+
+      if (currentRole === "admin" && staffCheck[0].staff_org_id !== currentUser.staff_org_id) {
         return res.status(403).json({
           success: false,
           message: "Access denied. Target employee does not belong to your organization.",
         });
       }
+
+      effectiveOrgId = staffCheck[0].staff_org_id;
     }
 
     const isAdminView = req.originalUrl.includes("employe-leads-admin") ||
       req.originalUrl.includes("employe-leads-super-admin");
 
-    let sql = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name FROM leads join company_staff on company_staff.staff_id = leads.assignedTo left join projects on projects.project_id = leads.main_project_id WHERE leads.assignedTo = ?`;
-    const params = [targetStaffId];
+    let sql = `SELECT DISTINCT leads.*, cs.staff_name, cs.staff_email, cs.staff_phone, projects.project_name 
+               FROM leads 
+               LEFT JOIN company_staff cs ON cs.staff_id = leads.assignedTo 
+               LEFT JOIN projects ON projects.project_id = leads.main_project_id 
+               WHERE leads.lead_org_id = ? 
+                 AND (leads.created_by = ? OR EXISTS (
+                   SELECT 1 FROM lead_assignees la 
+                   WHERE la.lead_id = leads.lead_id AND la.staff_id = ?
+                 ))`;
+    const params = [effectiveOrgId, targetStaffId, targetStaffId];
 
     if (!isAdminView) {
       sql += ` AND (leads.hidden_by_employee IS NULL OR leads.hidden_by_employee = 0)`;
@@ -47,7 +74,7 @@ const getEmployeeLeads = async (req, res) => {
 
     if (search && search.trim() !== "") {
       const s = `%${search.trim()}%`;
-      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
+      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR cs.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
       params.push(s, s, s, s, s, s);
     }
 
@@ -92,10 +119,11 @@ const getEmployeeLeads = async (req, res) => {
 
     sql += ` ORDER BY leads.lead_id DESC`;
 
-    db.query(sql, params, (err, result) => {
+    db.query(sql, params, async (err, result) => {
       if (err) {
         return res.status(400).json({ success: false, message: err.message });
       }
+      await attachAssigneesAndCreator(result);
       return res.status(200).send(result);
     });
   } catch (err) {
@@ -107,6 +135,11 @@ const updateOnlyLeadStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { lead_status } = req.body;
+
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
 
     const sql = `UPDATE leads SET lead_status = ? WHERE lead_id = ?`;
 
@@ -122,7 +155,7 @@ const updateOnlyLeadStatus = async (req, res) => {
 
     res.status(200).json({ message: "Lead updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error: err });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
@@ -141,6 +174,11 @@ const updateLeadStatus = async (req, res) => {
       follow_up_status,
       d_closeDate,
     } = req.body;
+
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
 
     const sql = `UPDATE leads SET lead_status = ?, deal_status = ?, meeting_status=?, booking_amount = ?, payment_mode = ?, registry = ?,  reason = ?, follow_up_status = ?, d_closeDate = ? WHERE lead_id = ?`;
 
@@ -171,7 +209,7 @@ const updateLeadStatus = async (req, res) => {
 
     res.status(200).json({ message: "Lead updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
@@ -193,25 +231,39 @@ const employeeProfile = async (req, res) => {
 
 const getAllEmployeeTotalLeads = async (req, res) => {
   try {
+    // Phase 8: Rewritten to use lead_assignees table.
+    // - Counts assigned and shared leads separately per employee.
+    // - Excludes leads hidden by the employee (hidden_by_employee = 1).
+    // - Only counts employees (staff_role = 'employee').
     const query = `
-    SELECT 
-    e.employeeId,
-    e.name,
-    e.email,
-    e.phone,
-    COUNT(l.lead_id) AS total_leads
-    FROM employee e
-    LEFT JOIN leads l ON e.employeeId = l.employeeId
-    GROUP BY e.employeeId;
+      SELECT
+        cs.staff_id,
+        cs.staff_name    AS name,
+        cs.staff_email   AS email,
+        cs.staff_phone   AS phone,
+        COUNT(DISTINCT CASE WHEN la.access_type = 'assigned' AND l.lead_id IS NOT NULL THEN la.lead_id END) AS assigned_count,
+        COUNT(DISTINCT CASE WHEN la.access_type = 'shared'   AND l.lead_id IS NOT NULL THEN la.lead_id END) AS shared_count,
+        COUNT(DISTINCT CASE WHEN l.lead_id IS NOT NULL THEN la.lead_id END) AS total_leads
+      FROM company_staff cs
+      LEFT JOIN lead_assignees la ON la.staff_id = cs.staff_id
+      LEFT JOIN leads l ON l.lead_id = la.lead_id AND l.hidden_by_employee = 0
+      WHERE cs.staff_role = 'employee'
+      GROUP BY cs.staff_id, cs.staff_name, cs.staff_email, cs.staff_phone
+      ORDER BY total_leads DESC
     `;
 
     db.query(query, (err, results) => {
       if (err) {
         return res.status(500).json({ error: "Internal server error" });
       }
+      // Expose staff_id as employeeId for backward-compat with old clients
+      const employees = results.map((r) => ({
+        ...r,
+        employeeId: r.staff_id,
+      }));
       return res.status(200).json({
         success: true,
-        employees: results,
+        employees,
       });
     });
   } catch (error) {
@@ -226,6 +278,11 @@ const getAllEmployeeTotalLeads = async (req, res) => {
 const getEmployeeFollow_Up = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
 
     const sql = `
     SELECT * FROM follow_up_leads
@@ -277,56 +334,7 @@ const getEmployeeFollow_UpMeta = async (req, res) => {
 
 
 
-// const createFollow_Up = (req, res) => {
-//   try {
-//     const {
-//       fu_project_id,
-//       fu_lead_id,
-//       fu_employeeId,
-//       follow_up_type,
-//       follow_up_date,
-//       follow_up_report,
-//     } = req.body;
-
-//     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-//     const sql = `INSERT INTO follow_up_leads (
-//       fu_project_id,
-//       fu_lead_id,
-//       fu_employeeId,
-//       follow_up_type,
-//       follow_up_date,
-//       follow_up_report,
-//       follow_created_at
-//     ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
-//     const insertParams = [
-//       fu_project_id,
-//       fu_lead_id,
-//       fu_employeeId,
-//       follow_up_type,
-//       follow_up_date,
-//       follow_up_report,
-//       dateTime,
-//     ];
-
-//     db.query(sql, insertParams, (err, results) => {
-//       if (err) {
-//         console.error("Error inserting follow-up data:", err);
-//         return res.status(500).json({ error: "Error inserting data" });
-//       }
-//       res.status(201).json({
-//         success: true,
-//         message: "Follow Up data successfully submitted",
-//       });
-//     });
-//   } catch (error) {
-//     console.error("Unexpected error:", error);
-//     res.status(500).json({ error: "Something went wrong" });
-//   }
-// };
-
-const createFollow_Up = (req, res) => {
+const createFollow_Up = async (req, res) => {
   try {
     const {
       fu_project_id,
@@ -345,6 +353,16 @@ const createFollow_Up = (req, res) => {
         success: false,
         message: "Missing required fields",
       });
+    }
+
+    if (leadType !== "meta") {
+      const access = await canAccessLead(req.user, fu_lead_id);
+      if (!access.allowed) {
+        return res.status(403).json({
+          success: false,
+          message: access.reason || "Access denied",
+        });
+      }
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
@@ -436,10 +454,23 @@ const createFollow_Up = (req, res) => {
 
 
 
-const updateFollow_Up = (req, res) => {
+const updateFollow_Up = async (req, res) => {
   try {
     const fid = req.params.fid;
     const { follow_up_type, follow_up_date, follow_up_report } = req.body;
+
+    const fuRows = await new Promise((resolve, reject) => {
+      db.query("SELECT fu_lead_id FROM follow_up_leads WHERE follow_up_id = ?", [fid], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      });
+    });
+    if (fuRows.length > 0 && fuRows[0].fu_lead_id) {
+      const access = await canAccessLead(req.user, fuRows[0].fu_lead_id);
+      if (!access.allowed) {
+        return res.status(403).json({ success: false, error: access.reason || "Access denied" });
+      }
+    }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
 
@@ -490,12 +521,25 @@ const updateFollow_Up = (req, res) => {
   }
 };
 
-const deleteFollow_Up = (req, res) => {
+const deleteFollow_Up = async (req, res) => {
   const { id } = req.params;
 
   // Basic validation
   if (!id) {
     return res.status(400).json({ error: "Follow Up ID is required" });
+  }
+
+  const fuRows = await new Promise((resolve, reject) => {
+    db.query("SELECT fu_lead_id FROM follow_up_leads WHERE follow_up_id = ?", [id], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows || []);
+    });
+  });
+  if (fuRows.length > 0 && fuRows[0].fu_lead_id) {
+    const access = await canAccessLead(req.user, fuRows[0].fu_lead_id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, error: access.reason || "Access denied" });
+    }
   }
 
   const sql = `DELETE FROM follow_up_leads WHERE follow_up_id = ?`;
@@ -518,6 +562,11 @@ const updateOnlyFollowUpStatus = async (req, res) => {
     const { id } = req.params;
     const { follow_up_status } = req.body;
 
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
+
     const sql = `UPDATE leads SET follow_up_status = ? WHERE lead_id = ?`;
 
     await new Promise((resolve, reject) => {
@@ -532,7 +581,7 @@ const updateOnlyFollowUpStatus = async (req, res) => {
 
     res.status(200).json({ message: "Follow Up updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error: err });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
@@ -597,6 +646,16 @@ const createRemark = async (req, res) => {
         success: false,
         message: "Missing required fields",
       });
+    }
+
+    if (leadType !== "meta") {
+      const access = await canAccessLead(req.user, remark_lead_id);
+      if (!access.allowed) {
+        return res.status(403).json({
+          success: false,
+          message: access.reason || "Access denied",
+        });
+      }
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
@@ -689,10 +748,23 @@ const createRemark = async (req, res) => {
 };
 
 
-const updateRemark = (req, res) => {
+const updateRemark = async (req, res) => {
   try {
     const rid = req.params.rid;
     const { remark_status, answer_remark, remark_date } = req.body;
+
+    const remRows = await new Promise((resolve, reject) => {
+      db.query("SELECT remark_lead_id FROM remark WHERE remark_id = ?", [rid], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      });
+    });
+    if (remRows.length > 0 && remRows[0].remark_lead_id) {
+      const access = await canAccessLead(req.user, remRows[0].remark_lead_id);
+      if (!access.allowed) {
+        return res.status(403).json({ success: false, error: access.reason || "Access denied" });
+      }
+    }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
 
@@ -744,11 +816,24 @@ const updateRemark = (req, res) => {
 
 
 
-const deleteRemark = (req, res) => {
+const deleteRemark = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
     return res.status(400).json({ error: "Remark ID is required" });
+  }
+
+  const remRows = await new Promise((resolve, reject) => {
+    db.query("SELECT remark_lead_id FROM remark WHERE remark_id = ?", [id], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows || []);
+    });
+  });
+  if (remRows.length > 0 && remRows[0].remark_lead_id) {
+    const access = await canAccessLead(req.user, remRows[0].remark_lead_id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, error: access.reason || "Access denied" });
+    }
   }
 
   const sql = `DELETE FROM remark WHERE remark_id = ?`;
@@ -769,6 +854,12 @@ const deleteRemark = (req, res) => {
 const getEmployeeRemark = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
+
     const sql = "SELECT * FROM remark join projects on projects.project_id = remark.remark_project_id join leads on leads.lead_id = remark.remark_lead_id join company_staff on company_staff.staff_id = remark.remark_employeeId WHERE remark.remark_lead_id = ?";
 
     db.query(sql, id, (err, result) => {
@@ -804,6 +895,11 @@ const updateOnlyRemarkStatus = async (req, res) => {
     const { id } = req.params;
     const { remark_status } = req.body;
 
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
+
     const sql = `UPDATE leads SET remark_status = ? WHERE lead_id = ?`;
 
     await new Promise((resolve, reject) => {
@@ -818,13 +914,18 @@ const updateOnlyRemarkStatus = async (req, res) => {
 
     res.status(200).json({ message: "Remarks Status updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error: err });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 const updateOnlyRemarkAnswerStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { answer_remark } = req.body;
+
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
 
     const sql = `UPDATE leads SET answer_remark = ? WHERE lead_id = ?`;
 
@@ -840,7 +941,7 @@ const updateOnlyRemarkAnswerStatus = async (req, res) => {
 
     res.status(200).json({ message: "Answer Remark updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error: err });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
@@ -848,6 +949,13 @@ const updateOnlyRemarkAnswerStatus = async (req, res) => {
 const updateOnlyRemarkAnswer = async (req, res) => {
   try {
     const { lead_id, answer_remark, remark_id } = req.body;
+
+    if (lead_id) {
+      const access = await canAccessLead(req.user, lead_id);
+      if (!access.allowed) {
+        return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+      }
+    }
 
     const sqlUpdateLeads = `UPDATE leads SET answer_remark = ? WHERE lead_id = ?`;
     const sqlUpdateRemark = `UPDATE remark SET answer_remark = ? WHERE id = ?`;
@@ -874,7 +982,7 @@ const updateOnlyRemarkAnswer = async (req, res) => {
 
     res.status(200).json({ message: "Answer Remark status updated successfully in both tables" });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 }
 
@@ -883,6 +991,11 @@ const updateOnlyPrimaryStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { primary_status } = req.body;
+
+    const access = await canAccessLead(req.user, id);
+    if (!access.allowed) {
+      return res.status(403).json({ success: false, message: access.reason || "Access denied" });
+    }
 
     const sql = `UPDATE leads SET primary_status = ? WHERE lead_id = ?`;
 

@@ -168,7 +168,7 @@ const AdminTotalClosedDealContent = () => {
                             {lead.lead_id}
                           </td>
                           <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
-                            {lead.assignedTo}
+                            {lead.assignee_names || lead.staff_name || lead.assignedTo}
                           </td>
                           <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                             {lead.name}

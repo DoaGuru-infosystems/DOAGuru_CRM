@@ -26,6 +26,7 @@ const AdminEditLeadPopup = ({
   const [errors, setErrors] = useState({});
   const [customLeadSource, setCustomLeadSource] = useState("");
   const [customFollowUp, setCustomFollowUp] = useState("");
+  const [selectedStaffIds, setSelectedStaffIds] = useState([]);
   const today = formatDateForInput(new Date());
 
   const initialLeadState = {
@@ -71,6 +72,14 @@ const AdminEditLeadPopup = ({
         setCustomFollowUp("");
       }
 
+      let initialStaff = [];
+      if (selectedLead.assignees && Array.isArray(selectedLead.assignees) && selectedLead.assignees.length > 0) {
+        initialStaff = selectedLead.assignees.map((a) => Number(a.staff_id));
+      } else if (selectedLead.assignedTo) {
+        initialStaff = [Number(selectedLead.assignedTo)];
+      }
+      setSelectedStaffIds(initialStaff);
+
       setCurrentLead({
         lead_org_id: selectedLead.lead_org_id || EmpId?.staff_org_id,
         lead_id: selectedLead.lead_id,
@@ -101,6 +110,8 @@ const AdminEditLeadPopup = ({
         user_id: userId,
       });
     } else {
+      setSelectedStaffIds([]);
+
       setCurrentLead({
         ...initialLeadState,
         lead_org_id: EmpId?.staff_org_id,
@@ -211,11 +222,41 @@ const AdminEditLeadPopup = ({
       calling_date: currentLead.calling_date || today,
       actual_date: currentLead.calling_date || today,
       assignedBy: "SuperAdmin",
+      staffIds: selectedStaffIds,
+      assignedTo: selectedStaffIds.length > 0 ? selectedStaffIds[0] : null,
     };
 
     try {
       setLoading(true);
       if (isEditing) {
+        // Handle any removed assignees
+        if (selectedLead?.assignees && selectedLead.assignees.length > 0) {
+          const removedAssignees = selectedLead.assignees.filter(
+            (a) => !selectedStaffIds.includes(Number(a.staff_id))
+          );
+          for (const rem of removedAssignees) {
+            try {
+              if (rem.access_type === "shared") {
+                await axios.delete(
+                  `http://localhost:9000/api/leads/share/${selectedLead.lead_id}/${rem.staff_id}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+              } else {
+                await axios.delete(
+                  `http://localhost:9000/api/leads/${selectedLead.lead_id}/assignee/${rem.staff_id}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+              }
+            } catch (delErr) {
+              console.error("Error removing assignee:", delErr);
+            }
+          }
+        }
+
         await axios.put(
           `http://localhost:9000/api/leads/${selectedLead?.lead_id}`,
           leadData,
@@ -241,7 +282,14 @@ const AdminEditLeadPopup = ({
       onClose();
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Failed to save lead");
+      if (err.response?.status === 409) {
+        toast.error(
+          err.response?.data?.message ||
+            "Duplicate lead: A lead with this mobile number or email already exists in your organization."
+        );
+      } else {
+        toast.error(err.response?.data?.message || "Failed to save lead");
+      }
     } finally {
       setLoading(false);
     }
@@ -516,24 +564,79 @@ const AdminEditLeadPopup = ({
                 )}
               </div>
 
-              {/* Assigned To (Optional dropdown for employee assignment) */}
+              {/* Assignees (Multi-assignee management) */}
               {employees && employees.length > 0 && (
                 <div className="md:col-span-2">
-                  <label className="text-sm font-semibold text-gray-700">
-                    Assigned To
+                  <label className="text-sm font-semibold text-gray-700 block mb-1">
+                    Assignees ({selectedStaffIds.length} assigned)
                   </label>
+
+                  {/* Selected staff chips */}
+                  {selectedStaffIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                      {selectedStaffIds.map((sid) => {
+                        const emp = employees.find(
+                          (e) => Number(e.staff_id) === Number(sid)
+                        );
+                        const origAssignee = selectedLead?.assignees?.find(
+                          (a) => Number(a.staff_id) === Number(sid)
+                        );
+                        const isShared = origAssignee?.access_type === "shared";
+                        return (
+                          <span
+                            key={sid}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                              isShared
+                                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                                : "bg-cyan-100 text-cyan-800 border border-cyan-200"
+                            }`}
+                          >
+                            <span>
+                              {isShared ? "🔗" : "👤"}{" "}
+                              {emp ? emp.staff_name : `Staff #${sid}`}
+                              {isShared ? " (shared)" : ""}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedStaffIds((prev) =>
+                                  prev.filter(
+                                    (id) => Number(id) !== Number(sid)
+                                  )
+                                );
+                              }}
+                              className="text-gray-500 hover:text-red-600 font-bold ml-1 text-sm leading-none"
+                              title="Remove Assignee"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   <select
-                    name="assignedTo"
-                    value={currentLead.assignedTo || ""}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+                    value=""
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (val && !selectedStaffIds.includes(val)) {
+                        setSelectedStaffIds((prev) => [...prev, val]);
+                      }
+                    }}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none bg-white text-sm"
                   >
-                    <option value="">Select Employee</option>
-                    {employees.map((emp) => (
-                      <option key={emp.staff_id} value={emp.staff_id}>
-                        {emp.staff_name} ({emp.staff_role})
-                      </option>
-                    ))}
+                    <option value="">+ Add staff assignee...</option>
+                    {employees
+                      .filter(
+                        (emp) =>
+                          !selectedStaffIds.includes(Number(emp.staff_id))
+                      )
+                      .map((emp) => (
+                        <option key={emp.staff_id} value={emp.staff_id}>
+                          {emp.staff_name} ({emp.staff_role})
+                        </option>
+                      ))}
                   </select>
                 </div>
               )}
