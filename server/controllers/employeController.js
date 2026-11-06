@@ -57,10 +57,9 @@ const getEmployeeLeads = async (req, res) => {
     const isAdminView = req.originalUrl.includes("employe-leads-admin") ||
       req.originalUrl.includes("employe-leads-super-admin");
 
-    let sql = `SELECT DISTINCT leads.*, cs.staff_name, cs.staff_email, cs.staff_phone, projects.project_name 
+    let sql = `SELECT DISTINCT leads.*, cs.staff_name, cs.staff_email, cs.staff_phone 
                FROM leads 
                LEFT JOIN company_staff cs ON cs.staff_id = leads.assignedTo 
-               LEFT JOIN projects ON projects.project_id = leads.main_project_id 
                WHERE leads.lead_org_id = ? 
                  AND (leads.created_by = ? OR EXISTS (
                    SELECT 1 FROM lead_assignees la 
@@ -74,8 +73,8 @@ const getEmployeeLeads = async (req, res) => {
 
     if (search && search.trim() !== "") {
       const s = `%${search.trim()}%`;
-      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR cs.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
-      params.push(s, s, s, s, s, s);
+      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR cs.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
+      params.push(s, s, s, s, s);
     }
 
     if (filterDate && filterDate.trim() !== "") {
@@ -286,11 +285,9 @@ const getEmployeeFollow_Up = async (req, res) => {
 
     const sql = `
     SELECT * FROM follow_up_leads
-    JOIN projects 
-      ON projects.project_id = follow_up_leads.fu_project_id
     JOIN leads 
       ON leads.lead_id = follow_up_leads.fu_lead_id
-    JOIN company_staff 
+    LEFT JOIN company_staff 
       ON company_staff.staff_id = follow_up_leads.fu_employeeId
     WHERE fu_lead_id = ?
   `;
@@ -312,11 +309,9 @@ const getEmployeeFollow_UpMeta = async (req, res) => {
 
     const sql = `
     SELECT * FROM follow_up_leads
-    JOIN projects 
-      ON projects.project_id = follow_up_leads.fu_project_id
     JOIN meta_leads 
       ON meta_leads.leadgen_id = follow_up_leads.fu_lead_id
-    JOIN company_staff 
+    LEFT JOIN company_staff 
       ON company_staff.staff_id = follow_up_leads.fu_employeeId
     WHERE fu_lead_id = ?
   `;
@@ -366,6 +361,7 @@ const createFollow_Up = async (req, res) => {
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
+    const safeFuProjectId = fu_project_id ? Number(fu_project_id) : 0;
 
     const insertSql = `
       INSERT INTO follow_up_leads (
@@ -380,7 +376,7 @@ const createFollow_Up = async (req, res) => {
     `;
 
     const insertParams = [
-      fu_project_id,
+      safeFuProjectId,
       fu_lead_id,
       fu_employeeId,
       follow_up_type,
@@ -659,7 +655,7 @@ const createRemark = async (req, res) => {
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
+    const safeRemarkProjectId = remark_project_id ? Number(remark_project_id) : 0;
 
     const sqlRemark = `
       INSERT INTO remark (
@@ -675,7 +671,7 @@ const createRemark = async (req, res) => {
 
     const insertParams = [
       remark_lead_id,
-      remark_project_id,
+      safeRemarkProjectId,
       remark_employeeId,
       remark_status,
       answer_remark,
@@ -860,7 +856,7 @@ const getEmployeeRemark = async (req, res) => {
       return res.status(403).json({ success: false, message: access.reason || "Access denied" });
     }
 
-    const sql = "SELECT * FROM remark join projects on projects.project_id = remark.remark_project_id join leads on leads.lead_id = remark.remark_lead_id join company_staff on company_staff.staff_id = remark.remark_employeeId WHERE remark.remark_lead_id = ?";
+    const sql = "SELECT * FROM remark join leads on leads.lead_id = remark.remark_lead_id left join company_staff on company_staff.staff_id = remark.remark_employeeId WHERE remark.remark_lead_id = ?";
 
     db.query(sql, id, (err, result) => {
       if (err) {
@@ -876,7 +872,7 @@ const getEmployeeRemark = async (req, res) => {
 const getEmployeeRemarkMeta = async (req, res) => {
   try {
     const { id } = req.params;
-    const sql = "SELECT * FROM remark join projects on projects.project_id = remark.remark_project_id join meta_leads on meta_leads.leadgen_id = remark.remark_lead_id join company_staff on company_staff.staff_id = remark.remark_employeeId WHERE remark.remark_lead_id = ?";
+    const sql = "SELECT * FROM remark join meta_leads on meta_leads.leadgen_id = remark.remark_lead_id left join company_staff on company_staff.staff_id = remark.remark_employeeId WHERE remark.remark_lead_id = ?";
 
     db.query(sql, id, (err, result) => {
       if (err) {

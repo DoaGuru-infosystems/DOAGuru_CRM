@@ -17,11 +17,9 @@ import SuperMainSocialMediaByProject from "../pages/superAdmin/SuperMainSocialMe
 import SuperAdminImportData from "../pages/superAdmin/SuperAdminImportData";
 import SuperReports from "../pages/superAdmin/SuperReports";
 import SuperDataExport from "../pages/superAdmin/SuperDataExport";
-import SuperProjectDashBoard from "../pages/superAdmin/SuperProjectDashBoard";
 import SuperAdEmployeemanagement from "../pages/superAdmin/SuperAdEmployeemanagement";
 import SuperAdminAdminmanagement from "../pages/superAdmin/SuperAdminAdminmanagement";
 import SuperAdminProfile from "../pages/superAdmin/SuperAdminProfile";
-import SuperDashProject from "../pages/superAdmin/SuperDashProject";
 import SuperAdminTotalLead from "../pages/superAdmin/SuperAdminTotalLead";
 import SuperAdminTotalClosedDeal from "../pages/superAdmin/SuperAdminTotalClosedDeal";
 import SuperSocialMediaLeads from "../pages/superAdmin/SuperSocialMediaLeads";
@@ -41,20 +39,16 @@ function SuperAdminRoutes() {
           path="/super-admin-employee-leads"
           element={<SuperEmployeeLeads />}
         />
-        <Route
+        {/* <Route
           path="/main-social-media-super-admin-leads"
           element={<SuperMainSocialMediaByProject />}
-        />
+        /> */}
         <Route
           path="/super-admin-import-data"
           element={<SuperAdminImportData />}
         />
         <Route path="/super-admin-reporting" element={<SuperReports />} />
         <Route path="/super-admin-data-export" element={<SuperDataExport />} />
-        <Route
-          path="/super-admin-project-dash"
-          element={<SuperProjectDashBoard />}
-        />
         <Route
           path="/super-admin-employee-management"
           element={<SuperAdEmployeemanagement />}
@@ -64,7 +58,6 @@ function SuperAdminRoutes() {
           element={<SuperAdminAdminmanagement />}
         />
         <Route path="/super-admin-profile" element={<SuperAdminProfile />} />
-        <Route path="/Super-admin-project" element={<SuperDashProject />} />
         <Route
           path="/super-admin-total-lead"
           element={<SuperAdminTotalLead />}

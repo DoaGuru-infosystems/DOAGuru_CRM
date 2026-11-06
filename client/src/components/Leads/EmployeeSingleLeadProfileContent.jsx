@@ -30,7 +30,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedLead, setEditedLead] = useState({});
   const [errors, setErrors] = useState({});
-  const [projects, setProjects] = useState([]);
   const [customLeadSource, setCustomLeadSource] = useState("");
 
   // Options for lead fields
@@ -142,7 +141,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   });
 
   const [visitLead, setVisitLead] = useState({
-    project_name: "",
     lead_id: "",
     name: "",
     employeeId: "",
@@ -156,12 +154,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   const [remarkCreated, setRemarkCreated] = useState(false);
 
   useEffect(() => {
-    if (token && EmpId?.staff_org_id) {
-      fetchProjects();
-    }
-  }, [token, EmpId]);
-
-  useEffect(() => {
     fetchFollowUp();
     fetchRemark();
     if (type === "meta") {
@@ -170,23 +162,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       fetchLeads();
     }
   }, [type, id]);
-
-  const fetchProjects = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/super-admin-all-project/${EmpId?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
 
   const fetchLeads = async () => {
     try {
@@ -236,15 +211,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
         return updated;
       }
       updated[name] = value;
-
-      if (name === "project_name") {
-        const selectedProj = projects.find((p) => p.project_name === value);
-        if (selectedProj) {
-          updated.main_project_id = selectedProj.project_id;
-        } else {
-          updated.main_project_id = "";
-        }
-      }
       return updated;
     });
   };
@@ -594,14 +560,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
                         </div>
                         <div>
                           <label className="text-cyan-600 font-semibold">
-                            Project Name
-                          </label>
-                          <div className="p-2 bg-gray-100 rounded">
-                            <p className="m-0">{lead.project_name}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-cyan-600 font-semibold">
                             Lead Status
                           </label>
                           <div className="p-2 bg-gray-100 rounded">
@@ -716,14 +674,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
                             <label className="text-cyan-600 font-semibold">Campaign</label>
                             <div className="p-2 bg-gray-100 rounded">
                               <p className="m-0">{lead.campaign}</p>
-                            </div>
-                          </div>
-                        )}
-                        {lead.interest_in_project_secondary && (
-                          <div>
-                            <label className="text-cyan-600 font-semibold">Sec Project Interest</label>
-                            <div className="p-2 bg-gray-100 rounded">
-                              <p className="m-0">{lead.interest_in_project_secondary}</p>
                             </div>
                           </div>
                         )}
@@ -846,25 +796,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
                             />
                           )}
                           {errors.leadSource && <span className="text-red-500 text-xs block mt-1">{errors.leadSource}</span>}
-                        </div>
-
-                        <div>
-                          <label className="text-cyan-600 font-semibold">
-                            Project Name
-                          </label>
-                          <select
-                            name="project_name"
-                            value={editedLead.project_name || ""}
-                            onChange={handleProfileInputChange}
-                            className="w-full p-2 border bg-white border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                          >
-                            <option value="">Select Primary Project</option>
-                            {projects.map((proj) => (
-                              <option key={proj.project_id} value={proj.project_name}>
-                                {proj.project_name}
-                              </option>
-                            ))}
-                          </select>
                         </div>
 
                         <div>
@@ -1066,25 +997,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
                             {campaignOptions.map((opt) => (
                               <option key={opt} value={opt}>
                                 {opt}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-cyan-600 font-semibold">
-                            Sec Project Interest
-                          </label>
-                          <select
-                            name="interest_in_project_secondary"
-                            value={editedLead.interest_in_project_secondary || ""}
-                            onChange={handleProfileInputChange}
-                            className="w-full p-2 border bg-white border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                          >
-                            <option value="">Select Secondary Project</option>
-                            {projects.map((proj) => (
-                              <option key={proj.project_id} value={proj.project_name}>
-                                {proj.project_name}
                               </option>
                             ))}
                           </select>

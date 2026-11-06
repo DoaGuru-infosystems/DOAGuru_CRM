@@ -20,7 +20,7 @@ const FollowUpCreationPopUp = ({
   const { type, id } = useParams();
   const [loading, setLoading] = useState(false);
   const [follow_up, setFollow_Up] = useState({
-    fu_project_id: leads?.[0]?.main_project_id || leads?.[0]?.project_id || leads?.[0]?.meta_project_id || "",
+    fu_project_id: leads?.[0]?.meta_project_id || null,
     fu_lead_id: leads?.[0]?.lead_id || (leads?.[0]?.leadgen_id ? Number(leads?.[0]?.leadgen_id) : ""),
     fu_employeeId: leads?.[0]?.assignedTo || leads?.[0]?.staff_id || leads?.[0]?.meta_assignedTo || superadminuser?.staff_id || "",
     follow_up_type: "",
@@ -44,7 +44,7 @@ const FollowUpCreationPopUp = ({
     if (leads && leads.length > 0) {
       setFollow_Up((prev) => ({
         ...prev,
-        fu_project_id: leads[0]?.main_project_id || leads[0]?.project_id || leads[0]?.meta_project_id || prev.fu_project_id,
+        fu_project_id: leads[0]?.meta_project_id || null,
         fu_lead_id: leads[0]?.lead_id || (leads[0]?.leadgen_id ? Number(leads[0]?.leadgen_id) : prev.fu_lead_id),
         fu_employeeId: leads[0]?.assignedTo || leads[0]?.staff_id || leads[0]?.meta_assignedTo || superadminuser?.staff_id || prev.fu_employeeId,
         leadType: type || prev.leadType || "general",
@@ -135,19 +135,21 @@ const FollowUpCreationPopUp = ({
 
             {/* Form */}
             <form onSubmit={saveFollowUp} className="space-y-4">
-              {/* Project Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Project Name
-                </label>
-                <input
-                  type="text"
-                  name="project_name"
-                  value={leads?.[0]?.project_name || ""}
-                  disabled
-                  className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-cyan-500"
-                />
-              </div>
+              {/* Project Name (Only if present, e.g. meta leads) */}
+              {leads?.[0]?.project_name && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Project Name
+                  </label>
+                  <input
+                    type="text"
+                    name="project_name"
+                    value={leads?.[0]?.project_name || ""}
+                    disabled
+                    className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+              )}
 
               {/* Name */}
               <div>

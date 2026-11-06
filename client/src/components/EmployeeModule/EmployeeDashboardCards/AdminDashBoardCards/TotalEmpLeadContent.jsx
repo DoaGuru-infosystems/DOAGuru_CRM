@@ -48,7 +48,7 @@ function TotalEmpLeadContent() {
     if (searchTerm) {
       const trimmedSearchTerm = searchTerm.toLowerCase().trim();
       filtered = filtered.filter((lead) =>
-        ["project_name", "name", "leadSource", "phone", "assignedTo"].some(
+        ["name", "leadSource", "phone", "assignedTo"].some(
           (key) => lead[key]?.toLowerCase().trim().includes(trimmedSearchTerm)
         )
       );
@@ -122,9 +122,7 @@ function TotalEmpLeadContent() {
                       <th className="sm:px-6 px-2 sm:py-3 py-2 border-b-2 border-gray-300 text-xs sm:text-sm text-left leading-4 text-gray-600 tracking-wider">
                         S.no
                       </th>
-                      <th className="sm:px-6 px-2 sm:py-3 py-2 border-b-2 border-gray-300 text-left text-xs sm:text-sm leading-4 text-gray-600 tracking-wider">
-                        Project Name
-                      </th>
+
                       <th className="sm:px-6 px-2 sm:py-3 py-2 border-b-2 border-gray-300 text-left text-xs sm:text-sm leading-4 text-gray-600 tracking-wider">
                         Lead Id
                       </th>
@@ -160,9 +158,7 @@ function TotalEmpLeadContent() {
                             ? index + 1
                             : index + 1 + currentPage * leadsPerPage}
                         </td>
-                        <td className="sm:px-6 px-2 sm:py-4 py-2 border-b border-gray-200 text-gray-800 text-xs sm:text-sm">
-                          {lead.project_name}
-                        </td>
+
                         <td className="sm:px-6 px-2 sm:py-4 py-2 border-b border-gray-200 text-gray-800 text-xs sm:text-sm">
                           {lead.lead_id}
                         </td>

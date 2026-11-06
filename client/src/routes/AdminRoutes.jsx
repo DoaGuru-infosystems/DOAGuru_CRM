@@ -14,9 +14,7 @@ import MainSocialMediaByProject from "../pages/Admin/MainSocialMediaByProject";
 import ImportLeadsAdmin from "../pages/Admin/ImportLeadsAdmin";
 import AdminReport from "../pages/Admin/AdminReport";
 import DataExport from "../pages/Admin/DataExport";
-import ProjectDashBoard from "../pages/Admin/ProjectDashBoard";
 import EmployeeManagement from "../pages/Admin/EmployeeManagement";
-import DashProject from "../pages/Admin/DashProject";
 import AdminTotalLead from "../pages/Admin/AdminTotalLead";
 import AdminTotalClosedDeal from "../pages/Admin/AdminTotalClosedDeal";
 import SingleLeadProfile from "../pages/Admin/SingleLeadProfile";
@@ -46,10 +44,8 @@ function AdminRoutes() {
         <Route path="/admin-import-data" element={<ImportLeadsAdmin />} />
         <Route path="/admin-report" element={<AdminReport />} />
         <Route path="/data-export" element={<DataExport />} />
-        <Route path="/Project-Dash" element={<ProjectDashBoard />} />
         <Route path="/employee-management" element={<EmployeeManagement />} />
         <Route path="/admin-profile" element={<AdminProfile />} />
-        <Route path="/admin-project" element={<DashProject />} />
         <Route path="/admin-total-leads" element={<AdminTotalLead />} />
         <Route path="/admin-total-closed" element={<AdminTotalClosedDeal />} />
         <Route path="/lead-single-data/:id" element={<SingleLeadProfile />} />

@@ -72,8 +72,6 @@ function AdminLeadsContent({ isSidebarOpen }) {
   const [meetingStatusFilter, setMeetingStatusFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const [sortOrder, setSortOrder] = useState("desce");
-  const [projects, setProjects] = useState([]);
-  const [projectunit, setProjectUnit] = useState([]);
   const [selectedLead, setSelectedLead] = useState();
   const [visitmonthFilter, setVisitMonthFilter] = useState("");
   const [yearFilter, setYearFilter] = useState("");
@@ -81,15 +79,11 @@ function AdminLeadsContent({ isSidebarOpen }) {
   // Fetch leads from the API
   useEffect(() => {
     fetchEmployees();
-    fetchProjects();
-    fetchProjectsUnit();
   }, []);
 
   useEffect(() => {
     fetchLeads();
   }, [token]);
-
-  console.log(projects);
 
   const fetchLeads = async () => {
     try {
@@ -129,51 +123,6 @@ function AdminLeadsContent({ isSidebarOpen }) {
       setEmployees(data);
     } catch (error) {
       console.error("Error fetching employees:", error);
-    }
-  };
-
-  const fetchProjects = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/super-admin-all-project/${adminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
-
-  const fetchProjectsUnit = async (main_project_id) => {
-    try {
-      if (!main_project_id) {
-        setProjectUnit([]);
-        return;
-      }
-
-      const response = await axios.get(
-        `http://localhost:9000/api/super-admin-project-unit/${main_project_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.length > 0) {
-        setProjectUnit(response.data);
-      } else {
-        setProjectUnit([]);
-      }
-    } catch (error) {
-      console.error("Error fetching units:", error);
-      setProjectUnit([]);
     }
   };
 
@@ -923,9 +872,6 @@ function AdminLeadsContent({ isSidebarOpen }) {
         employees={employees}
         errors={errors}
         combinedLeadSources={combinedLeadSources}
-        projectunit={projectunit}
-        projects={projects}
-        fetchProjectsUnit={fetchProjectsUnit}
         fetchLeads={fetchLeads}
         isEditing={isEditing}
         currentLeads={currentLeads}

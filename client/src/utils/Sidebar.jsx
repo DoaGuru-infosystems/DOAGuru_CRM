@@ -61,11 +61,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           icon: <BiExport />,
         },
         {
-          name: "Projects",
-          path: "/super-admin-project-dash",
-          icon: <GrProjects />,
-        },
-        {
           name: "Employees Management",
           path: "/super-admin-employee-management",
           icon: <IoIosPeople />,
@@ -101,12 +96,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           name: "Data Export",
           path: "/data-export",
           icon: <BiExport />,
-        },
-
-        {
-          name: "Projects",
-          path: "/Project-Dash",
-          icon: <GrProjects />,
         },
         {
           name: "Employees Management",

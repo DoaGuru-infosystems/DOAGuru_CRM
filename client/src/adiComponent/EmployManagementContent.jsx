@@ -4,7 +4,7 @@ import { BsPencilSquare, BsTrash, BsPlusCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useSelector } from "react-redux";
-import SuperAddEditEmployeePopup from "./Super-Admin/SuperAdminProject/SuperAddEditEmployeePopup";
+import SuperAddEditEmployeePopup from "./Super-Admin/SuperAddEditEmployeePopup";
 
 const EmployeeManagementContent = () => {
   const [employees, setEmployees] = useState([]);

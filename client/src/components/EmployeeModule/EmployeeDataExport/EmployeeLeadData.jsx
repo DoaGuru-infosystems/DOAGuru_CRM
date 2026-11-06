@@ -184,9 +184,6 @@ function EmployeeLeadData() {
             <thead>
               <tr>
                 <th className="px-6 py-3 border-b-2 border-gray-300">S.no</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300">
-                  Project Name
-                </th>
                 {/* <th className="px-6 py-3 border-b-2 border-gray-300">
                   Lead Number
                 </th> */}
@@ -225,9 +222,6 @@ function EmployeeLeadData() {
                   >
                     <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                       {index + 1 + currentPage * leadsPerPage}
-                    </td>
-                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
-                      {lead.project_name}
                     </td>
                     {/* <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                       {lead.lead_no}

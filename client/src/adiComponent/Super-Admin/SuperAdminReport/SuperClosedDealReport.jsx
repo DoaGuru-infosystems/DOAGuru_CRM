@@ -34,7 +34,6 @@ const SuperClosedDealReport = () => {
     "reason",
     "registry",
 
-    "project_name",
     "visit",
     "visit_date",
     "d_closeDate",
@@ -149,7 +148,6 @@ const SuperClosedDealReport = () => {
       reason: "Reason",
       registry: "Registry",
 
-      project_name: "Project",
       visit: "Visit",
       visit: "Visit Date",
       d_closeDate: "Close Date",

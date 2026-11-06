@@ -10,12 +10,9 @@ const ImportLeadsAdminContent = () => {
   const userId = adminuser.user_id;
   const [file, setFile] = useState(null);
   const [employees, setEmployees] = useState([]);
-  const [projects, setProjects] = useState([]);
   const [projectUnits, setProjectUnits] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedUnitType, setSelectedUnitType] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [selectedProjectName, setSelectedProjectName] = useState("");
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [selectedEmployeeName, setSelectedEmployeeName] = useState("");
   const [assignedDate, setAssignedDate] = useState("");
@@ -25,7 +22,6 @@ const ImportLeadsAdminContent = () => {
 
   useEffect(() => {
     fetchEmployees();
-    fetchProjects();
   }, []);
 
   const fetchEmployees = async () => {
@@ -38,39 +34,6 @@ const ImportLeadsAdminContent = () => {
     } catch (err) {
       console.error("Error fetching employees:", err);
     }
-  };
-
-  const fetchProjects = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:9000/api/all-project/${userId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProjects(res.data);
-    } catch (err) {
-      console.error("Error fetching projects:", err);
-    }
-  };
-
-  const fetchProjectUnits = async (projectId) => {
-    try {
-      const res = await axios.get(
-        `http://localhost:9000/api/super-admin-project-unit/${projectId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProjectUnits(res.data);
-    } catch (err) {
-      console.error("Error fetching project units:", err);
-    }
-  };
-
-  const handleProjectChange = (e) => {
-    const projectId = parseInt(e.target.value, 10);
-    const proj = projects.find((p) => p.main_project_id === projectId);
-    setSelectedProjectId(projectId);
-    setSelectedProjectName(proj?.project_name || "");
-    setSelectedUnitType("");
-    fetchProjectUnits(projectId);
   };
 
   const handleEmployeeChange = (e) => {
@@ -91,8 +54,6 @@ const ImportLeadsAdminContent = () => {
     if (
       !file ||
       !selectedEmployee ||
-      !selectedProjectId ||
-      !selectedUnitType ||
       !assignedDate
     ) {
       toast.error("Please fill all fields and upload a file.");
@@ -104,10 +65,8 @@ const ImportLeadsAdminContent = () => {
     formData.append("user_id", userId);
     formData.append("employeeId", selectedEmployee);
     formData.append("assignedTo", selectedEmployeeName);
-    formData.append("main_project_id", selectedProjectId);
-    formData.append("project_name", selectedProjectName);
-    formData.append("unit_type", selectedUnitType);
-    formData.append("unit_id", selectedUnitId);
+    if (selectedUnitType) formData.append("unit_type", selectedUnitType);
+    if (selectedUnitId) formData.append("unit_id", selectedUnitId);
     formData.append("assignedBy", "SuperAdmin");
     formData.append("assigned_date", assignedDate);
 
@@ -128,8 +87,6 @@ const ImportLeadsAdminContent = () => {
       setFileKey(Date.now());
       setSelectedEmployee("");
       setSelectedEmployeeName("");
-      setSelectedProjectId("");
-      setSelectedProjectName("");
       setSelectedUnitType("");
       setSelectedUnitId("");
       setProjectUnits([]);
@@ -207,30 +164,6 @@ const ImportLeadsAdminContent = () => {
               {employees.map((emp) => (
                 <option key={emp.employeeId} value={emp.employeeId}>
                   {emp.name}
-                </option>
-              ))}
-            </select>
-          </motion.div>
-
-          {/* Project */}
-          <motion.div
-            className="mb-6 text-left"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-          >
-            <label className="block text-gray-700 font-semibold mb-2">
-              Select Project
-            </label>
-            <select
-              value={selectedProjectId}
-              onChange={handleProjectChange}
-              className="border rounded-xl px-4 py-3 w-full focus:ring-2 focus:ring-cyan-500 transition hover:bg-cyan-50"
-            >
-              <option value="">Select</option>
-              {projects.map((proj) => (
-                <option key={proj.main_project_id} value={proj.main_project_id}>
-                  {proj.project_name}
                 </option>
               ))}
             </select>

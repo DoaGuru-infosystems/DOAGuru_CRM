@@ -429,7 +429,7 @@ const SuperEmployeeList = () => {
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Project</label>
+                <label className="block text-gray-700">Subject</label>
                 <input
                   type="text"
                   name="subject"

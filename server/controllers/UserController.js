@@ -210,7 +210,7 @@ const createLead = async (req, res) => {
       lead_email || null,
       firstAssignee,
       leadSource,
-      main_project_id || null,
+      null, // main_project_id decoupled from leads (always NULL)
       unit_type || "",
       unit_id || null,
       address,
@@ -229,7 +229,7 @@ const createLead = async (req, res) => {
       badge || null,
       salary || null,
       campaign || null,
-      interest_in_project_secondary || null,
+      null, // interest_in_project_secondary decoupled from leads (always NULL)
       lead_sub_source || null,
       budget || null,
       primary_status || null,
@@ -318,7 +318,7 @@ const getleadbyid = async (req, res) => {
       return res.status(403).json({ error: access.reason || "Access denied" });
     }
 
-    const getQuery = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name FROM leads left join company_staff on company_staff.staff_id = leads.assignedTo left join projects on projects.project_id = leads.main_project_id WHERE leads.lead_id = ?`;
+    const getQuery = `SELECT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone FROM leads left join company_staff on company_staff.staff_id = leads.assignedTo WHERE leads.lead_id = ?`;
     db.query(getQuery, [id], async (error, result) => {
       if (error) {
         return res.status(500).json({ error: "Internal Server Error" });
@@ -364,20 +364,19 @@ const getLeads = async (req, res) => {
       leadAlias: "leads",
     });
 
-    let sql = `SELECT DISTINCT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name,
+    let sql = `SELECT DISTINCT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone,
                (SELECT GROUP_CONCAT(cs2.staff_name ORDER BY la2.id SEPARATOR ', ')
                 FROM lead_assignees la2 JOIN company_staff cs2 ON cs2.staff_id = la2.staff_id
                 WHERE la2.lead_id = leads.lead_id AND la2.access_type = 'assigned') AS assignee_names
                FROM leads 
                LEFT JOIN company_staff ON company_staff.staff_id = leads.assignedTo 
-               LEFT JOIN projects ON projects.project_id = leads.main_project_id 
                WHERE ${vis.whereClause}`;
     const params = [...vis.params];
 
     if (search && search.trim() !== "") {
       const s = `%${search.trim()}%`;
-      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
-      params.push(s, s, s, s, s, s);
+      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
+      params.push(s, s, s, s, s);
     }
 
     if (filterDate && filterDate.trim() !== "") {
@@ -534,7 +533,7 @@ const updateLead = async (req, res) => {
     }
 
     const updatedTimeIST = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-    const sql = `UPDATE leads SET name = ?, phone = ?, assignedTo = ?, leadSource = ?, actual_date = ?, main_project_id = ?, unit_type = ?, unit_id = ?, address = ?, referred_by = ?, alternative_number = ?, dob = ?, anniversary_date = ?, office_business_name = ?, office_address = ?, nature_of_job = ?, department = ?, designation = ?, badge = ?, salary = ?, campaign = ?, interest_in_project_secondary = ?, lead_sub_source = ?, budget = ?, primary_status = ?, secondary_status = ?, lead_review = ?, visit_time = ?, project_type = ?, calling_date = ?, next_follow_date_time = ?, remark = ?, interested_follow_up = ?, lead_status = ?, lead_updated_at = ? WHERE lead_id = ?`;
+    const sql = `UPDATE leads SET name = ?, phone = ?, assignedTo = ?, leadSource = ?, actual_date = ?, unit_type = ?, unit_id = ?, address = ?, referred_by = ?, alternative_number = ?, dob = ?, anniversary_date = ?, office_business_name = ?, office_address = ?, nature_of_job = ?, department = ?, designation = ?, badge = ?, salary = ?, campaign = ?, lead_sub_source = ?, budget = ?, primary_status = ?, secondary_status = ?, lead_review = ?, visit_time = ?, project_type = ?, calling_date = ?, next_follow_date_time = ?, remark = ?, interested_follow_up = ?, lead_status = ?, lead_updated_at = ? WHERE lead_id = ?`;
 
     await new Promise((resolve, reject) => {
       db.query(
@@ -545,7 +544,6 @@ const updateLead = async (req, res) => {
           finalAssignedTo,
           leadSource,
           actual_date || "",
-          main_project_id || null,
           unit_type || "",
           unit_id || null,
           address,
@@ -561,7 +559,6 @@ const updateLead = async (req, res) => {
           badge || null,
           salary || null,
           campaign || null,
-          interest_in_project_secondary || null,
           lead_sub_source || null,
           budget || null,
           primary_status || null,
@@ -699,97 +696,19 @@ const deleteLead = async (req, res) => {
 };
 
 const addProject = (req, res) => {
-  const { project_org_id, projectName, location, total_units } =
-    req.body;
-  const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-  if (!project_org_id || !projectName || !location || !total_units) {
-    return res.status(400).json({ error: "Required fields are missing." });
-  }
-
-  const query = `
-    INSERT INTO projects (
-      project_org_id, project_name, location, total_units, project_created_at
-    ) VALUES (?, ?, ?,?, ?)
-  `;
-
-  const values = [project_org_id, projectName, location, total_units, dateTime];
-
-  db.query(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).json({ success: false, message: err.message });
-    }
-
-    res.status(200).json({ success: true, message: "Project added successfully." });
-  });
+  res.status(200).json({ success: true, message: "Projects module has been retired." });
 };
 
 const getAllProjects = (req, res) => {
-  const { orgId } = req.params;
-  const query = "SELECT * FROM projects WHERE project_org_id = ?";
-
-  db.query(query, [orgId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: "Failed to fetch projects." });
-    }
-
-    res.status(200).send(results);
-  });
+  res.status(200).send([]);
 };
 
 const editProject = (req, res) => {
-  const { id } = req.params;
-  const { project_name, location, total_units } = req.body;
-
-  const sql = `
-    UPDATE projects
-    SET project_name = ?, location = ?, total_units = ?
-    WHERE project_id = ?
-  `;
-
-  db.query(sql, [project_name, location, total_units, id], (err, result) => {
-    if (err) {
-      console.error("Error updating project:", err);
-      return res.status(500).json({ message: "Server error", error: err });
-    }
-
-    if (result.affectedRows > 0) {
-      res.status(200).json({ message: "Project updated successfully" });
-    } else {
-      res.status(404).json({ message: "Project not found" });
-    }
-  });
+  res.status(200).json({ message: "Projects module has been retired." });
 };
 
 const deleteProject = async (req, res) => {
-  const { id } = req.params;
-
-  if (!id) {
-    return res.status(400).json({ message: "Project ID is required" });
-  }
-
-  try {
-    const deleteResult = await new Promise((resolve, reject) => {
-      db.query(
-        "DELETE FROM projects WHERE project_id = ?",
-        [id],
-        (err, result) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-
-    if (deleteResult.affectedRows > 0) {
-      return res.status(200).json({ success: true, message: "Project deleted successfully" });
-    } else {
-      return res.status(404).json({ success: false, message: "Project not found" });
-    }
-  } catch (err) {
-    return res.status(500).json({ success: false, message: "Server error", error: err.message });
-  }
+  return res.status(200).json({ success: true, message: "Projects module has been retired." });
 };
 
 const createLeadTransferRequest = async (req, res) => {

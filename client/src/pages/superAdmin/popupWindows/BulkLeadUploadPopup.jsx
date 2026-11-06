@@ -9,7 +9,6 @@ const BulkLeadUploadPopup = ({
   isOpen,
   onClose,
   fetchLeads,
-  projects = [],
   employees = [],
 }) => {
   const modalRef = useRef();
@@ -20,7 +19,6 @@ const BulkLeadUploadPopup = ({
   const lead_org_id = EmpId?.staff_org_id;
   const isEmployee = EmpId?.staff_role === "employee";
 
-  const [main_project_id, setMainProjectId] = useState("");
   const [selectedStaffIds, setSelectedStaffIds] = useState([]);
 
   // Close popup when clicking outside or pressing ESC
@@ -46,7 +44,6 @@ const BulkLeadUploadPopup = ({
   const handleClose = () => {
     setFile(null);
     setSelectedStaffIds([]);
-    setMainProjectId("");
     onClose();
   };
 
@@ -84,9 +81,6 @@ const BulkLeadUploadPopup = ({
     const formData = new FormData();
     formData.append("file", file);
     formData.append("lead_org_id", lead_org_id);
-    if (main_project_id) {
-      formData.append("main_project_id", main_project_id);
-    }
 
     if (isEmployee) {
       // Employee shares with selected colleagues
@@ -280,27 +274,6 @@ const BulkLeadUploadPopup = ({
                       );
                     })}
                   </div>
-                </div>
-              )}
-
-              {/* Project Name (Optional) */}
-              {projects && projects.length > 0 && (
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                    Project (Optional)
-                  </label>
-                  <select
-                    value={main_project_id}
-                    onChange={(e) => setMainProjectId(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg border-gray-300 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-                  >
-                    <option value="">-- None / Default --</option>
-                    {projects.map((proj) => (
-                      <option key={proj.project_id} value={proj.project_id}>
-                        {proj.project_name}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               )}
 

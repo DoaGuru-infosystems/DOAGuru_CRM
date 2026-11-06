@@ -11,7 +11,6 @@ const AdminEditLeadPopup = ({
   onClose,
   employees,
   combinedLeadSources,
-  projects,
   fetchLeads,
   isEditing,
   selectedLead,

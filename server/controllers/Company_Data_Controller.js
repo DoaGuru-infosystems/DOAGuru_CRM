@@ -59,22 +59,19 @@ const importLeads = (req, res) => {
 
     const values = sheetData.map((lead) => [
       effectiveOrgId,
-      currentUser?.staff_id || null,
+      currentUser?.staff_id || user_id || null,
       currentUser?.staff_role || null,
       lead["Name"] || null,
       lead["Phone"] || null,
-      assignedTo || null,
+      assignedTo || employeeId || null,
       lead["Lead Source"] || null,
-      employeeId,
-      project_name,
-      main_project_id || null,
-      unit_type,
+      null, // main_project_id decoupled (NULL)
+      unit_type || null,
       unit_id || null,
       lead["Address"] || null,
       finalAssignedDate,
       convertExcelDate(lead["Actual Date"]),
-      assignedBy,
-      user_id,
+      assignedBy || null,
     ]);
 
     const sql = `
@@ -86,16 +83,13 @@ const importLeads = (req, res) => {
         phone,
         assignedTo,
         leadSource,
-        employeeId,
-        project_name,
         main_project_id,
         unit_type,
         unit_id,
         address,
         createdTime,
         actual_date,
-        assignedBy,
-        user_id
+        assignedBy
       ) VALUES ?
     `;
 

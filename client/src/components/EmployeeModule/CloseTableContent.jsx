@@ -49,7 +49,7 @@ const CloseTableContent = () => {
     if (searchTerm) {
       const trimmedSearchTerm = searchTerm.toLowerCase().trim();
       filtered = filtered.filter((lead) =>
-        ["project_name", "name", "leadSource", "phone", "assignedTo"].some(
+        ["name", "leadSource", "phone", "assignedTo"].some(
           (key) => lead[key]?.toLowerCase().trim().includes(trimmedSearchTerm)
         )
       );
@@ -126,9 +126,6 @@ const CloseTableContent = () => {
                       <th className="px-6 py-3 border-b-2 border-gray-300">
                         S.no
                       </th>
-                      <th className="px-6 py-3 border-b-2 border-gray-300">
-                        Project Name
-                      </th>
 
                       <th className="px-6 py-3 border-b-2 border-gray-300">
                         Assigned To
@@ -161,9 +158,6 @@ const CloseTableContent = () => {
                         >
                           <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                             {index + 1}
-                          </td>
-                          <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
-                            {lead.project_name}
                           </td>
 
                           <td className="px-6 py-4 border-b border-gray-200 text-gray-800">

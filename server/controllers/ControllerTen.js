@@ -297,7 +297,7 @@ CRMGuru Team`;
 const getMetaLeadsByStaffId = (req, res) => {
   const staffId = req.params.staffId;
   try {
-    const selectQuery = `select * from meta_leads join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo join projects on projects.project_id = meta_leads.meta_project_id where meta_leads.meta_assignedTo = ? order by meta_leads.meta_id desc`;
+    const selectQuery = `select * from meta_leads left join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo where meta_leads.meta_assignedTo = ? order by meta_leads.meta_id desc`;
     db.query(selectQuery, staffId, (err, result) => {
       if (err) {
         res.status(400).json({ success: false, message: err.message });
@@ -312,7 +312,7 @@ const getMetaLeadsByStaffId = (req, res) => {
 const getMetaLeadsByLeadId = (req, res) => {
   const metaId = req.params.metaId;
   try {
-    const selectQuery = `select * from meta_leads left join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo left join projects on projects.project_id = meta_leads.meta_project_id where meta_leads.leadgen_id = ?`;
+    const selectQuery = `select * from meta_leads left join company_staff on company_staff.staff_id = meta_leads.meta_assignedTo where meta_leads.leadgen_id = ?`;
     db.query(selectQuery, metaId, (err, result) => {
       if (err) {
         res.status(400).json({ success: false, message: err.message });
@@ -618,7 +618,7 @@ const bulkUploadLeads = async (req, res) => {
         normPhone,
         row.lead_email || row.email || row.Email || null,
         row.leadSource || row["Lead Source"] || "others",
-        main_project_id || null,
+        null, // main_project_id decoupled (always NULL)
         row.unit_type || row["Unit Type"] || null,
         unit_id || null,
         row.address || row.Address || null,
@@ -797,11 +797,11 @@ const updateLeadAssignment = async (req, res) => {
       targetStaffIds = [rawStaff];
     }
 
-    if (targetStaffIds.length === 0 && !main_project_id && !unit_id) {
+    if (targetStaffIds.length === 0 && !unit_id) {
       return res.status(400).json({
         success: false,
         message:
-          "At least one field (staffIds / assignedTo, main_project_id, unit_id) is required",
+          "At least one field (staffIds / assignedTo, unit_id) is required",
       });
     }
 
@@ -882,10 +882,6 @@ const updateLeadAssignment = async (req, res) => {
         currentUser.staff_name ||
           (currentRole === "superadmin" ? "SuperAdmin" : "Admin")
       );
-    }
-    if (main_project_id !== undefined) {
-      fields.push("main_project_id = ?");
-      values.push(main_project_id);
     }
     if (unit_id !== undefined) {
       fields.push("unit_id = ?");

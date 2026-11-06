@@ -141,9 +141,6 @@ const RemarkTab = () => {
                           S.no
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Project Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Lead Id
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -171,9 +168,6 @@ const RemarkTab = () => {
                         <tr key={remark.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {offset + index + 1}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {remark.project_name}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {remark.remark_lead_id}
@@ -221,20 +215,6 @@ const RemarkTab = () => {
                       <div className="bg-white p-6 rounded-lg shadow-lg w-[500px]">
                         <h2 className="text-xl mb-4 font-bold">Edit Remark</h2>
                         <form>
-                          <div className="mb-4">
-                            <label className="block text-gray-700">
-                              Project Name:
-                            </label>
-                            <input
-                              type="text"
-                              name="project_name"
-                              value={modalData.project_name || ""}
-                              // onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded"
-                              disabled
-                            />
-                          </div>
-
                           <div className="mb-4">
                             <label className="block text-gray-700">Name:</label>
                             <input

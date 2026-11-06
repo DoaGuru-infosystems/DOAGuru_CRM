@@ -8,7 +8,6 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
   const modalRef = useRef();
   const user = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
-  const [projects, setProjects] = useState([]);
   const [staff, setStaff] = useState([]);
 
   const [inputField, setInputField] = useState({
@@ -34,22 +33,7 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
     }
   };
 
-  const fetchAllProjects = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/all-project/${user?.staff_org_id}`,
-        {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        }
-      );
-      setProjects(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    fetchAllProjects();
     fetchAllStaff();
   }, []);
 
@@ -170,23 +154,6 @@ const MetaAssignedPopup = ({ isOpen, onClose, lead, fetchAllMetaLeads }) => {
                     {staff?.map((s) => (
                       <option key={s?.staff_id} value={s?.staff_id}>
                         {s?.staff_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-1">Project</label>
-                  <select
-                    name="meta_project_id"
-                    value={inputField.meta_project_id}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
-                  >
-                    <option value="">--select--</option>
-                    {projects?.map((p) => (
-                      <option key={p?.project_id} value={p?.project_id}>
-                        {p?.project_name}
                       </option>
                     ))}
                   </select>

@@ -11,7 +11,6 @@ const SuperAdminEditLeadPopup = ({
   onClose,
   employees,
   combinedLeadSources,
-  projects,
   fetchLeads,
   isEditing,
   selectedLead,

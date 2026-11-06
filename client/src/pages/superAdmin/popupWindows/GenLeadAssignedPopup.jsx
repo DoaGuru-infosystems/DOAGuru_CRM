@@ -15,10 +15,8 @@ const GenLeadAssignedPopup = ({
   const modalRef = useRef();
   const user = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
-  const [projects, setProjects] = useState([]);
   const [staff, setStaff] = useState([]);
   const [selectedStaffIds, setSelectedStaffIds] = useState([]);
-  const [mainProjectId, setMainProjectId] = useState("");
 
   const fetchAllStaff = async () => {
     try {
@@ -34,26 +32,10 @@ const GenLeadAssignedPopup = ({
     }
   };
 
-  const fetchAllProjects = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/all-project/${user?.staff_org_id}`,
-        {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        }
-      );
-      setProjects(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
-
   useEffect(() => {
     if (isOpen) {
-      fetchAllProjects();
       fetchAllStaff();
       setSelectedStaffIds([]);
-      setMainProjectId("");
     }
   }, [isOpen]);
 
@@ -101,7 +83,6 @@ const GenLeadAssignedPopup = ({
           `http://localhost:9000/api/updateLeadAssignment/${leadId}`,
           {
             staffIds: selectedStaffIds,
-            main_project_id: mainProjectId || undefined,
           },
           {
             headers: {
@@ -214,27 +195,6 @@ const GenLeadAssignedPopup = ({
             </div>
 
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto py-4 space-y-4">
-              {/* Optional Project Assignment */}
-              {projects && projects.length > 0 && (
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                    Project (Optional)
-                  </label>
-                  <select
-                    value={mainProjectId}
-                    onChange={(e) => setMainProjectId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-                  >
-                    <option value="">-- Keep Existing Project --</option>
-                    {projects.map((p) => (
-                      <option key={p.project_id} value={p.project_id}>
-                        {p.project_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
               {/* Staff Multi-Selection */}
               <div>
                 <div className="flex items-center justify-between mb-2">

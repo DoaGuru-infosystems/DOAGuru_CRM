@@ -145,7 +145,6 @@ const Topbar = ({ isSidebarOpen }) => {
           { name: "Import Data", path: "/admin-import-data" },
           { name: "Reports", path: "/admin-report" },
           { name: "Data Export", path: "/data-export" },
-          { name: "Projects", path: "/admin-project" },
           { name: "Employee Management", path: "/employee-management" },
           { name: "Profile", path: "/admin-profile" },
           { name: "Total Leads", path: "/admin-total-leads" },
@@ -171,12 +170,11 @@ const Topbar = ({ isSidebarOpen }) => {
           { name: "Employee Leads", path: "/super-admin-employee-leads" },
           {
             name: "Social Media Leads",
-            path: "/main-social-media-super-admin-leads",
+            path: "/social-media-superleads",
           },
           { name: "Import Data", path: "/super-admin-import-data" },
           { name: "Reports", path: "/super-admin-reporting" },
           { name: "Data Export", path: "/super-admin-data-export" },
-          { name: "Projects", path: "/Super-admin-project" },
           {
             name: "Employee Management",
             path: "/super-admin-employee-management",

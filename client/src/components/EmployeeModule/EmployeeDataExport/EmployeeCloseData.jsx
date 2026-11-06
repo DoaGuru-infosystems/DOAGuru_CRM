@@ -15,7 +15,6 @@ const EmployeeCloseData = () => {
   const leadsPerPage = 7;
   const EmpId = useSelector((state) => state.auth.user);
   const [selectedColumns, setSelectedColumns] = useState([
-    "project_name",
     "lead_no",
     "assignedTo",
     "name",
@@ -150,9 +149,6 @@ const EmployeeCloseData = () => {
             <thead>
               <tr>
                 <th className="px-6 py-3 border-b-2 border-gray-300">S.no</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300">
-                  Project Name
-                </th>
 
                 <th className="px-6 py-3 border-b-2 border-gray-300">
                   Assigned To
@@ -190,9 +186,6 @@ const EmployeeCloseData = () => {
                   >
                     <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
                       {index + 1 + currentPage * leadsPerPage}
-                    </td>
-                    <td className="px-6 py-4 border-b border-gray-200 text-gray-800">
-                      {lead.project_name}
                     </td>
 
                     <td className="px-6 py-4 border-b border-gray-200 text-gray-800">

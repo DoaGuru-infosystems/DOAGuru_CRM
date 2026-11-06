@@ -860,20 +860,19 @@ const getLeadsByOrg = async (req, res) => {
       leadAlias: "leads",
     });
 
-    let sql = `SELECT DISTINCT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone, projects.project_name,
+    let sql = `SELECT DISTINCT leads.*, company_staff.staff_name, company_staff.staff_email, company_staff.staff_phone,
                (SELECT GROUP_CONCAT(cs2.staff_name ORDER BY la2.id SEPARATOR ', ')
                 FROM lead_assignees la2 JOIN company_staff cs2 ON cs2.staff_id = la2.staff_id
                 WHERE la2.lead_id = leads.lead_id AND la2.access_type = 'assigned') AS assignee_names
                FROM leads 
                LEFT JOIN company_staff ON company_staff.staff_id = leads.assignedTo 
-               LEFT JOIN projects ON projects.project_id = leads.main_project_id 
                WHERE ${vis.whereClause}`;
     const params = [...vis.params];
 
     if (search && search.trim() !== "") {
       const s = `%${search.trim()}%`;
-      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR projects.project_name LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
-      params.push(s, s, s, s, s, s);
+      sql += ` AND (leads.name LIKE ? OR leads.phone LIKE ? OR leads.leadSource LIKE ? OR company_staff.staff_name LIKE ? OR leads.lead_id LIKE ?)`;
+      params.push(s, s, s, s, s);
     }
 
     if (filterDate && filterDate.trim() !== "") {

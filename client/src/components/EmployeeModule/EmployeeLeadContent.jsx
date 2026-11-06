@@ -59,8 +59,6 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [employees, setEmployees] = useState([]);
-  const [projectunit, setProjectUnit] = useState([]);
-  const [projects, setProjects] = useState([]);
   const [selectedLead, setSelectedLead] = useState();
   const [shareLead, setShareLead] = useState(null);
   const [selectedShareStaff, setSelectedShareStaff] = useState([]);
@@ -70,7 +68,6 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
   const [loadingSharedByMe, setLoadingSharedByMe] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [columnSearchValues, setColumnSearchValues] = useState({
-    project_name: "",
     lead_id: "",
     name: "",
     phone: "",
@@ -140,8 +137,6 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
 
   useEffect(() => {
     fetchLeads();
-    fetchProjectsUnit();
-    fetchProjects();
     fetchEmployees();
   }, []);
 
@@ -177,23 +172,6 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
       setLeads(data);
     } catch (error) {
       console.error("Error fetching leads:", error);
-    }
-  };
-
-  const fetchProjects = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/super-admin-all-project/${EmpId?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
     }
   };
 
@@ -299,35 +277,7 @@ const EmployeeLeadContent = ({ isSidebarOpen }) => {
     }
   };
 
-  const fetchProjectsUnit = async (main_project_id) => {
-  try {
-    if (!main_project_id) {
-      setProjectUnit([]);
-      return;
-    }
-
-    const response = await axios.get(
-      `http://localhost:9000/api/super-admin-project-unit/${main_project_id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.data.length > 0) {
-      setProjectUnit(response.data);
-    } else {
-      setProjectUnit([]);
-    }
-  } catch (error) {
-    console.error("Error fetching units:", error);
-    setProjectUnit([]);
-  }
-};
-
-const handleUpdate = async (lead) => {
+  const handleUpdate = async (lead) => {
   try {
     const response = await axios.put(
       `http://localhost:9000/api/updateOnlyLeadStatus/${lead.lead_id}`,
@@ -463,7 +413,7 @@ const applyFilters = () => {
   if (searchTerm) {
     const trimmedSearchTerm = searchTerm.toLowerCase().trim();
     filtered = filtered.filter((lead) =>
-      ["project_name", "name", "leadSource", "phone", "staff_name"].some(
+      ["name", "leadSource", "phone", "staff_name"].some(
         (key) => lead[key]?.toLowerCase().trim().includes(trimmedSearchTerm)
       )
     );
@@ -1376,9 +1326,6 @@ return (
       onClose={() => setShowPopup(false)}
       employees={employees}
       combinedLeadSources={combinedLeadSources}
-      projectunit={projectunit}
-      projects={projects}
-      fetchProjectsUnit={fetchProjectsUnit}
       fetchLeads={fetchLeads}
       isEditing={isEditing}
       currentLeads={currentLeads}
@@ -1619,7 +1566,6 @@ return (
         isOpen={showBulkModal}
         onClose={() => setShowBulkModal(false)}
         fetchLeads={fetchLeads}
-        projects={projects}
         employees={employees}
       />
   </>

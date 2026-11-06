@@ -145,9 +145,6 @@ const ViewAllFollowUpContent = () => {
                           S.no
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Project Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Lead Id
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -173,9 +170,6 @@ const ViewAllFollowUpContent = () => {
                         <tr key={followup.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {offset + index + 1}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {followup.project_name}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {followup.lead_id || followup.leadgen_id}
@@ -227,19 +221,6 @@ const ViewAllFollowUpContent = () => {
                           Edit Follow Up
                         </h2>
                         <form>
-                          <div className="mb-4">
-                            <label className="block text-gray-700">
-                              Project Name:
-                            </label>
-                            <input
-                              type="text"
-                              name="lead_id"
-                              value={modalData.project_name || ""}
-                              onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded"
-                              disabled
-                            />
-                          </div>
                           <div className="mb-4">
                             <label className="block text-gray-700">
                               Lead ID:

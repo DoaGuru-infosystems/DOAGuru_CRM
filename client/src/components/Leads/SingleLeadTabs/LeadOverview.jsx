@@ -19,10 +19,6 @@ const LeadOverview = ({ leads }) => {
                 Lead Source
               </th>
               <th className="px-3 py-2 border-b border-gray-200 text-xs sm:text-sm text-start font-semibold text-gray-700 whitespace-nowrap">Address</th>
-              <th className="px-3 py-2 border-b border-gray-200 text-xs sm:text-sm text-start font-semibold text-gray-700 whitespace-nowrap">Project</th>
-              <th className="px-3 py-2 border-b border-gray-200 text-xs sm:text-sm text-start font-semibold text-gray-700 whitespace-nowrap">
-                Project Id
-              </th>
               <th className="px-3 py-2 border-b border-gray-200 text-xs sm:text-sm text-start font-semibold text-gray-700 whitespace-nowrap">
                 Unit Type
               </th>
@@ -85,14 +81,6 @@ const LeadOverview = ({ leads }) => {
                 <td className="px-3 py-2.5 border-b border-gray-200 text-xs sm:text-sm text-gray-600 font-semibold whitespace-nowrap">
                   {lead.address ||
                     getFieldValue(lead.question_fields_data, "street_address")}
-                </td>
-
-                <td className="px-3 py-2.5 border-b border-gray-200 text-xs sm:text-sm text-gray-600 font-semibold whitespace-nowrap">
-                  {lead.project_name}
-                </td>
-
-                <td className="px-3 py-2.5 border-b border-gray-200 text-xs sm:text-sm text-gray-600 font-semibold whitespace-nowrap">
-                  {lead.project_id}
                 </td>
 
                 <td className="px-3 py-2.5 border-b border-gray-200 text-xs sm:text-sm text-gray-600 font-semibold whitespace-nowrap">

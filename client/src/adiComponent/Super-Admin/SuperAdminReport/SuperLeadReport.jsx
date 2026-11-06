@@ -30,7 +30,6 @@ function SuperLeadReport() {
     "payment_mode",
     "reason",
     "registry",
-    "project_name",
     "visit",
     "visit_date",
     "d_closeDate",
@@ -146,7 +145,6 @@ function SuperLeadReport() {
       reason: "Reason",
       registry: "Registry",
 
-      project_name: "Project",
       visit: "Visit",
       visit_date: "Visit Date",
       d_closeDate: "Close Date",

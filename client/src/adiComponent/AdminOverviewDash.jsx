@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { MdOutlineNextWeek } from "react-icons/md";
-import { AiOutlineProject } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { FaFolderOpen, FaHistory } from "react-icons/fa";
 import { logoutUser } from "../store/UserSlice";
@@ -14,7 +13,6 @@ const AdminOverviewDash = () => {
   const [leads, setLeads] = useState([]);
   const [employee, setEmployee] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState("LeadData");
-  const [project, setProjects] = useState([]);
   const [metaLeads, setMetaLeads] = useState([]);
   const [untouchedLeads, setUntouchedLeads] = useState(0);
   const [averageFollowUps, setAverageFollowUps] = useState(0);
@@ -97,25 +95,7 @@ const AdminOverviewDash = () => {
     }
   };
 
-  const fetchProjects = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/super-admin-all-project/${adminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setProjects(response.data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchProjects();
     fetchLeads();
     fetchEmployee();
     fetchAllMetaLeads();
@@ -123,28 +103,10 @@ const AdminOverviewDash = () => {
   }, []);
 
   const leadCount = leads.length;
-  const projectCount = project.length;
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 px-4 py-3">
-        {/* Card 1: Total Projects */}
-        <Link to="/admin-project" className="block w-full">
-          <div className="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 flex flex-col items-start cursor-pointer h-full">
-            <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 text-xl flex items-center justify-center mb-3">
-              <AiOutlineProject />
-            </div>
-            <div>
-              <h5 className="text-gray-500 text-[10px] font-bold uppercase tracking-wider">
-                Total Projects
-              </h5>
-              <p className="text-gray-900 text-2xl font-extrabold mt-1">
-                {projectCount}
-              </p>
-            </div>
-          </div>
-        </Link>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 px-4 py-3">
         {/* Card 2: Total Leads */}
         <Link to="/leads" className="block w-full">
           <div className="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 flex flex-col items-start cursor-pointer h-full">
