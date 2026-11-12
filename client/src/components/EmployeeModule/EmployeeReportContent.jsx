@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import EmpLeadReport from "./EmployeeReport/EmpLeadReport";
 import EmpClosedDealReport from "./EmployeeReport/EmpClosedDealReport";
 import { SiGoogleads } from "react-icons/si";
-import { FaHouseChimney, FaMeta } from "react-icons/fa6";
-import EmpMetaLeadReport from "./EmployeeReport/EmpMetaLeadReport";
+import { FaHouseChimney } from "react-icons/fa6";
 
 const EmployeeReportContent = () => {
   const [selectedComponent, setSelectedComponent] = useState("LeadData");
@@ -48,39 +47,11 @@ const EmployeeReportContent = () => {
                 </div>
               </div>
 
-              {/* Meta Leads */}
-              <div
-                className={`transition-all duration-300 transform hover:scale-105 shadow-md rounded-2xl cursor-pointer border ${
-                  selectedComponent === "metaLeadData"
-                    ? "bg-cyan-600 border-cyan-600 text-white shadow-lg shadow-cyan-300/50"
-                    : "bg-white border-gray-100 text-gray-800 hover:bg-gray-100"
-                }`}
-                onClick={() => setSelectedComponent("metaLeadData")}
-              >
-                <div className="p-3 sm:p-5 flex flex-col items-center text-center">
-                  <div
-                    className={`text-2xl sm:text-3xl mb-1 sm:mb-2 ${
-                      selectedComponent === "metaLeadData"
-                        ? "text-white"
-                        : "text-cyan-600"
-                    }`}
-                  >
-                    <FaMeta />
-                  </div>
-                  <p
-                    className="text-xs sm:text-base font-semibold"
-                  >
-                    Meta Leads
-                  </p>
-                </div>
-              </div>
-
             </div>
 
             {/* Render Selected Component */}
             <div className="w-full h-[calc(100vh-12rem)] overflow-y-auto mt-6 bg-white shadow-inner rounded-xl p-2 sm:p-4">
               {selectedComponent === "LeadData" && <EmpLeadReport />}
-              {selectedComponent === "metaLeadData" && <EmpMetaLeadReport />}
               {selectedComponent === "ClosedData" && <EmpClosedDealReport />}
             </div>
           </div>

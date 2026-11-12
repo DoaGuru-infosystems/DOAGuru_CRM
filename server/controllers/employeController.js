@@ -303,32 +303,6 @@ const getEmployeeFollow_Up = async (req, res) => {
   }
 };
 
-const getEmployeeFollow_UpMeta = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const sql = `
-    SELECT * FROM follow_up_leads
-    JOIN meta_leads 
-      ON meta_leads.leadgen_id = follow_up_leads.fu_lead_id
-    LEFT JOIN company_staff 
-      ON company_staff.staff_id = follow_up_leads.fu_employeeId
-    WHERE fu_lead_id = ?
-  `;
-
-    db.query(sql, [id], (err, results) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-      return res.status(200).send(results);
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-
-
 const createFollow_Up = async (req, res) => {
   try {
     const {
@@ -350,14 +324,12 @@ const createFollow_Up = async (req, res) => {
       });
     }
 
-    if (leadType !== "meta") {
-      const access = await canAccessLead(req.user, fu_lead_id);
-      if (!access.allowed) {
-        return res.status(403).json({
-          success: false,
-          message: access.reason || "Access denied",
-        });
-      }
+    const access = await canAccessLead(req.user, fu_lead_id);
+    if (!access.allowed) {
+      return res.status(403).json({
+        success: false,
+        message: access.reason || "Access denied",
+      });
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
@@ -396,24 +368,12 @@ const createFollow_Up = async (req, res) => {
       }
 
 
-      let updateSql = "";
-      let updateParams = [];
-
-      if (leadType === "meta") {
-        updateSql = `
-          UPDATE meta_leads
-          SET meta_lead_status = ?, meta_updated_at = ?
-          WHERE leadgen_id = ?
-        `;
-        updateParams = [lead_status, dateTime, fu_lead_id];
-      } else {
-        updateSql = `
+      const updateSql = `
           UPDATE leads
           SET lead_status = ?, lead_updated_at = ?
           WHERE lead_id = ?
         `;
-        updateParams = [lead_status, dateTime, fu_lead_id];
-      }
+      const updateParams = [lead_status, dateTime, fu_lead_id];
 
       db.query(updateSql, updateParams, (updateErr, updateResult) => {
         if (updateErr) {
@@ -644,14 +604,12 @@ const createRemark = async (req, res) => {
       });
     }
 
-    if (leadType !== "meta") {
-      const access = await canAccessLead(req.user, remark_lead_id);
-      if (!access.allowed) {
-        return res.status(403).json({
-          success: false,
-          message: access.reason || "Access denied",
-        });
-      }
+    const access = await canAccessLead(req.user, remark_lead_id);
+    if (!access.allowed) {
+      return res.status(403).json({
+        success: false,
+        message: access.reason || "Access denied",
+      });
     }
 
     const dateTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
@@ -690,24 +648,12 @@ const createRemark = async (req, res) => {
       }
 
 
-      let updateSql = "";
-      let updateParams = [];
-
-      if (leadType === "meta") {
-        updateSql = `
-          UPDATE meta_leads
-          SET meta_lead_status = ?, meta_updated_at = ?
-          WHERE leadgen_id = ?
-        `;
-        updateParams = [lead_status, dateTime, remark_lead_id];
-      } else {
-        updateSql = `
+      const updateSql = `
           UPDATE leads
           SET lead_status = ?, lead_updated_at = ?
           WHERE lead_id = ?
         `;
-        updateParams = [lead_status, dateTime, remark_lead_id];
-      }
+      const updateParams = [lead_status, dateTime, remark_lead_id];
 
       db.query(updateSql, updateParams, (updateErr, updateResult) => {
         if (updateErr) {
@@ -869,23 +815,6 @@ const getEmployeeRemark = async (req, res) => {
   }
 };
 
-const getEmployeeRemarkMeta = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const sql = "SELECT * FROM remark join meta_leads on meta_leads.leadgen_id = remark.remark_lead_id left join company_staff on company_staff.staff_id = remark.remark_employeeId WHERE remark.remark_lead_id = ?";
-
-    db.query(sql, id, (err, result) => {
-      if (err) {
-        res.status(400).json({ success: false, message: err.message });
-      }
-      res.status(200).send(result);
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Internal Server Erro, error: errr" });
-  }
-};
-
-
 const updateOnlyRemarkStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -1028,6 +957,4 @@ module.exports = {
   updateOnlyRemarkStatus,
   updateOnlyRemarkAnswer,
   updateOnlyRemarkAnswerStatus,
-  getEmployeeFollow_UpMeta,
-  getEmployeeRemarkMeta,
 };

@@ -4,13 +4,10 @@ import { GiFiles } from "react-icons/gi";
 import { useSelector } from "react-redux";
 import EmployeeLeadData from "./EmployeeDataExport/EmployeeLeadData";
 import EmployeeCloseData from "./EmployeeDataExport/EmployeeCloseData";
-import EmployeeMetaLeadData from "./EmployeeDataExport/EmployeeMetaLeadData";
-import { FaMeta } from "react-icons/fa6";
 
 function EmployeeDataExportContent() {
   const [leads, setLeads] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState("LeadData");
-  const [metaLeads, setMetaLeads] = useState([]);
   const EmpId = useSelector((state) => state.auth.user);
   const token = EmpId?.token;
 
@@ -32,31 +29,12 @@ function EmployeeDataExportContent() {
     }
   };
 
-  const fetchMetaLeads = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:9000/api/getMetaLeadsByStaffId/${EmpId.staff_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setMetaLeads(response.data);
-    } catch (error) {
-      console.error("Error fetching leads:", error);
-    }
-  };
-
   const closedCount = leads.filter(
     (lead) => lead.unit_status === "sold"
   ).length;
 
   useEffect(() => {
     fetchLeads();
-    fetchMetaLeads();
   }, []);
 
   return (
@@ -96,38 +74,11 @@ function EmployeeDataExportContent() {
                 </div>
               </div>
 
-              {/* Card 2: Meta Leads Data */}
-              <div className="w-full sm:w-1/2 lg:w-1/4 xl:w-1/5 my-2">
-                <div
-                  className={`shadow-md rounded-xl overflow-hidden cursor-pointer transition-all duration-300 transform hover:-translate-y-0.5 border ${
-                    selectedComponent === "metaLeadData"
-                      ? "bg-cyan-600 text-white border-cyan-600 shadow-cyan-600/30"
-                      : "bg-white text-gray-800 border-gray-100 hover:border-cyan-200"
-                  }`}
-                  onClick={() => setSelectedComponent("metaLeadData")}
-                >
-                  <div className="p-5 flex flex-col items-center text-center">
-                    <div className={`text-4xl mb-2 ${selectedComponent === "metaLeadData" ? "text-white" : "text-cyan-600"}`}>
-                      <FaMeta />
-                    </div>
-                    <div className="mt-1">
-                      <h5 className={`text-lg font-bold ${selectedComponent === "metaLeadData" ? "text-white" : "text-gray-800"}`}>
-                        Meta Leads Data
-                      </h5>
-                      <p className={`text-2xl font-extrabold mt-1 ${selectedComponent === "metaLeadData" ? "text-cyan-100" : "text-cyan-600"}`}>
-                        {metaLeads?.length || 0}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
 
             {/* Conditionally render the selected component */}
             <div className="w-full mb-20">
               {selectedComponent === "LeadData" && <EmployeeLeadData />}
-              {selectedComponent === "metaLeadData" && <EmployeeMetaLeadData />}
               {selectedComponent === "ClosedData" && <EmployeeCloseData />}
             </div>
           </div>

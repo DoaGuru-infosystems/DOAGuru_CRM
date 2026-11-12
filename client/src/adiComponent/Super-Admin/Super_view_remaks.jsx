@@ -19,13 +19,7 @@ const Super_view_remarks = ({ selectedLeadId, closeModalRemark, type }) => {
 
   const fetchRemarks = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${selectedLeadId?.leadgen_id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/remarks/${selectedLeadId?.lead_id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/remarks/${selectedLeadId?.lead_id}`;
 
       const response = await axios.get(apiUrl, {
         headers: {

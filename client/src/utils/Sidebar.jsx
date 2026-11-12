@@ -21,7 +21,6 @@ import { logoutUser } from "../store/UserSlice";
 import logoTwo from "../assets/favicon_one.png";
 import logoOne from "../assets/CRMGuruLogo.png";
 import { path } from "framer-motion/client";
-import { FaMeta } from "react-icons/fa6";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const user = useSelector((state) => state.auth.user);
@@ -43,11 +42,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           name: "Leads",
           path: "/super-admin-employee-leads",
           icon: <GrTableAdd />,
-        },
-        {
-          name: "Digital Marketing Leads",
-          path: "/social-media-superleads",
-          icon: <FaMeta />,
         },
 
         {
@@ -82,11 +76,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           icon: <GrTableAdd />,
         },
         {
-          name: "Digital Marketing Leads",
-          path: "/main-social-media-leads",
-          icon: <FaMeta />,
-        },
-        {
           name: "Reports",
           path: "/admin-report",
           icon: <TbReport />,
@@ -117,11 +106,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           name: "Assigned Leads",
           path: "/employee-leads",
           icon: <GrTableAdd />,
-        },
-        {
-          name: "Assigned Meta Leads",
-          path: "/meta-leads-employee",
-          icon: <FaMeta />,
         },
         {
           name: "Reports",

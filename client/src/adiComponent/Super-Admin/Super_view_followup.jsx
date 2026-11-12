@@ -24,13 +24,7 @@ const Super_view_followup = ({ selectedLeadId, closeModalFollowUp, type }) => {
 
   const fetchFollowUp = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${selectedLeadId?.leadgen_id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/employe-follow-up/${selectedLeadId?.lead_id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/employe-follow-up/${selectedLeadId?.lead_id}`;
 
       const response = await axios.get(apiUrl, {
         headers: {

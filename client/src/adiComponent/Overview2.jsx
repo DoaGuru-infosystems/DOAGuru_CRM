@@ -7,7 +7,6 @@ import { FaFolderOpen, FaHistory } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../store/UserSlice";
 import toast from "react-hot-toast";
-import { FaMeta } from "react-icons/fa6";
 
 const Overview2 = () => {
   const [leads, setLeads] = useState([]);
@@ -17,7 +16,6 @@ const Overview2 = () => {
   const userId = superadminuser.staff_id;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [metaLeads, setMetaLeads] = useState([]);
   const [untouchedLeads, setUntouchedLeads] = useState(0);
   const [averageFollowUps, setAverageFollowUps] = useState(0);
 
@@ -62,23 +60,8 @@ const Overview2 = () => {
     }
   };
 
-  const fetchAllMetaLeads = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser.staff_org_id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setMetaLeads(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     fetchLeads();
-    fetchAllMetaLeads();
     fetchDashboardAnalytics();
   }, []);
 
@@ -99,44 +82,6 @@ const Overview2 = () => {
               </h5>
               <p className="text-gray-900 text-2xl font-extrabold mt-1">
                 {leadCount}
-              </p>
-            </div>
-          </div>
-        </Link>
-
-        {/* Card 3: Total Meta Leads */}
-        <Link to="/social-media-superleads" className="block w-full">
-          <div
-            className={`border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 flex flex-col items-start cursor-pointer h-full ${
-              selectedComponent === "ClosedData"
-                ? "bg-violet-600 border-violet-650 text-white"
-                : "bg-white border-slate-150 text-gray-800"
-            }`}
-            onClick={() => setSelectedComponent("ClosedData")}
-          >
-            <div
-              className={`p-2.5 rounded-xl text-xl flex items-center justify-center mb-3 ${
-                selectedComponent === "ClosedData"
-                  ? "bg-violet-500 text-white"
-                  : "bg-violet-50 text-violet-600"
-              }`}
-            >
-              <FaMeta />
-            </div>
-            <div>
-              <h5
-                className={`text-[10px] font-bold uppercase tracking-wider ${
-                  selectedComponent === "ClosedData" ? "text-violet-100" : "text-gray-500"
-                }`}
-              >
-                Total Meta Leads
-              </h5>
-              <p
-                className={`text-2xl font-extrabold mt-1 ${
-                  selectedComponent === "ClosedData" ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {metaLeads?.length}
               </p>
             </div>
           </div>

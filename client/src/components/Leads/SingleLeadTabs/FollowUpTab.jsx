@@ -25,13 +25,7 @@ const FollowUpTab = () => {
 
   const fetchFollowUp = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/employe-follow-up/${id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/employe-follow-up/${id}`;
 
       const { data } = await axios.get(apiUrl, {
         headers: {

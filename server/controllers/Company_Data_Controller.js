@@ -1,11 +1,8 @@
 const { db } = require("../db");
-const axios = require('axios');
 const xlsx = require("xlsx");
 const moment = require("moment-timezone");
 const dotenv = require('dotenv');
 dotenv.config();
-
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 
 const importLeads = (req, res) => {
   try {
@@ -105,158 +102,6 @@ const importLeads = (req, res) => {
   }
 };
 
-const saveForm = (req, res) => {
-  const { formId, formName, project_id } = req.body;
-  db.query(
-    'INSERT INTO formtable (form_id, form_name,project_id) VALUES (?, ?,?)',
-    [formId, formName, project_id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to save form data' });
-      }
-      res.status(200).json({ message: 'Form saved successfully!' });
-    }
-  );
-};
-
-const updateForm = (req, res) => {
-  const { id, form_id, form_name } = req.body;
-
-  if (!id || !form_id || !form_name) {
-    return res.status(400).json({ error: 'ID ,Form ID and Form Name are required' });
-  }
-
-  db.query(
-    'UPDATE formtable SET  form_id = ?, form_name = ? WHERE id = ?',
-    [form_id, form_name, id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to update form data' });
-      }
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ error: 'Form not found' });
-      }
-      res.status(200).json({ message: 'Form updated successfully!' });
-    }
-  );
-};
-
-const deleteForm = (req, res) => {
-  const { id } = req.params;
-
-  if (!id) {
-    return res.status(400).json({ error: 'Form ID is required' });
-  }
-
-  db.query(
-    'DELETE FROM formtable WHERE id = ?',
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to delete form data' });
-      }
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ error: 'Form not found' });
-      }
-      res.status(200).json({ message: 'Form deleted successfully!' });
-    }
-  );
-};
-
-const getAllForms = (req, res) => {
-  db.query('SELECT * FROM formtable', (err, results) => {
-    if (err) {
-      console.error('Error fetching forms:', err);
-      return res.status(500).json({ error: 'Failed to fetch forms' });
-    }
-    res.status(200).json(results);
-  });
-};
-
-const getByProjectIdForms = (req, res) => {
-  const { id } = req.params;
-  db.query('SELECT * FROM formtable WHERE project_id = ?', [id], (err, results) => {
-    if (err) {
-      console.error('Error fetching forms:', err);
-      return res.status(500).json({ error: 'Failed to fetch forms' });
-    }
-    res.status(200).json(results);
-  });
-};
-
-const fetchLeads = async (req, res) => {
-  const { formId } = req.body;
-
-  if (!formId) {
-    return res.status(400).json({ error: 'Form ID is required' });
-  }
-
-  try {
-    const response = await axios.get(`https://graph.facebook.com/v20.0/${formId}?fields=name,leads&access_token=${ACCESS_TOKEN}`);
-
-    const leads = response.data.leads?.data || [];
-
-    for (const lead of leads) {
-      const leadId = lead.id;
-      const fullName = extractFieldValue(lead.field_data, 'full_name');
-      const phoneNumber = extractFieldValue(lead.field_data, 'phone_number');
-      const streetAddress = extractFieldValue(lead.field_data, 'street_address');
-      const createdTime = new Date(lead.created_time);
-
-      // Check for duplicate entry before inserting
-      const checkDuplicateQuery = `
-          SELECT COUNT(*) as count FROM leadstable 
-          WHERE lead_id = ? OR  phone_number = ?`;
-
-      db.query(checkDuplicateQuery, [leadId, phoneNumber], (err, results) => {
-        if (err) {
-          console.error('Error checking for duplicate lead:', err);
-          return;
-        }
-
-        if (results[0].count === 0) {
-          const insertQuery = `
-              INSERT INTO leadstable (lead_id, full_name, phone_number, street_address, created_time, form_id) 
-              VALUES (?, ?, ?, ?, ?, ?)`;
-
-          db.query(insertQuery, [leadId, fullName, phoneNumber, streetAddress, createdTime, formId], (insertErr, result) => {
-            if (insertErr) {
-              console.error('Error inserting lead:', insertErr);
-            }
-          });
-        } else {
-          console.log(`Duplicate lead found: ${fullName}, Phone: ${phoneNumber}, Lead ID: ${leadId}. Skipping...`);
-        }
-      });
-    }
-
-    res.status(200).json({ message: 'Leads fetched and saved successfully', leads });
-
-  } catch (err) {
-    console.error('Error fetching leads from Meta API:', err);
-    res.status(500).json({ error: 'Failed to fetch leads from Meta API' });
-  }
-
-};
-
-const getLeadsByFormId = (req, res) => {
-  const formId = req.params.formId;
-  db.query('SELECT * FROM leadstable WHERE form_id = ? ORDER BY created_time DESC', [formId], (err, results) => {
-    if (err) {
-      console.error('Error fetching leads:', err);
-      return res.status(500).json({ error: 'Failed to fetch leads' });
-    }
-    res.status(200).json(results);
-  });
-};
-
-const extractFieldValue = (fieldData, fieldName) => {
-  const field = fieldData.find(item => item.name === fieldName);
-  return field ? field.values[0] : '';
-};
-
 // Google OAuth removed
 
 const createServiceList = async (req, res) => {
@@ -347,13 +192,6 @@ const updateServiceList = async (req, res) => {
 
 module.exports = {
   importLeads,
-  saveForm,
-  updateForm,
-  deleteForm,
-  getAllForms,
-  fetchLeads,
-  getLeadsByFormId,
-  getByProjectIdForms,
 // Google OAuth functions unexported
   createServiceList,
   getServicelist,

@@ -25,13 +25,7 @@ const ViewAllRemarkContent = () => {
 
   const fetchRemarks = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/remarks/${id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/remarks/${id}`;
 
       const { data } = await axios.get(apiUrl, {
         headers: {

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import EmployeeLeadsGraph from "./DashboardCompo/EmployeeLeadGraph";
 import EmployeeOverview from "./DashboardCompo/EmployeDashboardOverview";
-import EmployeeLeadsReport from "./DashboardCompo/EmployeeLeadsReport";
 import EmployeeCloseGraph from "./DashboardCompo/EmployeeCloseGraph";
 import EmployeeLeadsDash from "./DashboardCompo/EmployeeLeadsDash";
 

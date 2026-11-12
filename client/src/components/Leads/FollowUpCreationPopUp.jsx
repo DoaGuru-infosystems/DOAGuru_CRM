@@ -11,7 +11,6 @@ const FollowUpCreationPopUp = ({
   onClose,
   fetchFollowUp,
   fetchLeads,
-  fetchMetaLeads,
   leads,
 }) => {
   const superadminuser = useSelector((state) => state.auth.user);
@@ -20,9 +19,9 @@ const FollowUpCreationPopUp = ({
   const { type, id } = useParams();
   const [loading, setLoading] = useState(false);
   const [follow_up, setFollow_Up] = useState({
-    fu_project_id: leads?.[0]?.meta_project_id || null,
-    fu_lead_id: leads?.[0]?.lead_id || (leads?.[0]?.leadgen_id ? Number(leads?.[0]?.leadgen_id) : ""),
-    fu_employeeId: leads?.[0]?.assignedTo || leads?.[0]?.staff_id || leads?.[0]?.meta_assignedTo || superadminuser?.staff_id || "",
+    fu_project_id: null,
+    fu_lead_id: leads?.[0]?.lead_id || "",
+    fu_employeeId: leads?.[0]?.assignedTo || leads?.[0]?.staff_id || superadminuser?.staff_id || "",
     follow_up_type: "",
     follow_up_date: "",
     follow_up_report: "",
@@ -44,9 +43,9 @@ const FollowUpCreationPopUp = ({
     if (leads && leads.length > 0) {
       setFollow_Up((prev) => ({
         ...prev,
-        fu_project_id: leads[0]?.meta_project_id || null,
-        fu_lead_id: leads[0]?.lead_id || (leads[0]?.leadgen_id ? Number(leads[0]?.leadgen_id) : prev.fu_lead_id),
-        fu_employeeId: leads[0]?.assignedTo || leads[0]?.staff_id || leads[0]?.meta_assignedTo || superadminuser?.staff_id || prev.fu_employeeId,
+        fu_project_id: null,
+        fu_lead_id: leads[0]?.lead_id || prev.fu_lead_id,
+        fu_employeeId: leads[0]?.assignedTo || leads[0]?.staff_id || superadminuser?.staff_id || prev.fu_employeeId,
         leadType: type || prev.leadType || "general",
       }));
     }
@@ -84,7 +83,6 @@ const FollowUpCreationPopUp = ({
 
       fetchFollowUp();
       fetchLeads();
-      fetchMetaLeads();
       setLoading(false);
       onClose();
     } catch (error) {

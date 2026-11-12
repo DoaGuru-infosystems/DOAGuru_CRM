@@ -17,13 +17,11 @@ const {
   deleteFollow_Up,
   createFollow_Up,
   getEmployeeFollow_Up,
-  getEmployeeFollow_UpMeta,
   updateOnlyFollowUpStatus,
   createRemark,
   updateRemark,
   deleteRemark,
   getEmployeeRemark,
-  getEmployeeRemarkMeta,
   updateOnlyRemarkStatus,
   updateOnlyRemarkAnswer,
   updateOnlyRemarkAnswerStatus,
@@ -35,7 +33,6 @@ const {
   updateLead,
   deleteLead,
   getleadbyid,
-  socialmediaLead,
   addProject,
   getAllProjects,
   deleteProject,
@@ -47,13 +44,6 @@ const {
 
 const {
   importLeads,
-  saveForm,
-  getAllForms,
-  fetchLeads,
-  getLeadsByFormId,
-  updateForm,
-  deleteForm,
-  getByProjectIdForms,
 // Google OAuth removed
   createServiceList,
   getServicelist,
@@ -67,10 +57,6 @@ const {
   verifyOtp,
   resetPassword,
   //   verifyOtpSuperAdmin,
-  saveWebsiteAPI,
-  updateWebsiteAPI,
-  deleteWebsiteAPI,
-  getwebsite_api,
 } = require("../controllers/UserRegitrationlLogin");
 
 const {
@@ -106,12 +92,6 @@ const {
 } = require("../controllers/ControllerNine");
 
 const {
-  metaLeadFetchByPageId,
-  getMetaLeadsByOrgId,
-  updateAndAssignedMetaLeads,
-  getMetaLeadsByStaffId,
-  getMetaLeadsByLeadId,
-  updateOnlyMetaLeadStatusEmployeeEnd,
   bulkUploadLeads,
   updateLeadAssignment,
   bulkAssignLeads,
@@ -188,12 +168,6 @@ router.get(
   getEmployeeFollow_Up,
 );
 router.get("/remarks-admin/:id", authenticate, httpLogger, getEmployeeRemark);
-router.get(
-  "/getEmployeeRemarkMeta/:id",
-  authenticate,
-  httpLogger,
-  getEmployeeRemarkMeta,
-);
 router.get("/leads-super-admin/:userId", authenticate, httpLogger, getLeads);
 router.get(
   "/leads-super-admin-byid/:id",
@@ -254,12 +228,6 @@ router.get(
   getSuperAdminRevenueHistory,
 );
 
-//WebsiteController routes
-router.post("/website-api", httpLogger, saveWebsiteAPI);
-router.put("/update-website-api", httpLogger, updateWebsiteAPI);
-router.delete("/delete-website-api/:id", httpLogger, deleteWebsiteAPI);
-router.get("/get-website-api", httpLogger, getwebsite_api);
-
 //import lead router
 const leadStorage = multer.memoryStorage();
 const leadUpload = multer({ leadStorage });
@@ -270,26 +238,6 @@ router.post(
   leadUpload.single("file"),
   httpLogger,
   importLeads,
-);
-
-// Routes for form operations
-router.put("/updateform", authenticate, httpLogger, updateForm);
-router.delete("/deleteform/:id", authenticate, httpLogger, deleteForm);
-router.post("/forms", authenticate, httpLogger, saveForm);
-router.get("/forms", authenticate, httpLogger, getAllForms);
-router.get("/forms/:id", authenticate, httpLogger, getByProjectIdForms);
-router.post("/leads/fetch", authenticate, httpLogger, fetchLeads);
-router.get(
-  "/Leads-data-fetch-admin/:formId",
-  authenticate,
-  httpLogger,
-  getLeadsByFormId,
-);
-router.get(
-  "/Leads-data-fetch-super-admin/:formId",
-  httpLogger,
-  authenticate,
-  getLeadsByFormId,
 );
 
 //Orgsnization Routes
@@ -330,11 +278,6 @@ router.delete("/deleteAdmin/:admin_id", authenticate, deleteAdmin);
 router.get("/employeeProfile/:id", authenticate, employeeProfile);
 router.get("/employe-leads/:id", authenticate, httpLogger, getEmployeeLeads);
 router.get("/employe-follow-up/:id", authenticate, getEmployeeFollow_Up);
-router.get(
-  "/getEmployeeFollow_UpMeta/:id",
-  authenticate,
-  getEmployeeFollow_UpMeta,
-);
 router.put("/employe-follow-up/:fid", authenticate, updateFollow_Up);
 router.delete("/employe-follow-up/:id", authenticate, deleteFollow_Up);
 router.post("/employe-follow-up", authenticate, createFollow_Up);
@@ -386,24 +329,6 @@ router.get(
 );
 
 // ========Controller ten========
-router.post("/metaLeadFetchByPageId", authenticate, metaLeadFetchByPageId);
-router.get("/getMetaLeadsByOrgId/:orgId", authenticate, getMetaLeadsByOrgId);
-router.put(
-  "/updateAndAssignedMetaLeads/:mlid",
-  authenticate,
-  updateAndAssignedMetaLeads,
-);
-router.get(
-  "/getMetaLeadsByStaffId/:staffId",
-  authenticate,
-  getMetaLeadsByStaffId,
-);
-router.get("/getMetaLeadsByLeadId/:metaId", authenticate, getMetaLeadsByLeadId);
-router.put(
-  "/updateOnlyMetaLeadStatusEmployeeEnd/:id",
-  authenticate,
-  updateOnlyMetaLeadStatusEmployeeEnd,
-);
 const excelUpload = multer({ dest: "uploads/" });
 router.post(
   "/bulk-upload-leads",

@@ -3,12 +3,9 @@ import axios from "axios";
 import { GiFiles } from "react-icons/gi";
 import { useSelector } from "react-redux";
 import SuperLeadData from "./SuperDataExport/SuperLeadData";
-import SuperMetaLeadData from "./SuperDataExport/SuperMetaLeadData";
-import { FaMeta } from "react-icons/fa6";
 
 const SuperDataExportContent = () => {
   const [leads, setLeads] = useState([]);
-  const [metaLeads, setMetaLeads] = useState([]);
   const [employee, setEmployee] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState("LeadData");
   const superadminuser = useSelector((state) => state.auth.user);
@@ -17,7 +14,6 @@ const SuperDataExportContent = () => {
 
   useEffect(() => {
     fetchLeads();
-    fetchMetaLeads();
     fetchEmployee();
   }, []);
 
@@ -33,23 +29,6 @@ const SuperDataExportContent = () => {
         }
       );
       setLeads(data);
-    } catch (error) {
-      console.error("Error fetching leads:", error);
-    }
-  };
-
-  const fetchMetaLeads = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getMetaLeadsByOrgId/${superadminuser?.staff_org_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setMetaLeads(data);
     } catch (error) {
       console.error("Error fetching leads:", error);
     }
@@ -127,52 +106,11 @@ const SuperDataExportContent = () => {
                 </div>
               </div>
 
-              {/* Meta Leads Data */}
-              <div className="w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/5 my-2 px-2">
-                <div
-                  className={`shadow-lg rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${selectedComponent === "metaLeadData"
-                    ? "bg-cyan-600 text-white"
-                    : "bg-white"
-                    }`}
-                  onClick={() => setSelectedComponent("metaLeadData")}
-                >
-                  <div className="p-4 flex flex-col items-center text-center">
-                    <div
-                      className={`text-3xl ${selectedComponent === "metaLeadData"
-                        ? "text-white"
-                        : "text-gray-700"
-                        }`}
-                    >
-                      <FaMeta />
-                    </div>
-                    <div className="mt-2">
-                      <h5
-                        className={`text-base sm:text-lg font-semibold ${selectedComponent === "metaLeadData"
-                          ? "text-white"
-                          : "text-gray-800"
-                          }`}
-                      >
-                        Meta Leads Data
-                      </h5>
-                      <p
-                        className={`${selectedComponent === "metaLeadData"
-                          ? "text-white"
-                          : "text-gray-600"
-                          }`}
-                      >
-                        {metaLeads?.length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
 
             {/* Conditionally render the selected component */}
             <div className="">
               {selectedComponent === "LeadData" && <SuperLeadData />}
-              {selectedComponent === "metaLeadData" && <SuperMetaLeadData />}
             </div>
           </div>
         </div>

@@ -156,11 +156,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
   useEffect(() => {
     fetchFollowUp();
     fetchRemark();
-    if (type === "meta") {
-      fetchMetaLeads();
-    } else {
-      fetchLeads();
-    }
+    fetchLeads();
   }, [type, id]);
 
   const fetchLeads = async () => {
@@ -178,24 +174,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
       setLeads(response.data);
     } catch (error) {
       console.error("Error fetching leads:", error);
-    }
-  };
-
-  const fetchMetaLeads = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getMetaLeadsByLeadId/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setLeads(data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
     }
   };
 
@@ -271,7 +249,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
 
     setLoading(true);
     try {
-      const targetId = type === "meta" ? editedLead?.leadgen_id : editedLead?.lead_id;
+      const targetId = editedLead?.lead_id;
       await axios.put(
         `http://localhost:9000/api/leads/${targetId}`,
         leadData,
@@ -283,11 +261,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
         }
       );
       toast.success("Lead details updated successfully!");
-      if (type === "meta") {
-        fetchMetaLeads();
-      } else {
-        fetchLeads();
-      }
+      fetchLeads();
       setIsEditingProfile(false);
     } catch (error) {
       console.error("Error saving lead details:", error);
@@ -299,13 +273,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
 
   const fetchFollowUp = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/employe-follow-up/${id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/employe-follow-up/${id}`;
 
       const { data } = await axios.get(apiUrl, {
         headers: {
@@ -322,13 +290,7 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
 
   const fetchRemark = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/remarks/${id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/remarks/${id}`;
 
       const response = await axios.get(apiUrl, {
         headers: {
@@ -1188,7 +1150,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
         leads={leads}
         visitLead={visitLead}
         fetchLeads={fetchLeads}
-        fetchMetaLeads={fetchMetaLeads}
         fetchFollowUp={fetchFollowUp}
       />
       <RemarkCreationPopup
@@ -1197,7 +1158,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
         leads={leads}
         visitLead={visitLead}
         fetchLeads={fetchLeads}
-        fetchMetaLeads={fetchMetaLeads}
         fetchRemark={fetchRemark}
       />
       <UpdateLeadStatusPopup
@@ -1205,7 +1165,6 @@ function EmployeeSingleLeadProfileContent({ isSidebarOpen }) {
         onClose={() => setShowPopup(false)}
         leads={leads}
         fetchLeads={fetchLeads}
-        fetchMetaLeads={fetchMetaLeads}
       />
     </>
   );

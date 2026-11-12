@@ -43,33 +43,9 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
     }
   };
 
-  const fetchMetaLeads = async () => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:9000/api/getMetaLeadsByLeadId/${selectedLeadId?.leadgen_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(data);
-      setLeads(data);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-    }
-  };
-
   const fetchFollowUp = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeFollow_UpMeta/${selectedLeadId?.leadgen_id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/employe-follow-up/${selectedLeadId?.lead_id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/employe-follow-up/${selectedLeadId?.lead_id}`;
 
       const response = await axios.get(apiUrl, {
         headers: {
@@ -85,13 +61,7 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
   };
   const fetchRemark = async () => {
     try {
-      let apiUrl = "";
-
-      if (type === "meta") {
-        apiUrl = `http://localhost:9000/api/getEmployeeRemarkMeta/${selectedLeadId?.leadgen_id}`;
-      } else {
-        apiUrl = `http://localhost:9000/api/remarks/${selectedLeadId?.lead_id}`;
-      }
+      const apiUrl = `http://localhost:9000/api/remarks/${selectedLeadId?.lead_id}`;
 
       const response = await axios.get(apiUrl, {
         headers: {
@@ -126,11 +96,7 @@ function Super_Single_Lead_Profile({ selectedLeadId, closeModalLead, type }) {
   };
 
   useEffect(() => {
-    if (type === "meta") {
-      fetchMetaLeads();
-    } else {
-      fetchLeads();
-    }
+    fetchLeads();
     fetchFollowUp();
     fetchRemark();
   }, [id]);

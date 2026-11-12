@@ -10,7 +10,6 @@ const UpdateLeadStatusPopup = ({
   onClose,
   fetchLeads,
   leads,
-  fetchMetaLeads,
 }) => {
   const superadminuser = useSelector((state) => state.auth.user);
   const token = superadminuser.token;
@@ -46,33 +45,6 @@ const UpdateLeadStatusPopup = ({
       toast.success("Lead status updated successfully");
       setRender(!render);
       fetchLeads();
-      setLoading(false);
-      onClose();
-    } catch (error) {
-      setLoading(false);
-      toast.error("Failed to update the lead status.");
-    }
-  };
-
-  const saveMetaChanges = async (e) => {
-    e.preventDefault();
-
-    try {
-      setLoading(true);
-      const response = await axios.put(
-        `http://localhost:9000/api/updateOnlyMetaLeadStatusEmployeeEnd/${leads[0]?.meta_id}`,
-        currentLead,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      toast.success("Lead status updated successfully");
-      setRender(!render);
-      fetchMetaLeads();
       setLoading(false);
       onClose();
     } catch (error) {
@@ -122,7 +94,7 @@ const UpdateLeadStatusPopup = ({
             </h2>
 
             <form
-              onSubmit={type === "meta" ? saveMetaChanges : saveChanges}
+              onSubmit={saveChanges}
               className="space-y-4"
             >
               <div>

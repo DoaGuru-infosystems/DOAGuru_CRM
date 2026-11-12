@@ -26,27 +26,17 @@ const SuperLeadGraph = () => {
     const fetchAllData = async () => {
       try {
         setLoading(true);
-        const [leadsRes, metaLeadsRes] = await Promise.all([
-          axios.get(
-            `http://localhost:9000/api/getLeadsByOrg/${orgId}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          ),
-          axios.get(
-            `http://localhost:9000/api/getMetaLeadsByOrgId/${orgId}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-        ]);
+        const leadsRes = await axios.get(
+          `http://localhost:9000/api/getLeadsByOrg/${orgId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const allLeads = leadsRes.data || [];
-        const allMetaLeads = metaLeadsRes.data || [];
-        console.log(allMetaLeads);
 
         const today = moment();
         const startDate = moment().subtract(28, "days");
@@ -72,7 +62,6 @@ const SuperLeadGraph = () => {
           }, {});
 
         const leadsGrouped = groupByDate(allLeads, "createdTime");
-        const metaLeadsGrouped = groupByDate(allMetaLeads, "generated_time");
 
         const finalData = [];
         for (let i = 0; i <= 27; i++) {
@@ -81,7 +70,6 @@ const SuperLeadGraph = () => {
           finalData.push({
             createdDate: formattedDate,
             Leads: leadsGrouped[formattedDate] || 0,
-            MetaLeads: metaLeadsGrouped[formattedDate] || 0,
           });
         }
 
@@ -126,13 +114,6 @@ const SuperLeadGraph = () => {
                   dataKey="Leads"
                   name="Leads"
                   fill="#0891b2"
-                  radius={[10, 10, 0, 0]}
-                  barSize={14}
-                />
-                <Bar
-                  dataKey="MetaLeads"
-                  name="Meta Leads"
-                  fill="#f59e0b"
                   radius={[10, 10, 0, 0]}
                   barSize={14}
                 />

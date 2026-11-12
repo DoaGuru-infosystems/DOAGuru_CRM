@@ -10,7 +10,6 @@ const RemarkCreationPopup = ({
   onClose,
   fetchRemark,
   fetchLeads,
-  fetchMetaLeads,
   leads,
 }) => {
   const superadminuser = useSelector((state) => state.auth.user);
@@ -19,9 +18,9 @@ const RemarkCreationPopup = ({
   const { type, id } = useParams();
   const [loading, setLoading] = useState(false);
   const [remark, setRemark] = useState({
-    remark_lead_id: leads[0]?.lead_id || leads[0]?.leadgen_id,
-    remark_project_id: leads[0]?.project_id || leads[0]?.meta_project_id,
-    remark_employeeId: leads[0]?.staff_id || leads[0]?.meta_assignedTo,
+    remark_lead_id: leads[0]?.lead_id,
+    remark_project_id: leads[0]?.project_id,
+    remark_employeeId: leads[0]?.staff_id,
     remark_status: "",
     answer_remark: "",
     remark_date: "",
@@ -32,9 +31,9 @@ const RemarkCreationPopup = ({
   useEffect(() => {
     setRemark({
       ...remark,
-      remark_lead_id: leads[0]?.lead_id || leads[0]?.leadgen_id,
-      remark_project_id: leads[0]?.project_id || leads[0]?.meta_project_id,
-      remark_employeeId: leads[0]?.staff_id || leads[0]?.meta_assignedTo,
+      remark_lead_id: leads[0]?.lead_id,
+      remark_project_id: leads[0]?.project_id,
+      remark_employeeId: leads[0]?.staff_id,
     });
   }, [leads]);
 
@@ -73,7 +72,6 @@ const RemarkCreationPopup = ({
 
       fetchRemark();
       fetchLeads();
-      fetchMetaLeads();
       setLoading(false);
       onClose();
     } catch (error) {
